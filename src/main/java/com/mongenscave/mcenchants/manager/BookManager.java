@@ -2,6 +2,7 @@ package com.mongenscave.mcenchants.manager;
 
 import com.mongenscave.mcenchants.McEnchants;
 import com.mongenscave.mcenchants.config.Config;
+import com.mongenscave.mcenchants.item.ItemFactory;
 import com.mongenscave.mcenchants.model.Category;
 import com.mongenscave.mcenchants.model.Enchant;
 import com.mongenscave.mcenchants.model.EnchantedBook;
@@ -40,31 +41,30 @@ public class BookManager {
         Config config = McEnchants.getInstance().getConfiguration();
 
         String material = config.getString("mysterious-book-item.material", "BOOK");
-        ItemStack book = new ItemStack(Material.valueOf(material.toUpperCase()));
-
-        ItemMeta meta = book.getItemMeta();
-        if (meta == null) return book;
+        int amount = config.getInt("mysterious-book-item.amount", 1);
 
         String name = config.getString("mysterious-book-item.name", "{categoryColor}{categoryName} &fKönyv")
                 .replace("{categoryColor}", category.getColor())
                 .replace("{categoryName}", category.getName());
 
-        meta.setDisplayName(MessageProcessor.process(name));
+        List<String> lore = config.getStringList("mysterious-book-item.lore");
 
-        List<String> lore = config.getStringList("mysterious-book-item.lore").stream()
-                .map(MessageProcessor::process)
-                .collect(Collectors.toList());
-
-        meta.setLore(lore);
+        ItemStack book = ItemFactory.create(Material.valueOf(material.toUpperCase()), amount)
+                .setName(name)
+                .addLore(lore.toArray(new String[0]))
+                .finish();
 
         int modelData = config.getInt("mysterious-book-item.modeldata", 0);
-        if (modelData > 0) meta.setCustomModelData(modelData);
+        if (modelData > 0) {
+            book.editMeta(meta -> meta.setCustomModelData(modelData));
+        }
 
-        PersistentDataContainer pdc = meta.getPersistentDataContainer();
-        pdc.set(new NamespacedKey(McEnchants.getInstance(), "mysterious_category"),
-                PersistentDataType.STRING, categoryId);
+        book.editMeta(meta -> {
+            PersistentDataContainer pdc = meta.getPersistentDataContainer();
+            pdc.set(new NamespacedKey(McEnchants.getInstance(), "mysterious_category"),
+                    PersistentDataType.STRING, categoryId);
+        });
 
-        book.setItemMeta(meta);
         return book;
     }
 
@@ -99,10 +99,7 @@ public class BookManager {
         Config applyConfig = McEnchants.getInstance().getApply();
 
         String material = config.getString("revealed-book-item.material", "PAPER");
-        ItemStack book = new ItemStack(Material.valueOf(material.toUpperCase()));
-
-        ItemMeta meta = book.getItemMeta();
-        if (meta == null) return book;
+        int amount = config.getInt("revealed-book-item.amount", 1);
 
         String romanLevel = getRomanNumeral(level);
 
@@ -113,8 +110,6 @@ public class BookManager {
                 .replace("{categoryColor}", enchant.getCategory().getColor())
                 .replace("{name}", processedEnchantName)
                 .replace("{level}", romanLevel);
-
-        meta.setDisplayName(MessageProcessor.process(name));
 
         String appliesDisplay = enchant.getAppliesTo().stream()
                 .map(type -> {
@@ -134,22 +129,27 @@ public class BookManager {
                         .replace("{success}", String.valueOf(successRate))
                         .replace("{destroy}", String.valueOf(destroyRate))
                         .replace("{applies}", appliesDisplay))
-                .map(MessageProcessor::process)
-                .collect(Collectors.toList());
+                .toList();
 
-        meta.setLore(lore);
+        ItemStack book = ItemFactory.create(Material.valueOf(material.toUpperCase()), amount)
+                .setName(name)
+                .addLore(lore.toArray(new String[0]))
+                .finish();
 
         int modelData = config.getInt("revealed-book-item.modeldata", 0);
-        if (modelData > 0) meta.setCustomModelData(modelData);
+        if (modelData > 0) {
+            book.editMeta(meta -> meta.setCustomModelData(modelData));
+        }
 
-        PersistentDataContainer pdc = meta.getPersistentDataContainer();
-        pdc.set(ENCHANT_KEY, PersistentDataType.STRING, enchantId);
-        pdc.set(LEVEL_KEY, PersistentDataType.INTEGER, level);
-        pdc.set(SUCCESS_KEY, PersistentDataType.INTEGER, successRate);
-        pdc.set(DESTROY_KEY, PersistentDataType.INTEGER, destroyRate);
-        pdc.set(REVEALED_KEY, PersistentDataType.BYTE, (byte) 1);
+        book.editMeta(meta -> {
+            PersistentDataContainer pdc = meta.getPersistentDataContainer();
+            pdc.set(ENCHANT_KEY, PersistentDataType.STRING, enchantId);
+            pdc.set(LEVEL_KEY, PersistentDataType.INTEGER, level);
+            pdc.set(SUCCESS_KEY, PersistentDataType.INTEGER, successRate);
+            pdc.set(DESTROY_KEY, PersistentDataType.INTEGER, destroyRate);
+            pdc.set(REVEALED_KEY, PersistentDataType.BYTE, (byte) 1);
+        });
 
-        book.setItemMeta(meta);
         return book;
     }
 
@@ -159,10 +159,7 @@ public class BookManager {
         Config config = McEnchants.getInstance().getConfiguration();
 
         String material = config.getString("dust-item.material", "SUGAR");
-        ItemStack dust = new ItemStack(Material.valueOf(material.toUpperCase()));
-
-        ItemMeta meta = dust.getItemMeta();
-        if (meta == null) return dust;
+        int amount = config.getInt("dust-item.amount", 1);
 
         int repairAmount = category.getRandomDustSuccess();
 
@@ -170,22 +167,23 @@ public class BookManager {
                 .replace("{categoryColor}", category.getColor())
                 .replace("{categoryName}", category.getName());
 
-        meta.setDisplayName(MessageProcessor.process(name));
-
         List<String> lore = config.getStringList("dust-item.lore").stream()
                 .map(line -> line.replace("{repair}", String.valueOf(repairAmount)))
-                .map(MessageProcessor::process)
-                .collect(Collectors.toList());
+                .toList();
 
-        meta.setLore(lore);
+        ItemStack dust = ItemFactory.create(Material.valueOf(material.toUpperCase()), amount)
+                .setName(name)
+                .addLore(lore.toArray(new String[0]))
+                .finish();
 
-        PersistentDataContainer pdc = meta.getPersistentDataContainer();
-        pdc.set(new NamespacedKey(McEnchants.getInstance(), "dust_category"),
-                PersistentDataType.STRING, categoryId);
-        pdc.set(new NamespacedKey(McEnchants.getInstance(), "dust_repair"),
-                PersistentDataType.INTEGER, repairAmount);
+        dust.editMeta(meta -> {
+            PersistentDataContainer pdc = meta.getPersistentDataContainer();
+            pdc.set(new NamespacedKey(McEnchants.getInstance(), "dust_category"),
+                    PersistentDataType.STRING, categoryId);
+            pdc.set(new NamespacedKey(McEnchants.getInstance(), "dust_repair"),
+                    PersistentDataType.INTEGER, repairAmount);
+        });
 
-        dust.setItemMeta(meta);
         return dust;
     }
 
