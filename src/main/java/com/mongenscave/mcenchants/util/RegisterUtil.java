@@ -1,13 +1,19 @@
 package com.mongenscave.mcenchants.util;
 
 import com.mongenscave.mcenchants.McEnchants;
+import com.mongenscave.mcenchants.annotation.Category;
 import com.mongenscave.mcenchants.annotation.Enchant;
 import com.mongenscave.mcenchants.command.CommandEnchant;
 import com.mongenscave.mcenchants.handler.CommandExceptionHandler;
 import com.mongenscave.mcenchants.identifier.key.ConfigKey;
+import com.mongenscave.mcenchants.listener.BookRevealListener;
+import com.mongenscave.mcenchants.listener.EnchantApplyListener;
+import com.mongenscave.mcenchants.listener.EnchantTriggerListener;
 import com.mongenscave.mcenchants.listener.MenuListener;
+import com.mongenscave.mcenchants.suggestion.CategorySuggestionProvider;
 import com.mongenscave.mcenchants.suggestion.EnchantSuggestionProvider;
 import lombok.experimental.UtilityClass;
+import org.bukkit.plugin.PluginManager;
 import revxrsal.commands.bukkit.BukkitLamp;
 import revxrsal.commands.orphan.Orphans;
 
@@ -23,13 +29,23 @@ public class RegisterUtil {
                             Enchant.class,
                             annotation -> new EnchantSuggestionProvider<>()
                     );
+                    registry.addProviderForAnnotation(
+                            Category.class,
+                            annotation -> new CategorySuggestionProvider<>()
+                    );
                 })
                 .build();
 
-        lamp.register(Orphans.path(ConfigKey.ALIASES.getList().toArray(String[]::new)).handler(new CommandEnchant()));
+        lamp.register(Orphans.path(ConfigKey.ALIASES.getList().toArray(String[]::new))
+                .handler(new CommandEnchant()));
     }
 
     public void registerListeners() {
-        plugin.getServer().getPluginManager().registerEvents(new MenuListener(), plugin);
+        PluginManager pm = plugin.getServer().getPluginManager();
+
+        pm.registerEvents(new MenuListener(), plugin);
+        pm.registerEvents(new EnchantApplyListener(), plugin);
+        pm.registerEvents(new BookRevealListener(), plugin);
+        pm.registerEvents(new EnchantTriggerListener(), plugin);
     }
 }

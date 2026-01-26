@@ -16,11 +16,10 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
-import java.util.Random;
+import java.util.concurrent.ThreadLocalRandom;
 import java.util.stream.Collectors;
 
 public class BookManager {
-    private static final Random RANDOM = new Random();
     private static final NamespacedKey ENCHANT_KEY = new NamespacedKey(McEnchants.getInstance(), "enchant_id");
     private static final NamespacedKey LEVEL_KEY = new NamespacedKey(McEnchants.getInstance(), "enchant_level");
     private static final NamespacedKey SUCCESS_KEY = new NamespacedKey(McEnchants.getInstance(), "success_rate");
@@ -83,8 +82,9 @@ public class BookManager {
         Enchant randomEnchant = enchantManager.getRandomEnchantFromCategory(categoryId);
         if (randomEnchant == null) return mysteriousBook;
 
-        int level = RANDOM.nextInt(randomEnchant.getMaxLevel()) + 1;
-        int successRate = 50 + RANDOM.nextInt(30);
+        ThreadLocalRandom random = ThreadLocalRandom.current();
+        int level = random.nextInt(1, randomEnchant.getMaxLevel() + 1);
+        int successRate = random.nextInt(50, 81);
         int destroyRate = 100 - successRate;
 
         return createRevealedBook(randomEnchant.getId(), level, successRate, destroyRate);
@@ -118,7 +118,7 @@ public class BookManager {
                 })
                 .collect(Collectors.joining(applyConfig.getString("applies-to-rules.separator", ", ")));
 
-        String description = enchant.getBookLoreEnabled()
+        String description = enchant.isBookLoreEnabled()
                 ? String.join(" ", enchant.getBookLoreLines())
                 : "";
 

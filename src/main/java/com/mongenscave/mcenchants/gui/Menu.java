@@ -1,7 +1,10 @@
 package com.mongenscave.mcenchants.gui;
 
+import com.mongenscave.mcenchants.McEnchants;
 import com.mongenscave.mcenchants.data.ItemData;
 import com.mongenscave.mcenchants.data.MenuController;
+import com.mongenscave.mcenchants.data.SoundData;
+import com.mongenscave.mcenchants.processor.MenuProcessor;
 import com.mongenscave.mcenchants.processor.MessageProcessor;
 import org.bukkit.Bukkit;
 import org.bukkit.NamespacedKey;
@@ -87,7 +90,7 @@ public abstract class Menu implements InventoryHolder {
         if (item.getItemMeta() == null) return;
 
         PersistentDataContainer pdc = item.getItemMeta().getPersistentDataContainer();
-        NamespacedKey key = new NamespacedKey(McProfile.getInstance(), "mcProfile");
+        NamespacedKey key = new NamespacedKey(McEnchants.getInstance(), "mcEnchants");
 
         if (!pdc.has(key, PersistentDataType.STRING)) return;
 

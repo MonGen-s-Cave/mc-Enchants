@@ -14,6 +14,7 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ThreadLocalRandom;
 import java.util.stream.Collectors;
 
 @Getter
@@ -33,7 +34,7 @@ public class EnchantManager {
         Section enchantsSection = config.getSection("enchants");
 
         if (enchantsSection == null) {
-            LoggerUtil.warn("No enchants section found in enchants.yml");
+            LoggerUtil.warn("0 enchants!");
             return;
         }
 
@@ -44,7 +45,6 @@ public class EnchantManager {
             try {
                 Enchant enchant = loadEnchant(enchantId, enchantSection);
                 enchants.put(enchantId, enchant);
-                LoggerUtil.info("Loaded enchant: " + enchantId);
             } catch (Exception exception) {
                 LoggerUtil.error(exception.getMessage());
             }
@@ -137,7 +137,7 @@ public class EnchantManager {
 
         if (categoryEnchants.isEmpty()) return null;
 
-        return categoryEnchants.get(new Random().nextInt(categoryEnchants.size()));
+        return categoryEnchants.get(ThreadLocalRandom.current().nextInt(categoryEnchants.size()));
     }
 
     public void reload() {

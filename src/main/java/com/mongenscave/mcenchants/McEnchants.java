@@ -3,6 +3,7 @@ package com.mongenscave.mcenchants;
 import com.github.Anon8281.universalScheduler.UniversalScheduler;
 import com.github.Anon8281.universalScheduler.scheduling.schedulers.TaskScheduler;
 import com.mongenscave.mcenchants.config.Config;
+import com.mongenscave.mcenchants.manager.ManagerRegistry;
 import com.mongenscave.mcenchants.util.RegisterUtil;
 import dev.dejvokep.boostedyaml.dvs.versioning.BasicVersioning;
 import dev.dejvokep.boostedyaml.settings.dumper.DumperSettings;
@@ -19,6 +20,7 @@ import java.io.File;
 public final class McEnchants extends ZapperJavaPlugin {
     @Getter private static McEnchants instance;
     @Getter private TaskScheduler scheduler;
+    @Getter private ManagerRegistry managerRegistry;
     @Getter private Config language;
     @Getter private Config apply;
     @Getter private Config enchants;
@@ -37,6 +39,8 @@ public final class McEnchants extends ZapperJavaPlugin {
     public void onEnable() {
         saveDefaultConfig();
         initializeComponents();
+
+        managerRegistry = new ManagerRegistry();
 
         RegisterUtil.registerListeners();
         RegisterUtil.registerCommands();

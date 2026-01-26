@@ -1,6 +1,8 @@
 package com.mongenscave.mcenchants.command;
 
 import com.mongenscave.mcenchants.McEnchants;
+import com.mongenscave.mcenchants.data.MenuController;
+import com.mongenscave.mcenchants.gui.impl.MainMenu;
 import com.mongenscave.mcenchants.identifier.key.MessageKey;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
@@ -15,11 +17,12 @@ public class CommandEnchant implements OrphanCommand {
 
     @CommandPlaceholder
     public void openMainMenu(@NotNull Player player) {
-        // menu
+        MenuController controller = MenuController.getMenuUtils(player);
+        new MainMenu(controller).open();
     }
 
     @Subcommand("reload")
-    @CommandPermission("mcprofile.reload")
+    @CommandPermission("mcenchants.reload")
     public void reload(@NotNull CommandSender sender) {
         plugin.getConfiguration().reload();
         plugin.getLanguage().reload();
@@ -28,6 +31,8 @@ public class CommandEnchant implements OrphanCommand {
         plugin.getCategory().reload();
         plugin.getApply().reload();
         plugin.getLevels().reload();
+
+        plugin.getManagerRegistry().reload();
 
         sender.sendMessage(MessageKey.RELOAD.getMessage());
     }
