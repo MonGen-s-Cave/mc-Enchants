@@ -44,11 +44,7 @@ public final class EnchanterMenu extends Menu {
 
         Player player = (Player) event.getWhoClicked();
 
-        // TODO: Implement economy check here
-        // if (!hasEnoughMoney(player, category.getPrice())) {
-        //     player.sendMessage("Nincs elég pénzed!");
-        //     return;
-        // }
+        // TODO XP check
 
         ItemStack mysteriousBook = bookManager.createMysteriousBook(categoryId);
         player.getInventory().addItem(mysteriousBook);

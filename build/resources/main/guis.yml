@@ -1,0 +1,127 @@
+main-menu:
+  title: "&aNavigáció"
+  size: 54
+  items:
+    enchanter:
+      material: "BOOK"
+      name: "&7Enchantok vásárlása"
+      lore:
+        - "&7Katt hogy enchantokat vásárolj!"
+      slot: 0
+    repairer:
+      material: "SUGAR"
+      name: "&7Javító"
+      lore:
+        - "&7Katt hogy feljavítsd könyveidet!"
+      slot: 1
+    resolver:
+      material: "STICK"
+      name: "&7Felbontó"
+      lore:
+        - "&7Katt, hogy felbontsd a rossz könyveidet!"
+      slot: 2
+
+repairer-menu:
+  title: "&aJavító"
+  size: 9
+  book-input-slot: 0
+  dust-input-slot: 1
+  output-slot: 9
+  items: []
+
+resolver-menu:
+  title: "&aFelbontó"
+  size: 36
+  placeable-slots: "0,1,2,3,4,5,6,7,8,9,10"
+  items:
+    accept:
+      material: "LIME_WOOL"
+      name: "&aElfogadás"
+      slot: 20
+      lore:
+        - "&7Katt hogy elfogadd az ajánlatot!"
+    deny:
+      material: "RED_WOOL"
+      name: "&cElutasítás"
+      slot: 21
+      lore:
+        - "&7Katt, hogy elutasítsd az ajánlatot!"
+
+
+enchanter-menu:
+  title: "&aEnchantok vásárlása"
+  size: 9
+
+  items:
+    common:
+      material: "PAPER"
+      modeldata: 99
+      category: "common"
+      name: "&#a9a9a9Common &fKönyv vásárlás"
+      slot: 0
+      lore:
+        - ""
+        - "&7Katt hogy vásárolj könyvet!"
+        - ""
+      sound:
+        name: "minecraft:ui.button.click"
+        volume: 1.0
+        pitch: 0.8
+    rare:
+      material: "PAPER"
+      modeldata: 100
+      category: "rare"
+      name: "&#7d7cf9Rare &fKönyv vásárlás"
+      slot: 1
+      lore:
+        - ""
+        - "&7Katt hogy vásárolj könyvet!"
+        - ""
+      sound:
+        name: "minecraft:ui.button.click"
+        volume: 1.0
+        pitch: 0.8
+    epic:
+      material: "PAPER"
+      modeldata: 101
+      category: "epic"
+      name: "&#b785fcEpic &fKönyv vásárlás"
+      slot: 2
+      lore:
+        - ""
+        - "&7Katt hogy vásárolj könyvet!"
+        - ""
+      sound:
+        name: "minecraft:ui.button.click"
+        volume: 1.0
+        pitch: 0.8
+    legendary:
+      material: "PAPER"
+      modeldata: 102
+      category: "legendary"
+      name: "&#fca86fLegendary &fKönyv vásárlás"
+      slot: 3
+      lore:
+        - ""
+        - "&7Katt hogy vásárolj könyvet!"
+        - ""
+      sound:
+        name: "minecraft:ui.button.click"
+        volume: 1.0
+        pitch: 0.8
+    mythic:
+      material: "PAPER"
+      modeldata: 103
+      category: "mythic"
+      name: "&#fc7f7fMythic &fKönyv vásárlás"
+      slot: 4
+      lore:
+        - ""
+        - "&7Katt hogy vásárolj könyvet!"
+        - ""
+      sound:
+        name: "minecraft:ui.button.click"
+        volume: 1.0
+        pitch: 0.8
+
+version: '1'

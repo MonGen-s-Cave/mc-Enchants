@@ -1,0 +1,33 @@
+categories:
+  common:
+    color: "&#a9a9a9"
+    name: "Common"
+    dust-success: "1-30"
+    price: 500
+  rare:
+    color: "&#7d7cf9"
+    name: "Rare"
+    dust-success: "1-25"
+    price: 1000
+  epic:
+    color: "&#b785fc"
+    name: "Epic"
+    dust-success: "1-20"
+    price: 1500
+  ultimate:
+    color: "&#fccb62"
+    name: "Ultimate"
+    dust-success: "0"
+    price: 2000
+  legendary:
+    color: "&#fca86f"
+    name: "Legendary"
+    dust-success: "1-15"
+    price: 3000
+  mythic:
+    color: "&#fc7f7f"
+    name: "Mythic"
+    dust-success: "1-10"
+    price: 4000
+
+version: '1'

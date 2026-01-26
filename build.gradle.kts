@@ -21,7 +21,6 @@ dependencies {
     compileOnly("io.papermc.paper:paper-api:1.21.8-R0.1-SNAPSHOT")
     compileOnly("org.projectlombok:lombok:1.18.36")
     compileOnly("com.nexomc:nexo:1.15.0")
-    compileOnly("me.clip:placeholderapi:2.11.6")
 
     implementation("dev.dejvokep:boosted-yaml:1.3.6")
     implementation("io.github.revxrsal:lamp.bukkit:4.0.0-rc.12") {

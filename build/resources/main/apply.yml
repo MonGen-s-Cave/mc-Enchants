@@ -1,0 +1,33 @@
+applies-to-rules:
+  separator: ","
+  displays:
+    hoe:
+      display: "Kapa"
+    sword:
+      display: "Kard"
+    pickaxe:
+      display: "Csákány"
+    axe:
+      display: "Balta"
+    spade:
+      display: "Lándzsa"
+    shovel:
+      display: "Ásó"
+    bow:
+      display: "Íj"
+    crossbow:
+      display: "Szerszámíj"
+    trident:
+      display: "Trident"
+    boots:
+      display: "Csizma"
+    leggings:
+      display: "Lábszárvédő"
+    chestplate:
+      display: "Mellvért"
+    helmet:
+      display: "Sisak"
+    armor:
+      display: "Páncél"
+
+version: '1'

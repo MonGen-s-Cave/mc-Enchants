@@ -1,6 +1,7 @@
 package com.mongenscave.mcenchants.listener;
 
 import com.mongenscave.mcenchants.McEnchants;
+import com.mongenscave.mcenchants.executor.EnchantActionExecutor;
 import com.mongenscave.mcenchants.identifier.EnchantType;
 import com.mongenscave.mcenchants.manager.EnchantManager;
 import com.mongenscave.mcenchants.model.Enchant;
@@ -28,10 +29,12 @@ import java.util.concurrent.ConcurrentHashMap;
 
 public final class EnchantTriggerListener implements Listener {
     private final EnchantManager enchantManager;
+    private final EnchantActionExecutor actionExecutor;
     private final Map<String, Long> cooldowns = new ConcurrentHashMap<>();
 
     public EnchantTriggerListener() {
         this.enchantManager = McEnchants.getInstance().getManagerRegistry().getEnchantManager();
+        this.actionExecutor = new EnchantActionExecutor();
     }
 
     @EventHandler
@@ -180,9 +183,7 @@ public final class EnchantTriggerListener implements Listener {
     }
 
     private void executeActions(@NotNull Player player, @NotNull EnchantLevel level, @NotNull Map<String, Object> context) {
-        level.getActions().forEach(action -> {
-            // TODO: Implement action execution
-        });
+        level.getActions().forEach(action -> actionExecutor.executeAction(player, action, context));
     }
 
     @NotNull
