@@ -26,7 +26,7 @@ repairer-menu:
   size: 9
   book-input-slot: 0
   dust-input-slot: 1
-  output-slot: 9
+  output-slot: 8
   items: []
 
 resolver-menu:

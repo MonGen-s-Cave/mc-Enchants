@@ -105,9 +105,13 @@ public class BookManager {
         if (meta == null) return book;
 
         String romanLevel = getRomanNumeral(level);
+
+        String processedEnchantName = enchant.getName()
+                .replace("{categoryColor}", enchant.getCategory().getColor());
+
         String name = config.getString("revealed-book-item.name", "{name} &8[&#94A3B8{level}&8]")
                 .replace("{categoryColor}", enchant.getCategory().getColor())
-                .replace("{name}", enchant.getName())
+                .replace("{name}", processedEnchantName)
                 .replace("{level}", romanLevel);
 
         meta.setDisplayName(MessageProcessor.process(name));

@@ -50,16 +50,20 @@ public final class EnchanterMenu extends Menu {
         Player player = (Player) event.getWhoClicked();
         Category category = categoryManager.getCategory(categoryId);
 
-        int requiredLevels = category.getPrice();
-        int playerLevels = player.getLevel();
+        int requiredXP = category.getPrice();
+        int playerXP = getTotalExperience(player);
 
-        if (playerLevels < requiredLevels) {
-            player.sendMessage(MessageProcessor.process("&cNincs elég XP szinted! Szükséges: &e" + requiredLevels + "&c, van: &e" + playerLevels));
+        if (playerXP < requiredXP) {
+            player.sendMessage(MessageProcessor.process("&cNincs elég XP pontod! Szükséges: &e" + requiredXP + "&c, van: &e" + playerXP));
             player.playSound(player.getLocation(), Sound.ENTITY_VILLAGER_NO, 1.0f, 1.0f);
             return;
         }
 
-        player.setLevel(playerLevels - requiredLevels);
+        int newTotalXP = playerXP - requiredXP;
+        player.setExp(0);
+        player.setLevel(0);
+        player.setTotalExperience(0);
+        player.giveExp(newTotalXP);
 
         ItemStack mysteriousBook = bookManager.createMysteriousBook(categoryId);
         player.getInventory().addItem(mysteriousBook);
@@ -67,6 +71,27 @@ public final class EnchanterMenu extends Menu {
         player.sendMessage(MessageProcessor.process("&aSikeresen vásároltál egy &e" + category.getName() + "&a mysterious könyvet!"));
         player.playSound(player.getLocation(), Sound.ENTITY_PLAYER_LEVELUP, 1.0f, 1.2f);
         player.closeInventory();
+    }
+
+    private int getTotalExperience(@NotNull Player player) {
+        int level = player.getLevel();
+        int totalExp = Math.round(player.getExp() * getExpToLevel(level));
+
+        for (int i = 0; i < level; i++) {
+            totalExp += getExpToLevel(i);
+        }
+
+        return totalExp;
+    }
+
+    private int getExpToLevel(int level) {
+        if (level <= 15) {
+            return 2 * level + 7;
+        } else if (level <= 30) {
+            return 5 * level - 38;
+        } else {
+            return 9 * level - 158;
+        }
     }
 
     @Override
