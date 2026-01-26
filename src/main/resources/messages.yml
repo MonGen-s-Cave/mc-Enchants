@@ -1,0 +1,10 @@
+prefix: "&#D27CC5[Enchants]"
+
+messages:
+  reload: "%prefix% &aSuccess reload!"
+  no-permission: "%prefix% &cNo permission!"
+  player-required: "%prefix% &cOnly players!"
+  player-not-found: "%prefix% &cPlayer not found!"
+  missing-argument: "%prefix% &cInvalid Usage!"
+
+version: '1'

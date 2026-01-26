@@ -1,0 +1,6 @@
+name: mc-Enchants
+version: '1.0.0'
+main: com.mongenscave.mcenchants.McEnchants
+api-version: '1.18'
+authors: [ coma112 ]
+folia-supported: true
