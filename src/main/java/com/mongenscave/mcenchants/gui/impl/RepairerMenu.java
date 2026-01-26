@@ -7,7 +7,6 @@ import com.mongenscave.mcenchants.identifier.key.MenuKey;
 import com.mongenscave.mcenchants.item.ItemFactory;
 import com.mongenscave.mcenchants.manager.BookManager;
 import com.mongenscave.mcenchants.model.EnchantedBook;
-import com.mongenscave.mcenchants.processor.MessageProcessor;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.InventoryClickEvent;
@@ -30,75 +29,66 @@ public final class RepairerMenu extends Menu {
 
     @Override
     public void handleMenu(@NotNull InventoryClickEvent event) {
-        int slot = event.getSlot();
-        ItemStack cursor = event.getCursor();
-        ItemStack current = event.getCurrentItem();
-        Player player = (Player) event.getWhoClicked();
-
-        if (slot == outputSlot) {
-            if (current != null && current.getType() != Material.AIR) {
-                event.setCancelled(false);
-                McEnchants.getInstance().getScheduler().runTaskLater(() -> {
-                    if (inventory.getItem(outputSlot) == null || inventory.getItem(outputSlot).getType() == Material.AIR) {
-                        inventory.setItem(bookInputSlot, null);
-                        inventory.setItem(dustInputSlot, null);
-                    }
-                }, 1L);
-            }
-            return;
-        }
-
-        if (slot == bookInputSlot) {
-            if (cursor.getType() != Material.AIR) {
-                if (bookManager.isRevealedBook(cursor)) {
-                    if (current != null && current.getType() != Material.AIR) {
-                        if (bookManager.isRevealedBook(current)) {
-                            event.setCancelled(false);
-                            McEnchants.getInstance().getScheduler().runTaskLater(this::processRepair, 2L);
-                        } else {
-                            event.setCancelled(true);
-                        }
-                    } else {
-                        event.setCancelled(false);
-                        McEnchants.getInstance().getScheduler().runTaskLater(this::processRepair, 2L);
-                    }
-                } else {
-                    event.setCancelled(true);
-                    player.sendMessage(MessageProcessor.process("&cCsak revealed könyvet rakhatsz ide!"));
-                }
-            } else {
-                event.setCancelled(false);
-                McEnchants.getInstance().getScheduler().runTaskLater(() -> inventory.setItem(outputSlot, null), 1L);
-            }
-            return;
-        }
-
-        if (slot == dustInputSlot) {
-            if (cursor.getType() != Material.AIR) {
-                if (bookManager.isDust(cursor)) {
-                    if (current != null && current.getType() != Material.AIR) {
-                        if (bookManager.isDust(current)) {
-                            event.setCancelled(false);
-                            McEnchants.getInstance().getScheduler().runTaskLater(this::processRepair, 2L);
-                        } else {
-                            event.setCancelled(true);
-                        }
-                    } else {
-                        event.setCancelled(false);
-                        McEnchants.getInstance().getScheduler().runTaskLater(this::processRepair, 2L);
-                    }
-                } else {
-                    event.setCancelled(true);
-                    player.sendMessage(MessageProcessor.process("&cCsak port rakhatsz ide!"));
-                }
-            } else {
-                event.setCancelled(false);
-                McEnchants.getInstance().getScheduler().runTaskLater(() -> inventory.setItem(outputSlot, null), 1L);
-            }
-            return;
-        }
+        if (!(event.getWhoClicked() instanceof Player player)) return;
 
         event.setCancelled(true);
+
+        int rawSlot = event.getRawSlot();
+        int topSize = inventory.getSize();
+
+        ItemStack item = event.getCurrentItem();
+        if (item == null || item.getType() == Material.AIR) return;
+
+        if (rawSlot >= topSize) {
+            if (bookManager.isRevealedBook(item)) {
+                placeItem(item, bookInputSlot);
+                processRepair();
+
+                return;
+            }
+
+            if (bookManager.isDust(item)) {
+                placeItem(item, dustInputSlot);
+                processRepair();
+
+                return;
+            }
+
+            return;
+        }
+
+        if (rawSlot == bookInputSlot || rawSlot == dustInputSlot) {
+            ItemStack returnItem = inventory.getItem(rawSlot);
+            if (returnItem == null || returnItem.getType() == Material.AIR) return;
+
+            inventory.setItem(rawSlot, null);
+            inventory.setItem(outputSlot, null);
+
+            player.getInventory().addItem(returnItem);
+            return;
+        }
+
+        if (rawSlot == outputSlot) {
+            ItemStack result = inventory.getItem(outputSlot);
+            if (result == null || result.getType() == Material.AIR) return;
+
+            player.getInventory().addItem(result);
+
+            inventory.setItem(outputSlot, null);
+            inventory.setItem(bookInputSlot, null);
+            inventory.setItem(dustInputSlot, null);
+        }
+    }
+
+    private void placeItem(@NotNull ItemStack source, int slot) {
+        ItemStack existing = inventory.getItem(slot);
+        if (existing != null && existing.getType() != Material.AIR) return;
+
+        ItemStack one = source.clone();
+        one.setAmount(1);
+        inventory.setItem(slot, one);
+
+        source.setAmount(source.getAmount() - 1);
     }
 
     private void processRepair() {
@@ -108,14 +98,11 @@ public final class RepairerMenu extends Menu {
         inventory.setItem(outputSlot, null);
 
         if (bookItem == null || dustItem == null) return;
-        if (bookItem.getType() == Material.AIR || dustItem.getType() == Material.AIR) return;
         if (!bookManager.isRevealedBook(bookItem)) return;
         if (!bookManager.isDust(dustItem)) return;
 
-        String dustCategory = bookManager.getDustCategory(dustItem);
         Integer repairAmount = bookManager.getDustRepairAmount(dustItem);
-
-        if (dustCategory == null || repairAmount == null) return;
+        if (repairAmount == null) return;
 
         EnchantedBook bookData = bookManager.getBookData(bookItem);
         if (bookData == null) return;
@@ -142,6 +129,7 @@ public final class RepairerMenu extends Menu {
         ItemFactory.setItemsForMenu("repairer-menu.items", inventory);
     }
 
+    @NotNull
     @Override
     public String getMenuName() {
         return MenuKey.MENU_REPAIRER_TITLE.getString();
