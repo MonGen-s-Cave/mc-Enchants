@@ -13,7 +13,6 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
-import org.bukkit.event.inventory.ClickType;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.inventory.InventoryType;
 import org.bukkit.inventory.ItemStack;
@@ -37,23 +36,27 @@ public final class EnchantApplyListener implements Listener {
 
     @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
     public void onInventoryClick(@NotNull InventoryClickEvent event) {
+        if (!(event.getWhoClicked() instanceof Player player)) return;
         if (event.getClickedInventory() == null) return;
         if (event.getClickedInventory().getType() != InventoryType.PLAYER) return;
-        if (event.getClick() != ClickType.RIGHT) return;
-        if (!(event.getWhoClicked() instanceof Player player)) return;
 
         ItemStack cursor = event.getCursor();
         ItemStack clicked = event.getCurrentItem();
 
-        if (clicked == null) return;
+        // Ellenőrizzük, hogy van-e cursor-on enchant book és inventory-ban tárgy
+        if (cursor == null || clicked == null) return;
         if (cursor.getType() == Material.AIR || clicked.getType() == Material.AIR) return;
 
+        // Csak akkor folytatjuk, ha revealed book van a cursoron
         if (!bookManager.isRevealedBook(cursor)) return;
 
         event.setCancelled(true);
 
         EnchantedBook bookData = bookManager.getBookData(cursor);
-        if (bookData == null) return;
+        if (bookData == null) {
+            player.sendMessage(MessageProcessor.process("&cHibás könyv adat!"));
+            return;
+        }
 
         Enchant enchant = enchantManager.getEnchant(bookData.getEnchantId());
         if (enchant == null) {
