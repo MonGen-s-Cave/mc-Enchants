@@ -13,6 +13,18 @@ public class EnchantAction {
     private final int duration;
 
     public static EnchantAction fromString(@NotNull String actionString) {
+        String[] initialSplit = actionString.split(":", 2);
+        String baseAction = initialSplit[0].trim();
+
+        if (baseAction.equalsIgnoreCase("POTION")) {
+            return EnchantAction.builder()
+                    .actionType(actionString)
+                    .radius(0)
+                    .multiplier(1.0)
+                    .duration(0)
+                    .build();
+        }
+
         String[] parts = actionString.split(":");
         String actionType = parts[0].trim();
 

@@ -20,21 +20,21 @@ enchants:
           - "{sneaking} = true => allow"
         cooldown: 3
         actions:
-          - "PLANT_SEEDS:3"
+          - "PLANT_SEEDS:1"  # radius = 1 -> 3x3 terület
       2:
         chance: 100
         conditions:
           - "{sneaking} = true => allow"
         cooldown: 2
         actions:
-          - "PLANT_SEEDS:3"
+          - "PLANT_SEEDS:1"  # radius = 1 -> 3x3 terület
       3:
         chance: 100
         conditions:
           - "{sneaking} = true => allow"
         cooldown: 0
         actions:
-          - "PLANT_SEEDS:3"
+          - "PLANT_SEEDS:1"  # radius = 1 -> 3x3 terület
 
   skullrift:
     name: "{categoryColor}Koponyahasadék"
@@ -76,7 +76,7 @@ enchants:
         chance: 100
         conditions:
           - "{sneaking} = true => allow"
-        cooldown: 30
+        cooldown: 5
         actions:
           - "POTION:INVISIBILITY:0:200"
           - "POTION:SPEED:1:200"
