@@ -18,6 +18,7 @@ import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
+import org.bukkit.persistence.PersistentDataType;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -255,11 +256,21 @@ public interface ItemFactory {
                     List<Integer> slots = parseSmartSlots(slotConfig, inventory);
 
                     if (!slots.isEmpty()) {
+                        ItemStack finalItem = itemOptional.get();
+
+                        String category = itemSection.getString("category");
+                        if (category != null && !category.isEmpty()) {
+                            finalItem.editMeta(meta -> {
+                                NamespacedKey categoryKey = new NamespacedKey(McEnchants.getInstance(), "category");
+                                meta.getPersistentDataContainer().set(categoryKey, PersistentDataType.STRING, category);
+                            });
+                        }
+
                         List<String> commands = itemSection.getStringList("commands");
                         SoundData soundData = parseSoundData(itemSection);
 
                         ItemData itemData = new ItemData(
-                                itemOptional.get(),
+                                finalItem,
                                 slots,
                                 itemSection.getInt("priority", 0),
                                 commands.isEmpty() ? null : commands,

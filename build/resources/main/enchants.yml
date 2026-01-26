@@ -1,34 +1,35 @@
 enchants:
-  name: "{categoryColor}Ültető Mester"
-  category: "rare"
-  applies-to: "hoe"
-  item-lore:
-    enabled: true
-    lines:
-      - "{categoryColor}Ültető Mester &8[&#94A3B8{level}&8]"
-  book-lore:
-    enabled: true
-    lines:
-      - "Shift + Jobb katt, és"
-      - "3x3-as területen kapál!"
-  type: "RIGHT_CLICK"
-  levels:
-    1:
-      conditions:
-        - "{sneaking} = true => allow"
-      cooldown: 3
-      actions:
-        - "PLANT_SEEDS:3"
-    2:
-      conditions:
-        - "{sneaking} = true => allow"
-      cooldown: 2
-      actions:
-        - "PLANT_SEEDS:3"
-    3:
-      conditions:
-        - "{sneaking} = true => allow"
-      actions:
-        - "PLANT_SEEDS:3"
+  planter_master:
+    name: "{categoryColor}Ültető Mester"
+    category: "rare"
+    applies-to: "hoe"
+    item-lore:
+      enabled: true
+      lines:
+        - "{categoryColor}Ültető Mester &8[&#94A3B8{level}&8]"
+    book-lore:
+      enabled: true
+      lines:
+        - "Shift + Jobb katt, és"
+        - "3x3-as területen kapál!"
+    type: "RIGHT_CLICK"
+    levels:
+      1:
+        conditions:
+          - "{sneaking} = true => allow"
+        cooldown: 3
+        actions:
+          - "PLANT_SEEDS:3"
+      2:
+        conditions:
+          - "{sneaking} = true => allow"
+        cooldown: 2
+        actions:
+          - "PLANT_SEEDS:3"
+      3:
+        conditions:
+          - "{sneaking} = true => allow"
+        actions:
+          - "PLANT_SEEDS:3"
 
 version: '1'

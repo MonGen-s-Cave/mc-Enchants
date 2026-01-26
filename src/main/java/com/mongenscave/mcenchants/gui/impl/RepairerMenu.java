@@ -37,12 +37,12 @@ public final class RepairerMenu extends Menu {
             return;
         }
 
-        if (slot != bookInputSlot && slot != dustInputSlot) {
-            event.setCancelled(true);
+        if (slot == bookInputSlot || slot == dustInputSlot) {
+            McEnchants.getInstance().getScheduler().runTaskLater(this::processRepair, 1L);
             return;
         }
 
-        McEnchants.getInstance().getScheduler().runTaskLater(() -> processRepair(), 1L);
+        event.setCancelled(true);
     }
 
     private void processRepair() {

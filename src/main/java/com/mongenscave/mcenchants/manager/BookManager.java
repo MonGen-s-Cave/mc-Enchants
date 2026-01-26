@@ -106,6 +106,7 @@ public class BookManager {
 
         String romanLevel = getRomanNumeral(level);
         String name = config.getString("revealed-book-item.name", "{name} &8[&#94A3B8{level}&8]")
+                .replace("{categoryColor}", enchant.getCategory().getColor())
                 .replace("{name}", enchant.getName())
                 .replace("{level}", romanLevel);
 
@@ -124,6 +125,7 @@ public class BookManager {
 
         List<String> lore = config.getStringList("revealed-book-item.lore").stream()
                 .map(line -> line
+                        .replace("{categoryColor}", enchant.getCategory().getColor())
                         .replace("{description}", description)
                         .replace("{success}", String.valueOf(successRate))
                         .replace("{destroy}", String.valueOf(destroyRate))

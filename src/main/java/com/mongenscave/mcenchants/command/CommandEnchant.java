@@ -1,19 +1,31 @@
 package com.mongenscave.mcenchants.command;
 
 import com.mongenscave.mcenchants.McEnchants;
+import com.mongenscave.mcenchants.annotation.Category;
+import com.mongenscave.mcenchants.annotation.Enchant;
 import com.mongenscave.mcenchants.data.MenuController;
 import com.mongenscave.mcenchants.gui.impl.MainMenu;
 import com.mongenscave.mcenchants.identifier.key.MessageKey;
+import com.mongenscave.mcenchants.manager.BookManager;
+import com.mongenscave.mcenchants.manager.EnchantManager;
+import com.mongenscave.mcenchants.processor.MessageProcessor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
+import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.NotNull;
 import revxrsal.commands.annotation.CommandPlaceholder;
+import revxrsal.commands.annotation.Default;
+import revxrsal.commands.annotation.Optional;
 import revxrsal.commands.annotation.Subcommand;
 import revxrsal.commands.bukkit.annotation.CommandPermission;
 import revxrsal.commands.orphan.OrphanCommand;
 
+import java.util.concurrent.ThreadLocalRandom;
+
 public class CommandEnchant implements OrphanCommand {
     private static final McEnchants plugin = McEnchants.getInstance();
+    private static final BookManager bookManager = plugin.getManagerRegistry().getBookManager();
+    private static final EnchantManager enchantManager = plugin.getManagerRegistry().getEnchantManager();
 
     @CommandPlaceholder
     public void openMainMenu(@NotNull Player player) {
@@ -35,5 +47,91 @@ public class CommandEnchant implements OrphanCommand {
         plugin.getManagerRegistry().reload();
 
         sender.sendMessage(MessageKey.RELOAD.getMessage());
+    }
+
+    @Subcommand("givebook")
+    @CommandPermission("mcenchants.admin.givebook")
+    public void giveBook(
+            @NotNull CommandSender sender,
+            @NotNull Player target,
+            @Category @NotNull String categoryId,
+            @Default("1") int amount
+    ) {
+        if (amount < 1 || amount > 64) {
+            sender.sendMessage(MessageProcessor.process("&cAz összegnek 1 és 64 között kell lennie!"));
+            return;
+        }
+
+        ItemStack mysteriousBook = bookManager.createMysteriousBook(categoryId);
+        mysteriousBook.setAmount(amount);
+
+        target.getInventory().addItem(mysteriousBook);
+
+        sender.sendMessage(MessageProcessor.process(
+                "&aAdtál &e" + amount + "&a db &e" + categoryId + "&a mysterious könyvet &e" + target.getName() + "&a játékosnak!"
+        ));
+
+        target.sendMessage(MessageProcessor.process(
+                "&aKaptál &e" + amount + "&a db &e" + categoryId + "&a mysterious könyvet!"
+        ));
+    }
+
+    @Subcommand("giveenchant")
+    @CommandPermission("mcenchants.admin.giveenchant")
+    public void giveEnchant(
+            @NotNull CommandSender sender,
+            @NotNull Player target,
+            @Enchant @NotNull String enchantId,
+            @Default("1") int level,
+            @Optional Integer successRate,
+            @Default("1") int amount
+    ) {
+        com.mongenscave.mcenchants.model.Enchant enchant = enchantManager.getEnchant(enchantId);
+
+        if (enchant == null) {
+            sender.sendMessage(MessageProcessor.process("&cEz az enchant nem létezik: &e" + enchantId));
+            return;
+        }
+
+        if (level < 1 || level > enchant.getMaxLevel()) {
+            sender.sendMessage(MessageProcessor.process("&cA szint 1 és " + enchant.getMaxLevel() + " között kell legyen!"));
+            return;
+        }
+
+        if (amount < 1 || amount > 64) {
+            sender.sendMessage(MessageProcessor.process("&cAz összegnek 1 és 64 között kell lennie!"));
+            return;
+        }
+
+        int finalSuccessRate;
+        int destroyRate;
+
+        if (successRate == null) {
+            // Random success rate between 50-80%
+            finalSuccessRate = ThreadLocalRandom.current().nextInt(50, 81);
+            destroyRate = 100 - finalSuccessRate;
+        } else {
+            // Custom success rate or 100%
+            if (successRate == 100) {
+                finalSuccessRate = 100;
+                destroyRate = 0;
+            } else {
+                finalSuccessRate = Math.max(0, Math.min(100, successRate));
+                destroyRate = 100 - finalSuccessRate;
+            }
+        }
+
+        ItemStack revealedBook = bookManager.createRevealedBook(enchantId, level, finalSuccessRate, destroyRate);
+        revealedBook.setAmount(amount);
+
+        target.getInventory().addItem(revealedBook);
+
+        sender.sendMessage(MessageProcessor.process(
+                "&aAdtál &e" + amount + "&a db &e" + enchant.getName() + " " + level + "&a könyvet (&e" + finalSuccessRate + "%&a siker) &e" + target.getName() + "&a játékosnak!"
+        ));
+
+        target.sendMessage(MessageProcessor.process(
+                "&aKaptál &e" + amount + "&a db &e" + enchant.getName() + " " + level + "&a könyvet (&e" + finalSuccessRate + "%&a siker)!"
+        ));
     }
 }
