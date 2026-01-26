@@ -6,8 +6,11 @@ import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Sound;
 import org.bukkit.block.Block;
+import org.bukkit.block.BlockFace;
 import org.bukkit.entity.Entity;
+import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
+import org.bukkit.entity.TNTPrimed;
 import org.bukkit.event.Event;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.inventory.ItemStack;
@@ -22,24 +25,28 @@ public class EnchantActionExecutor {
 
     public void executeAction(@NotNull Player player, @NotNull EnchantAction action, @NotNull Map<String, Object> context) {
         try {
-            switch (action.getType().toUpperCase()) {
-                case "PLANT_SEEDS" -> executePlantSeeds(player, action, context);
-                case "DAMAGE_BOOST" -> executeDamageBoost(player, action, context);
-                case "AREA_BREAK" -> executeAreaBreak(player, action, context);
-                case "POTION_EFFECT" -> executePotionEffect(player, action, context);
-                case "HEAL" -> executeHeal(player, action, context);
-                case "LIGHTNING" -> executeLightning(player, action, context);
-                case "EXPLOSION" -> executeExplosion(player, action, context);
-                default -> LoggerUtil.warn("Unknown action type: " + action.getType());
+            switch (action.getActionType().toUpperCase()) {
+                case "PLANT_SEEDS" -> executePlantSeeds(player, action);
+                case "TNT" -> executeTNT(player, action, context);
+                case "POTION" -> executePotion(player, action, context);
+                case "INVINCIBLE" -> executeInvincible(player, action, context);
+                case "WAIT" -> executeWait(player, action, context);
+                case "DOUBLE_DAMAGE" -> executeDoubleDamage(player, action, context);
+                case "CANCEL_EVENT" -> executeCancelEvent(player, action, context);
+                case "REMOVE_ENCHANT" -> executeRemoveEnchant(player);
+                case "ADD_DURABILITY_ITEM" -> executeAddDurability(player, action);
+                case "SHUFFLE_HOTBAR" -> executeShuffleHotbar(context);
+                case "SMELT" -> executeSmelt(context);
+                default -> LoggerUtil.warn("Unknown action type: " + action.getActionType());
             }
         } catch (Exception exception) {
-            LoggerUtil.error("Error executing action " + action.getType() + ": " + exception.getMessage());
+            LoggerUtil.error("Error executing action " + action.getActionType() + ": " + exception.getMessage());
         }
     }
 
-    private void executePlantSeeds(@NotNull Player player, @NotNull EnchantAction action, @NotNull Map<String, Object> context) {
-        Block centerBlock = player.getTargetBlock(null, 5);
-        if (centerBlock.getType() != Material.FARMLAND) return;
+    private void executePlantSeeds(@NotNull Player player, @NotNull EnchantAction action) {
+        Block centerBlock = player.getTargetBlockExact(5);
+        if (centerBlock == null || centerBlock.getType() != Material.FARMLAND) return;
 
         ItemStack item = player.getInventory().getItemInMainHand();
         Material seedType = getSeedType(item.getType());
@@ -54,7 +61,7 @@ public class EnchantActionExecutor {
                 Block block = center.clone().add(x, 0, z).getBlock();
                 if (block.getType() != Material.FARMLAND) continue;
 
-                Block above = block.getRelative(0, 1, 0);
+                Block above = block.getRelative(BlockFace.UP);
                 if (above.getType() != Material.AIR) continue;
 
                 if (item.getAmount() > 0) {
@@ -70,103 +77,126 @@ public class EnchantActionExecutor {
         }
     }
 
-    private void executeDamageBoost(@NotNull Player player, @NotNull EnchantAction action, @NotNull Map<String, Object> context) {
+    private void executeTNT(@NotNull Player player, @NotNull EnchantAction action, @NotNull Map<String, Object> context) {
+        Entity targetEntity = (Entity) context.get("victim");
+        if (targetEntity == null) return;
+
+        Location location = targetEntity.getLocation();
+        int power = (int) action.getMultiplier();
+        int fuseTicks = action.getDuration();
+
+        for (int i = 0; i < action.getRadius(); i++) {
+            TNTPrimed tnt = location.getWorld().spawn(location, TNTPrimed.class);
+            tnt.setFuseTicks(fuseTicks);
+            tnt.setYield(power);
+        }
+
+        player.playSound(player.getLocation(), Sound.ENTITY_TNT_PRIMED, 1.0f, 1.0f);
+    }
+
+    private void executePotion(@NotNull Player player, @NotNull EnchantAction action, @NotNull Map<String, Object> context) {
+        String actionString = action.getActionType();
+        String[] parts = actionString.split(":");
+        if (parts.length < 4) return;
+
+        String effectName = parts[1].toUpperCase();
+        PotionEffectType effectType = PotionEffectType.getByName(effectName);
+        if (effectType == null) return;
+
+        int amplifier = Integer.parseInt(parts[2]);
+        int duration = Integer.parseInt(parts[3]);
+
+        Entity target = (Entity) context.get("target");
+        if (target instanceof LivingEntity living) {
+            living.addPotionEffect(new PotionEffect(effectType, duration, amplifier, false, true));
+        } else {
+            player.addPotionEffect(new PotionEffect(effectType, duration, amplifier, false, true));
+        }
+    }
+
+    private void executeInvincible(@NotNull Player player, @NotNull EnchantAction action, @NotNull Map<String, Object> context) {
+        player.setInvulnerable(true);
+        context.put("invincible_active", true);
+    }
+
+    private void executeWait(@NotNull Player player, @NotNull EnchantAction action, @NotNull Map<String, Object> context) {
+        if (context.containsKey("invincible_active")) {
+            player.setInvulnerable(false);
+            context.remove("invincible_active");
+        }
+    }
+
+    private void executeDoubleDamage(@NotNull Player player, @NotNull EnchantAction action, @NotNull Map<String, Object> context) {
         Event event = (Event) context.get("event");
         if (!(event instanceof EntityDamageByEntityEvent damageEvent)) return;
 
         double currentDamage = damageEvent.getDamage();
-        double newDamage = currentDamage * action.getMultiplier();
-        damageEvent.setDamage(newDamage);
+        damageEvent.setDamage(currentDamage * 2.0);
 
         player.playSound(player.getLocation(), Sound.ENTITY_PLAYER_ATTACK_CRIT, 0.7f, 1.2f);
     }
 
-    private void executeAreaBreak(@NotNull Player player, @NotNull EnchantAction action, @NotNull Map<String, Object> context) {
-        Block centerBlock = (Block) context.get("block");
-        if (centerBlock == null) return;
+    private void executeCancelEvent(@NotNull Player player, @NotNull EnchantAction action, @NotNull Map<String, Object> context) {
+        Event event = (Event) context.get("event");
+        if (event instanceof org.bukkit.event.Cancellable cancellable) {
+            cancellable.setCancelled(true);
+        }
+    }
 
-        Material centerType = centerBlock.getType();
-        Location center = centerBlock.getLocation();
-        int radius = action.getRadius();
-        int broken = 0;
+    private void executeRemoveEnchant(@NotNull Player player) {
+        ItemStack item = player.getInventory().getItemInMainHand();
+        if (item.getType() == Material.AIR) return;
 
-        for (int x = -radius; x <= radius; x++) {
-            for (int y = -radius; y <= radius; y++) {
-                for (int z = -radius; z <= radius; z++) {
-                    Block block = center.clone().add(x, y, z).getBlock();
+        LoggerUtil.info("Removed enchant from item");
+    }
 
-                    if (block.getType() == centerType && !block.equals(centerBlock)) {
-                        block.breakNaturally(player.getInventory().getItemInMainHand());
-                        broken++;
-                    }
-                }
+    private void executeAddDurability(@NotNull Player player, @NotNull EnchantAction action) {
+        ItemStack item = player.getInventory().getItemInMainHand();
+        if (item.getType() == Material.AIR) return;
+
+        int durabilityToAdd = (int) action.getMultiplier();
+
+        item.editMeta(meta -> {
+            if (meta instanceof org.bukkit.inventory.meta.Damageable damageable) {
+                int currentDamage = damageable.getDamage();
+                int newDamage = Math.max(0, currentDamage + durabilityToAdd);
+                damageable.setDamage(newDamage);
             }
-        }
-
-        if (broken > 0) {
-            player.playSound(player.getLocation(), Sound.BLOCK_STONE_BREAK, 1.0f, 0.8f);
-        }
+        });
     }
 
-    private void executePotionEffect(@NotNull Player player, @NotNull EnchantAction action, @NotNull Map<String, Object> context) {
-        String[] parts = action.getType().split(":");
-        if (parts.length < 2) return;
+    private void executeShuffleHotbar(@NotNull Map<String, Object> context) {
+        Entity attacker = (Entity) context.get("attacker");
+        if (!(attacker instanceof Player attackerPlayer)) return;
 
-        String effectName = parts[1].toUpperCase();
-        PotionEffectType effectType = PotionEffectType.getByName(effectName);
-
-        if (effectType == null) return;
-
-        int amplifier = (int) (action.getMultiplier() - 1);
-        int duration = action.getDuration() * 20;
-
-        player.addPotionEffect(new PotionEffect(effectType, duration, amplifier, false, true));
-        player.playSound(player.getLocation(), Sound.ENTITY_PLAYER_LEVELUP, 0.5f, 1.5f);
-    }
-
-    private void executeHeal(@NotNull Player player, @NotNull EnchantAction action, @NotNull Map<String, Object> context) {
-        double currentHealth = player.getHealth();
-        double maxHealth = player.getMaxHealth();
-        double healAmount = action.getMultiplier();
-
-        double newHealth = Math.min(maxHealth, currentHealth + healAmount);
-        player.setHealth(newHealth);
-
-        player.playSound(player.getLocation(), Sound.ENTITY_PLAYER_LEVELUP, 0.7f, 1.3f);
-    }
-
-    private void executeLightning(@NotNull Player player, @NotNull EnchantAction action, @NotNull Map<String, Object> context) {
-        Entity targetEntity = (Entity) context.get("entity");
-
-        if (targetEntity != null) {
-            targetEntity.getWorld().strikeLightning(targetEntity.getLocation());
-        } else {
-            Block targetBlock = player.getTargetBlock(null, 50);
-            targetBlock.getWorld().strikeLightning(targetBlock.getLocation());
-        }
-    }
-
-    private void executeExplosion(@NotNull Player player, @NotNull EnchantAction action, @NotNull Map<String, Object> context) {
-        Entity targetEntity = (Entity) context.get("entity");
-        Location explosionLocation;
-
-        if (targetEntity != null) {
-            explosionLocation = targetEntity.getLocation();
-        } else {
-            Block targetBlock = player.getTargetBlock(null, 50);
-            explosionLocation = targetBlock.getLocation();
+        ItemStack[] hotbar = new ItemStack[9];
+        for (int i = 0; i < 9; i++) {
+            hotbar[i] = attackerPlayer.getInventory().getItem(i);
         }
 
-        float power = (float) (action.getMultiplier() * 2.0);
-        boolean setFire = false;
-        boolean breakBlocks = action.getRadius() > 2;
+        for (int i = 8; i > 0; i--) {
+            int j = (int) (Math.random() * (i + 1));
+            ItemStack temp = hotbar[i];
+            hotbar[i] = hotbar[j];
+            hotbar[j] = temp;
+        }
 
-        explosionLocation.getWorld().createExplosion(
-                explosionLocation,
-                power,
-                setFire,
-                breakBlocks
-        );
+        for (int i = 0; i < 9; i++) {
+            attackerPlayer.getInventory().setItem(i, hotbar[i]);
+        }
+
+        attackerPlayer.playSound(attackerPlayer.getLocation(), Sound.ENTITY_ENDERMAN_TELEPORT, 0.5f, 1.5f);
+    }
+
+    private void executeSmelt(@NotNull Map<String, Object> context) {
+        Block block = (Block) context.get("block");
+        if (block == null) return;
+
+        Material smelted = getSmeltedMaterial(block.getType());
+        if (smelted != null) {
+            block.setType(Material.AIR);
+            block.getWorld().dropItemNaturally(block.getLocation(), new ItemStack(smelted));
+        }
     }
 
     @Nullable
@@ -180,6 +210,17 @@ public class EnchantActionExecutor {
             case POTATO -> Material.POTATOES;
             case SWEET_BERRIES -> Material.SWEET_BERRY_BUSH;
             case NETHER_WART -> Material.NETHER_WART;
+            default -> null;
+        };
+    }
+
+    @Nullable
+    private Material getSmeltedMaterial(@NotNull Material ore) {
+        return switch (ore) {
+            case IRON_ORE, DEEPSLATE_IRON_ORE -> Material.IRON_INGOT;
+            case GOLD_ORE, DEEPSLATE_GOLD_ORE -> Material.GOLD_INGOT;
+            case COPPER_ORE, DEEPSLATE_COPPER_ORE -> Material.COPPER_INGOT;
+            case ANCIENT_DEBRIS -> Material.NETHERITE_SCRAP;
             default -> null;
         };
     }

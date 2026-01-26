@@ -106,13 +106,15 @@ public class EnchantManager {
     private EnchantLevel loadEnchantLevel(int level, @NotNull Section section) {
         List<String> conditions = section.getStringList("conditions");
         long cooldown = section.getLong("cooldown", 0L);
+        int chance = section.getInt("chance", 100);
 
         List<EnchantAction> actions = section.getStringList("actions").stream()
-                .map(EnchantAction::new)
+                .map(EnchantAction::fromString)
                 .collect(Collectors.toList());
 
         return EnchantLevel.builder()
                 .level(level)
+                .chance(chance)
                 .conditions(conditions)
                 .cooldown(cooldown)
                 .actions(actions)

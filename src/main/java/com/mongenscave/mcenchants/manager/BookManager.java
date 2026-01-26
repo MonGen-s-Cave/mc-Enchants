@@ -6,7 +6,6 @@ import com.mongenscave.mcenchants.item.ItemFactory;
 import com.mongenscave.mcenchants.model.Category;
 import com.mongenscave.mcenchants.model.Enchant;
 import com.mongenscave.mcenchants.model.EnchantedBook;
-import com.mongenscave.mcenchants.processor.MessageProcessor;
 import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
 import org.bukkit.inventory.ItemStack;
@@ -26,6 +25,9 @@ public class BookManager {
     private static final NamespacedKey SUCCESS_KEY = new NamespacedKey(McEnchants.getInstance(), "success_rate");
     private static final NamespacedKey DESTROY_KEY = new NamespacedKey(McEnchants.getInstance(), "destroy_rate");
     private static final NamespacedKey REVEALED_KEY = new NamespacedKey(McEnchants.getInstance(), "revealed");
+    private static final NamespacedKey MYSTERIOUS_CATEGORY_KEY = new NamespacedKey(McEnchants.getInstance(), "mysterious_category");
+    private static final NamespacedKey DUST_CATEGORY_KEY = new NamespacedKey(McEnchants.getInstance(), "dust_category");
+    private static final NamespacedKey DUST_REPAIR_KEY = new NamespacedKey(McEnchants.getInstance(), "dust_repair");
 
     private final EnchantManager enchantManager;
     private final CategoryManager categoryManager;
@@ -42,6 +44,7 @@ public class BookManager {
 
         String material = config.getString("mysterious-book-item.material", "BOOK");
         int amount = config.getInt("mysterious-book-item.amount", 1);
+        int modelData = config.getInt("mysterious-book-item.modeldata", 0);
 
         String name = config.getString("mysterious-book-item.name", "{categoryColor}{categoryName} &fKönyv")
                 .replace("{categoryColor}", category.getColor())
@@ -51,18 +54,16 @@ public class BookManager {
 
         ItemStack book = ItemFactory.create(Material.valueOf(material.toUpperCase()), amount)
                 .setName(name)
-                .addLore(lore.toArray(new String[0]))
+                .setLore(lore)
                 .finish();
 
-        int modelData = config.getInt("mysterious-book-item.modeldata", 0);
-        if (modelData > 0) {
-            book.editMeta(meta -> meta.setCustomModelData(modelData));
-        }
-
         book.editMeta(meta -> {
+            if (modelData > 0) {
+                meta.setCustomModelData(modelData);
+            }
+
             PersistentDataContainer pdc = meta.getPersistentDataContainer();
-            pdc.set(new NamespacedKey(McEnchants.getInstance(), "mysterious_category"),
-                    PersistentDataType.STRING, categoryId);
+            pdc.set(MYSTERIOUS_CATEGORY_KEY, PersistentDataType.STRING, categoryId);
         });
 
         return book;
@@ -74,8 +75,7 @@ public class BookManager {
         if (meta == null) return mysteriousBook;
 
         PersistentDataContainer pdc = meta.getPersistentDataContainer();
-        String categoryId = pdc.get(new NamespacedKey(McEnchants.getInstance(), "mysterious_category"),
-                PersistentDataType.STRING);
+        String categoryId = pdc.get(MYSTERIOUS_CATEGORY_KEY, PersistentDataType.STRING);
 
         if (categoryId == null) return mysteriousBook;
 
@@ -100,6 +100,7 @@ public class BookManager {
 
         String material = config.getString("revealed-book-item.material", "PAPER");
         int amount = config.getInt("revealed-book-item.amount", 1);
+        int modelData = config.getInt("revealed-book-item.modeldata", 0);
 
         String romanLevel = getRomanNumeral(level);
 
@@ -133,15 +134,14 @@ public class BookManager {
 
         ItemStack book = ItemFactory.create(Material.valueOf(material.toUpperCase()), amount)
                 .setName(name)
-                .addLore(lore.toArray(new String[0]))
+                .setLore(lore)
                 .finish();
 
-        int modelData = config.getInt("revealed-book-item.modeldata", 0);
-        if (modelData > 0) {
-            book.editMeta(meta -> meta.setCustomModelData(modelData));
-        }
-
         book.editMeta(meta -> {
+            if (modelData > 0) {
+                meta.setCustomModelData(modelData);
+            }
+
             PersistentDataContainer pdc = meta.getPersistentDataContainer();
             pdc.set(ENCHANT_KEY, PersistentDataType.STRING, enchantId);
             pdc.set(LEVEL_KEY, PersistentDataType.INTEGER, level);
@@ -173,15 +173,13 @@ public class BookManager {
 
         ItemStack dust = ItemFactory.create(Material.valueOf(material.toUpperCase()), amount)
                 .setName(name)
-                .addLore(lore.toArray(new String[0]))
+                .setLore(lore)
                 .finish();
 
         dust.editMeta(meta -> {
             PersistentDataContainer pdc = meta.getPersistentDataContainer();
-            pdc.set(new NamespacedKey(McEnchants.getInstance(), "dust_category"),
-                    PersistentDataType.STRING, categoryId);
-            pdc.set(new NamespacedKey(McEnchants.getInstance(), "dust_repair"),
-                    PersistentDataType.INTEGER, repairAmount);
+            pdc.set(DUST_CATEGORY_KEY, PersistentDataType.STRING, categoryId);
+            pdc.set(DUST_REPAIR_KEY, PersistentDataType.INTEGER, repairAmount);
         });
 
         return dust;
@@ -219,18 +217,14 @@ public class BookManager {
         ItemMeta meta = item.getItemMeta();
         if (meta == null) return false;
 
-        return meta.getPersistentDataContainer()
-                .has(new NamespacedKey(McEnchants.getInstance(), "mysterious_category"),
-                        PersistentDataType.STRING);
+        return meta.getPersistentDataContainer().has(MYSTERIOUS_CATEGORY_KEY, PersistentDataType.STRING);
     }
 
     public boolean isDust(@NotNull ItemStack item) {
         ItemMeta meta = item.getItemMeta();
         if (meta == null) return false;
 
-        return meta.getPersistentDataContainer()
-                .has(new NamespacedKey(McEnchants.getInstance(), "dust_category"),
-                        PersistentDataType.STRING);
+        return meta.getPersistentDataContainer().has(DUST_CATEGORY_KEY, PersistentDataType.STRING);
     }
 
     @Nullable
@@ -238,9 +232,7 @@ public class BookManager {
         ItemMeta meta = item.getItemMeta();
         if (meta == null) return null;
 
-        return meta.getPersistentDataContainer()
-                .get(new NamespacedKey(McEnchants.getInstance(), "dust_category"),
-                        PersistentDataType.STRING);
+        return meta.getPersistentDataContainer().get(DUST_CATEGORY_KEY, PersistentDataType.STRING);
     }
 
     @Nullable
@@ -248,9 +240,7 @@ public class BookManager {
         ItemMeta meta = item.getItemMeta();
         if (meta == null) return null;
 
-        return meta.getPersistentDataContainer()
-                .get(new NamespacedKey(McEnchants.getInstance(), "dust_repair"),
-                        PersistentDataType.INTEGER);
+        return meta.getPersistentDataContainer().get(DUST_REPAIR_KEY, PersistentDataType.INTEGER);
     }
 
     @NotNull

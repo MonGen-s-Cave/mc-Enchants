@@ -1,46 +1,49 @@
 package com.mongenscave.mcenchants.model;
 
+import lombok.Builder;
 import lombok.Getter;
 import org.jetbrains.annotations.NotNull;
 
 @Getter
+@Builder
 public class EnchantAction {
-    @NotNull private final String type;
+    @NotNull private final String actionType;
     private final int radius;
     private final double multiplier;
     private final int duration;
 
-    public EnchantAction(@NotNull String actionString) {
+    public static EnchantAction fromString(@NotNull String actionString) {
         String[] parts = actionString.split(":");
-        this.type = parts[0];
+        String actionType = parts[0].trim();
+
+        int radius = 0;
+        double multiplier = 1.0;
+        int duration = 0;
 
         if (parts.length > 1) {
             String[] params = parts[1].split(";");
-            this.radius = parseIntParam(params, 0, 0);
-            this.multiplier = parseDoubleParam(params, 1, 1.0);
-            this.duration = parseIntParam(params, 2, 0);
-        } else {
-            this.radius = 0;
-            this.multiplier = 1.0;
-            this.duration = 0;
+            if (params.length > 0) {
+                try {
+                    radius = Integer.parseInt(params[0].trim());
+                } catch (NumberFormatException ignored) {}
+            }
+            if (params.length > 1) {
+                try {
+                    multiplier = Double.parseDouble(params[1].trim());
+                } catch (NumberFormatException ignored) {}
+            }
+            if (params.length > 2) {
+                try {
+                    duration = Integer.parseInt(params[2].trim());
+                } catch (NumberFormatException ignored) {}
+            }
         }
-    }
 
-    private int parseIntParam(@NotNull String[] params, int index, int defaultValue) {
-        try {
-            if (index < params.length) {
-                return Integer.parseInt(params[index].trim());
-            }
-        } catch (NumberFormatException ignored) {}
-        return defaultValue;
-    }
-
-    private double parseDoubleParam(@NotNull String[] params, int index, double defaultValue) {
-        try {
-            if (index < params.length) {
-                return Double.parseDouble(params[index].trim());
-            }
-        } catch (NumberFormatException ignored) {}
-        return defaultValue;
+        return EnchantAction.builder()
+                .actionType(actionType)
+                .radius(radius)
+                .multiplier(multiplier)
+                .duration(duration)
+                .build();
     }
 }

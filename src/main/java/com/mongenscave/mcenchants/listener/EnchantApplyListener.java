@@ -11,7 +11,9 @@ import org.bukkit.NamespacedKey;
 import org.bukkit.Sound;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
+import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
+import org.bukkit.event.inventory.ClickType;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.inventory.InventoryType;
 import org.bukkit.inventory.ItemStack;
@@ -33,16 +35,17 @@ public final class EnchantApplyListener implements Listener {
         this.enchantManager = McEnchants.getInstance().getManagerRegistry().getEnchantManager();
     }
 
-    @EventHandler
+    @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
     public void onInventoryClick(@NotNull InventoryClickEvent event) {
         if (event.getClickedInventory() == null) return;
         if (event.getClickedInventory().getType() != InventoryType.PLAYER) return;
+        if (event.getClick() != ClickType.RIGHT) return;
         if (!(event.getWhoClicked() instanceof Player player)) return;
 
         ItemStack cursor = event.getCursor();
         ItemStack clicked = event.getCurrentItem();
 
-        if (cursor == null || clicked == null) return;
+        if (clicked == null) return;
         if (cursor.getType() == Material.AIR || clicked.getType() == Material.AIR) return;
 
         if (!bookManager.isRevealedBook(cursor)) return;

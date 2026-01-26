@@ -9,6 +9,7 @@ import com.mongenscave.mcenchants.model.EnchantLevel;
 import org.bukkit.NamespacedKey;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
+import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.Action;
 import org.bukkit.event.block.BlockBreakEvent;
@@ -26,6 +27,7 @@ import org.jetbrains.annotations.Nullable;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ThreadLocalRandom;
 
 public final class EnchantTriggerListener implements Listener {
     private final EnchantManager enchantManager;
@@ -37,7 +39,7 @@ public final class EnchantTriggerListener implements Listener {
         this.actionExecutor = new EnchantActionExecutor();
     }
 
-    @EventHandler
+    @EventHandler(priority = EventPriority.NORMAL)
     public void onPlayerInteract(@NotNull PlayerInteractEvent event) {
         if (event.getHand() != EquipmentSlot.HAND) return;
 
@@ -56,32 +58,50 @@ public final class EnchantTriggerListener implements Listener {
         }
     }
 
-    @EventHandler
+    @EventHandler(priority = EventPriority.NORMAL)
     public void onBlockBreak(@NotNull BlockBreakEvent event) {
         Player player = event.getPlayer();
         ItemStack item = player.getInventory().getItemInMainHand();
 
         triggerEnchants(player, item, EnchantType.BREAK_BLOCK,
                 createContext(player, event.getBlock(), null, null));
+
+        triggerEnchants(player, item, EnchantType.MINING,
+                createContext(player, event.getBlock(), null, null));
     }
 
-    @EventHandler
+    @EventHandler(priority = EventPriority.NORMAL)
     public void onEntityDamageByEntity(@NotNull EntityDamageByEntityEvent event) {
         if (!(event.getDamager() instanceof Player player)) return;
 
         ItemStack item = player.getInventory().getItemInMainHand();
-        triggerEnchants(player, item, EnchantType.DAMAGE_ENTITY,
-                createContext(player, null, event.getEntity(), event));
+
+        Map<String, Object> context = createContext(player, null, event.getEntity(), event);
+        context.put("victim", event.getEntity());
+
+        triggerEnchants(player, item, EnchantType.ATTACK, context);
     }
 
-    @EventHandler
+    @EventHandler(priority = EventPriority.NORMAL)
     public void onEntityDamage(@NotNull EntityDamageEvent event) {
         if (!(event.getEntity() instanceof Player player)) return;
 
-        ItemStack[] armor = player.getInventory().getArmorContents();
-        for (ItemStack piece : armor) {
-            if (piece != null) {
-                triggerEnchants(player, piece, EnchantType.TAKE_DAMAGE,
+        if (event instanceof EntityDamageByEntityEvent damageByEntity) {
+            Map<String, Object> context = createContext(player, null, damageByEntity.getDamager(), event);
+            context.put("attacker", damageByEntity.getDamager());
+
+            ItemStack[] armor = player.getInventory().getArmorContents();
+            for (ItemStack piece : armor) {
+                if (piece != null) {
+                    triggerEnchants(player, piece, EnchantType.DEFENSE, context);
+                }
+            }
+        }
+
+        if (event.getCause() == EntityDamageEvent.DamageCause.FALL) {
+            ItemStack boots = player.getInventory().getBoots();
+            if (boots != null) {
+                triggerEnchants(player, boots, EnchantType.FALL_DAMAGE,
                         createContext(player, null, null, event));
             }
         }
@@ -105,6 +125,12 @@ public final class EnchantTriggerListener implements Listener {
             EnchantLevel enchantLevel = enchant.getLevel(level);
             if (enchantLevel == null) continue;
 
+            int chance = enchantLevel.getChance();
+            if (chance < 100) {
+                int roll = ThreadLocalRandom.current().nextInt(1, 101);
+                if (roll > chance) continue;
+            }
+
             String cooldownKey = player.getUniqueId() + ":" + enchantId;
             long now = System.currentTimeMillis();
             Long lastUse = cooldowns.get(cooldownKey);
@@ -113,7 +139,7 @@ public final class EnchantTriggerListener implements Listener {
                 continue;
             }
 
-            if (!checkConditions(enchantLevel, context)) continue;
+            if (!checkConditions(enchantLevel, context, player)) continue;
 
             executeActions(player, enchantLevel, context);
 
@@ -150,11 +176,11 @@ public final class EnchantTriggerListener implements Listener {
         return enchants;
     }
 
-    private boolean checkConditions(@NotNull EnchantLevel level, @NotNull Map<String, Object> context) {
+    private boolean checkConditions(@NotNull EnchantLevel level, @NotNull Map<String, Object> context, @NotNull Player player) {
         if (level.getConditions().isEmpty()) return true;
 
         for (String condition : level.getConditions()) {
-            if (!evaluateCondition(condition, context)) {
+            if (!evaluateCondition(condition, context, player)) {
                 return false;
             }
         }
@@ -162,7 +188,7 @@ public final class EnchantTriggerListener implements Listener {
         return true;
     }
 
-    private boolean evaluateCondition(@NotNull String condition, @NotNull Map<String, Object> context) {
+    private boolean evaluateCondition(@NotNull String condition, @NotNull Map<String, Object> context, @NotNull Player player) {
         String[] parts = condition.split("=>");
         if (parts.length != 2) return true;
 
@@ -170,8 +196,7 @@ public final class EnchantTriggerListener implements Listener {
         String result = parts[1].trim();
 
         if (check.contains("{sneaking}")) {
-            Player player = (Player) context.get("player");
-            boolean sneaking = player != null && player.isSneaking();
+            boolean sneaking = player.isSneaking();
             boolean expected = check.contains("true");
 
             if (sneaking == expected) {
@@ -190,6 +215,7 @@ public final class EnchantTriggerListener implements Listener {
     private Map<String, Object> createContext(@NotNull Player player, @Nullable Object block, @Nullable Object entity, @Nullable Object event) {
         Map<String, Object> context = new HashMap<>();
         context.put("player", player);
+        context.put("target", player);
         if (block != null) context.put("block", block);
         if (entity != null) context.put("entity", entity);
         if (event != null) context.put("event", event);

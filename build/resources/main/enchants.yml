@@ -1,7 +1,7 @@
 enchants:
-  planter_master:
+  planter:
     name: "{categoryColor}Ültető Mester"
-    category: "rare"
+    category: "legendary"
     applies-to: "hoe"
     item-lore:
       enabled: true
@@ -15,21 +15,312 @@ enchants:
     type: "RIGHT_CLICK"
     levels:
       1:
+        chance: 100
         conditions:
           - "{sneaking} = true => allow"
         cooldown: 3
         actions:
           - "PLANT_SEEDS:3"
       2:
+        chance: 100
         conditions:
           - "{sneaking} = true => allow"
         cooldown: 2
         actions:
           - "PLANT_SEEDS:3"
       3:
+        chance: 100
         conditions:
           - "{sneaking} = true => allow"
+        cooldown: 0
         actions:
           - "PLANT_SEEDS:3"
+
+  skullrift:
+    name: "{categoryColor}Koponyahasadék"
+    category: "mythic"
+    applies-to: "sword"
+    item-lore:
+      enabled: true
+      lines:
+        - "{categoryColor}Koponyahasadék &8[&#94A3B8{level}&8]"
+    book-lore:
+      enabled: true
+      lines:
+        - "Eséllyel hatalmas robbanást idéz"
+        - "elő az ellenfélnél támadáskor."
+    type: "ATTACK"
+    levels:
+      1:
+        chance: 20
+        cooldown: 8
+        actions:
+          - "TNT:10;3;3"
+
+  voidcaller:
+    name: "{categoryColor}Üresség Hívója"
+    category: "mythic"
+    applies-to: "sword"
+    item-lore:
+      enabled: true
+      lines:
+        - "{categoryColor}Üresség Hívója &8[&#94A3B8{level}&8]"
+    book-lore:
+      enabled: true
+      lines:
+        - "Shift+jobbklikk hatására láthatatlan"
+        - "leszel 10 másodpercre és gyorsaságot kapsz."
+    type: "RIGHT_CLICK"
+    levels:
+      1:
+        chance: 100
+        conditions:
+          - "{sneaking} = true => allow"
+        cooldown: 30
+        actions:
+          - "POTION:INVISIBILITY:0:200"
+          - "POTION:SPEED:1:200"
+
+  malgron:
+    name: "{categoryColor}Malgron Pecsétje"
+    category: "mythic"
+    applies-to: "sword"
+    item-lore:
+      enabled: true
+      lines:
+        - "{categoryColor}Malgron Pecsétje &8[&#94A3B8{level}&8]"
+    book-lore:
+      enabled: true
+      lines:
+        - "Shift+jobbklikk hatására 3 másodpercre"
+        - "sebezhetetlen leszel."
+    type: "RIGHT_CLICK"
+    levels:
+      1:
+        chance: 100
+        conditions:
+          - "{sneaking} = true => allow"
+        cooldown: 5
+        actions:
+          - "INVINCIBLE"
+          - "WAIT:60"
+          - "INVINCIBLE"
+
+  impact:
+    name: "{categoryColor}Becsapódás"
+    category: "epic"
+    applies-to: "trident"
+    item-lore:
+      enabled: true
+      lines:
+        - "{categoryColor}Becsapódás &8[&#94A3B8{level}&8]"
+    book-lore:
+      enabled: true
+      lines:
+        - "Eséllyel dupla sebzést okoz."
+    type: "ATTACK"
+    levels:
+      1:
+        chance: 5
+        cooldown: 3
+        actions:
+          - "DOUBLE_DAMAGE"
+      2:
+        chance: 8
+        cooldown: 3
+        actions:
+          - "DOUBLE_DAMAGE"
+      3:
+        chance: 11
+        cooldown: 5
+        actions:
+          - "DOUBLE_DAMAGE"
+      4:
+        chance: 14
+        cooldown: 6
+        actions:
+          - "DOUBLE_DAMAGE"
+
+  jellylegs:
+    name: "{categoryColor}Kocsonyalábak"
+    category: "legendary"
+    applies-to: "boots"
+    item-lore:
+      enabled: true
+      lines:
+        - "{categoryColor}Kocsonyalábak &8[&#94A3B8{level}&8]"
+    book-lore:
+      enabled: true
+      lines:
+        - "Eséllyel semlegesíti az esési sebzést."
+    type: "FALL_DAMAGE"
+    levels:
+      1:
+        chance: 40
+        cooldown: 0
+        actions:
+          - "CANCEL_EVENT"
+      2:
+        chance: 80
+        cooldown: 0
+        actions:
+          - "CANCEL_EVENT"
+      3:
+        chance: 100
+        cooldown: 0
+        actions:
+          - "CANCEL_EVENT"
+
+  restore:
+    name: "{categoryColor}Helyreállítás"
+    category: "legendary"
+    applies-to: "pickaxe,shovel,axe"
+    item-lore:
+      enabled: true
+      lines:
+        - "{categoryColor}Helyreállítás &8[&#94A3B8{level}&8]"
+    book-lore:
+      enabled: true
+      lines:
+        - "Eltöréskor a tárgy eséllyel elveszíti ezt"
+        - "a varázst, de visszaszerzi a tartóssága felét."
+    type: "ITEM_BREAK"
+    levels:
+      1:
+        chance: 40
+        cooldown: 0
+        actions:
+          - "REMOVE_ENCHANT:restore"
+          - "ADD_DURABILITY_ITEM:-50"
+      2:
+        chance: 60
+        cooldown: 0
+        actions:
+          - "REMOVE_ENCHANT:restore"
+          - "ADD_DURABILITY_ITEM:-50"
+      3:
+        chance: 80
+        cooldown: 0
+        actions:
+          - "REMOVE_ENCHANT:restore"
+          - "ADD_DURABILITY_ITEM:-50"
+      4:
+        chance: 100
+        cooldown: 0
+        actions:
+          - "REMOVE_ENCHANT:restore"
+          - "ADD_DURABILITY_ITEM:-50"
+
+  shuffle:
+    name: "{categoryColor}Felkeverés"
+    category: "common"
+    applies-to: "armor"
+    item-lore:
+      enabled: true
+      lines:
+        - "{categoryColor}Felkeverés &8[&#94A3B8{level}&8]"
+    book-lore:
+      enabled: true
+      lines:
+        - "Összekeveri az ellenfél gyorstárát."
+    type: "DEFENSE"
+    levels:
+      1:
+        chance: 5
+        cooldown: 20
+        actions:
+          - "SHUFFLE_HOTBAR"
+      2:
+        chance: 6
+        cooldown: 18
+        actions:
+          - "SHUFFLE_HOTBAR"
+      3:
+        chance: 8
+        cooldown: 15
+        actions:
+          - "SHUFFLE_HOTBAR"
+
+  aquatic:
+    name: "{categoryColor}Vízi Áldás"
+    category: "common"
+    applies-to: "helmet"
+    item-lore:
+      enabled: true
+      lines:
+        - "{categoryColor}Vízi Áldás &8[&#94A3B8{level}&8]"
+    book-lore:
+      enabled: true
+      lines:
+        - "Állandó víz alatt lélegzés."
+    type: "EFFECT_STATIC"
+    levels:
+      1:
+        chance: 100
+        cooldown: 0
+        actions:
+          - "POTION:WATER_BREATHING:0:999999"
+
+  autosmelt:
+    name: "{categoryColor}Automatikus Olvasztás"
+    category: "common"
+    applies-to: "pickaxe"
+    item-lore:
+      enabled: true
+      lines:
+        - "{categoryColor}Automatikus Olvasztás &8[&#94A3B8{level}&8]"
+    book-lore:
+      enabled: true
+      lines:
+        - "Az ércek automatikusan beolvadnak"
+        - "kibányászáskor."
+    type: "MINING"
+    levels:
+      1:
+        chance: 41
+        cooldown: 0
+        actions:
+          - "SMELT"
+      2:
+        chance: 62
+        cooldown: 0
+        actions:
+          - "SMELT"
+      3:
+        chance: 100
+        cooldown: 0
+        actions:
+          - "SMELT"
+
+  confusion:
+    name: "{categoryColor}Káosz"
+    category: "common"
+    applies-to: "axe"
+    item-lore:
+      enabled: true
+      lines:
+        - "{categoryColor}Káosz &8[&#94A3B8{level}&8]"
+    book-lore:
+      enabled: true
+      lines:
+        - "Eséllyel hányingert okoz"
+        - "az áldozatnak."
+    type: "ATTACK"
+    levels:
+      1:
+        chance: 13
+        cooldown: 4
+        actions:
+          - "POTION:CONFUSION:0:40"
+      2:
+        chance: 19
+        cooldown: 5
+        actions:
+          - "POTION:CONFUSION:0:80"
+      3:
+        chance: 24
+        cooldown: 6
+        actions:
+          - "POTION:CONFUSION:0:120"
 
 version: '1'

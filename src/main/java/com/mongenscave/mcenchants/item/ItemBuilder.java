@@ -15,6 +15,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @SuppressWarnings("all")
 public class ItemBuilder implements ItemFactory {
@@ -72,7 +73,10 @@ public class ItemBuilder implements ItemFactory {
 
     @Override
     public ItemBuilder setLore(@NotNull List<String> lore) {
-        meta.setLore(lore);
+        List<String> processedLore = lore.stream()
+                .map(MessageProcessor::process)
+                .collect(Collectors.toList());
+        meta.setLore(processedLore);
         return this;
     }
 
