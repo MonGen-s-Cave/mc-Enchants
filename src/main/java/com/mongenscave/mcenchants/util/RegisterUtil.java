@@ -20,6 +20,7 @@ import revxrsal.commands.orphan.Orphans;
 @UtilityClass
 public class RegisterUtil {
     private final McEnchants plugin = McEnchants.getInstance();
+    private static EnchantTriggerListener enchantTriggerListener;
 
     public void registerCommands() {
         var lamp = BukkitLamp.builder(plugin)
@@ -46,6 +47,12 @@ public class RegisterUtil {
         pm.registerEvents(new MenuListener(), plugin);
         pm.registerEvents(new EnchantApplyListener(), plugin);
         pm.registerEvents(new BookRevealListener(), plugin);
-        pm.registerEvents(new EnchantTriggerListener(), plugin);
+
+        enchantTriggerListener = new EnchantTriggerListener();
+        pm.registerEvents(enchantTriggerListener, plugin);
+    }
+
+    public void unregisterListeners() {
+        if (enchantTriggerListener != null) enchantTriggerListener.shutdown();
     }
 }

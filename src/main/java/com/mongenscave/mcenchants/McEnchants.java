@@ -5,6 +5,8 @@ import com.github.Anon8281.universalScheduler.scheduling.schedulers.TaskSchedule
 import com.mongenscave.mcenchants.api.McEnchantsAPI;
 import com.mongenscave.mcenchants.api.McEnchantsAPIImpl;
 import com.mongenscave.mcenchants.config.Config;
+import com.mongenscave.mcenchants.data.MenuController;
+import com.mongenscave.mcenchants.gui.Menu;
 import com.mongenscave.mcenchants.manager.ManagerRegistry;
 import com.mongenscave.mcenchants.util.RegisterUtil;
 import dev.dejvokep.boostedyaml.dvs.versioning.BasicVersioning;
@@ -51,7 +53,13 @@ public final class McEnchants extends ZapperJavaPlugin {
     }
 
     @Override
-    public void onDisable() {}
+    public void onDisable() {
+        RegisterUtil.unregisterListeners();
+        MenuController.clearAll();
+        Menu.clearRegistry();
+
+        if (scheduler != null) scheduler.cancelTasks(this);
+    }
 
     public Config getConfiguration() {
         return config;

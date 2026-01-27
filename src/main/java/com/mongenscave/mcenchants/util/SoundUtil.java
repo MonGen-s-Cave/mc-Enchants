@@ -2,25 +2,29 @@ package com.mongenscave.mcenchants.util;
 
 import com.mongenscave.mcenchants.identifier.key.ConfigKey;
 import lombok.experimental.UtilityClass;
+import org.bukkit.Location;
 import org.bukkit.Sound;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 
 @UtilityClass
 public class SoundUtil {
+
     public void playSound(@NotNull Player player, @NotNull ConfigKey configKey) {
         String soundName = configKey.getString();
-        playSound(player, soundName);
+        playSound(player, soundName, 1.0f, 1.0f);
     }
 
-    private void playSound(@NotNull Player player, @NotNull String soundName) {
+    public void playSound(@NotNull Player player, @NotNull String soundName, float volume, float pitch) {
         if (soundName.isEmpty()) return;
+
+        Location location = player.getLocation();
 
         try {
             Sound sound = Sound.valueOf(soundName.toUpperCase().replace(".", "_"));
-            player.playSound(player.getLocation(), sound, (float) 1.0, (float) 1.0);
+            player.playSound(location, sound, volume, pitch);
         } catch (IllegalArgumentException exception) {
-            player.playSound(player.getLocation(), soundName, (float) 1.0, (float) 1.0);
+            player.playSound(location, soundName, volume, pitch);
         }
     }
 
