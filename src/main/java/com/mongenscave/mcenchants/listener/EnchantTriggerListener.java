@@ -48,8 +48,20 @@ public final class EnchantTriggerListener implements Listener {
     private final EnchantActionExecutor actionExecutor;
     private final Map<String, Long> cooldowns = new ConcurrentHashMap<>();
     private final Map<UUID, Set<String>> activeEffects = new ConcurrentHashMap<>();
-    private final Map<UUID, Boolean> recentHeadshots = new ConcurrentHashMap<>();
+    private final Map<UUID, ProjectileHitData> recentProjectileHits = new ConcurrentHashMap<>();
     private MyScheduledTask passiveCheckTask;
+
+    private static class ProjectileHitData {
+        final LivingEntity target;
+        final boolean isHeadshot;
+        final long timestamp;
+
+        ProjectileHitData(LivingEntity target, boolean isHeadshot) {
+            this.target = target;
+            this.isHeadshot = isHeadshot;
+            this.timestamp = System.currentTimeMillis();
+        }
+    }
 
     public EnchantTriggerListener() {
         this.enchantManager = McEnchants.getInstance().getManagerRegistry().getEnchantManager();
@@ -168,7 +180,7 @@ public final class EnchantTriggerListener implements Listener {
     @EventHandler
     public void onPlayerQuit(@NotNull PlayerQuitEvent event) {
         activeEffects.remove(event.getPlayer().getUniqueId());
-        recentHeadshots.remove(event.getPlayer().getUniqueId());
+        recentProjectileHits.remove(event.getPlayer().getUniqueId());
     }
 
     @EventHandler
@@ -191,7 +203,14 @@ public final class EnchantTriggerListener implements Listener {
         }
 
         if (type != null) {
-            Map<String, Object> context = createContext(player, event.getClickedBlock(), null, null, null);
+            Map<String, Object> context = new HashMap<>();
+            context.put("player", player);
+            context.put("target", player);
+            if (event.getClickedBlock() != null) {
+                context.put("block", event.getClickedBlock());
+            }
+            context.put("event", event);
+
             triggerEnchants(player, item, type, context);
         }
     }
@@ -201,7 +220,11 @@ public final class EnchantTriggerListener implements Listener {
         Player player = event.getPlayer();
         ItemStack item = player.getInventory().getItemInMainHand();
 
-        Map<String, Object> context = createContext(player, event.getBlock(), null, null, null);
+        Map<String, Object> context = new HashMap<>();
+        context.put("player", player);
+        context.put("block", event.getBlock());
+        context.put("target", player);
+        context.put("event", event);
 
         triggerEnchants(player, item, EnchantType.BREAK_BLOCK, context);
         triggerEnchants(player, item, EnchantType.MINING, context);
@@ -209,25 +232,41 @@ public final class EnchantTriggerListener implements Listener {
 
     @EventHandler(priority = EventPriority.NORMAL, ignoreCancelled = true)
     public void onEntityDamageByEntity(@NotNull EntityDamageByEntityEvent event) {
-        if (!(event.getDamager() instanceof Player player)) return;
+        // ATTACK - when player damages entity
+        if (event.getDamager() instanceof Player attacker) {
+            ItemStack item = attacker.getInventory().getItemInMainHand();
 
-        ItemStack item = player.getInventory().getItemInMainHand();
-
-        if (event.getEntity() instanceof Player) {
-            Map<String, Object> context = createContext(player, null, event.getEntity(), event, event.getEntity());
+            Map<String, Object> context = new HashMap<>();
+            context.put("player", attacker);
+            context.put("attacker", attacker);
             context.put("victim", event.getEntity());
-            context.put("damager", player);
+            context.put("target", event.getEntity());
+            context.put("event", event);
             context.put("damage", event.getDamage());
 
-            triggerEnchants(player, item, EnchantType.ATTACK, context);
-        } else {
-            Map<String, Object> context = createContext(player, null, event.getEntity(), event, event.getEntity());
-            context.put("victim", event.getEntity());
-            context.put("damager", player);
+            triggerEnchants(attacker, item, EnchantType.ATTACK, context);
+
+            if (!(event.getEntity() instanceof Player)) {
+                triggerEnchants(attacker, item, EnchantType.ATTACK_MOB, context);
+            }
+        }
+
+        // DEFENSE - when player receives damage
+        if (event.getEntity() instanceof Player victim) {
+            Map<String, Object> context = new HashMap<>();
+            context.put("player", victim);
+            context.put("victim", victim);
+            context.put("attacker", event.getDamager());
+            context.put("target", victim);
+            context.put("event", event);
             context.put("damage", event.getDamage());
 
-            triggerEnchants(player, item, EnchantType.ATTACK, context);
-            triggerEnchants(player, item, EnchantType.ATTACK_MOB, context);
+            ItemStack[] armor = victim.getInventory().getArmorContents();
+            for (ItemStack piece : armor) {
+                if (piece != null && !piece.getType().isAir()) {
+                    triggerEnchants(victim, piece, EnchantType.DEFENSE, context);
+                }
+            }
         }
     }
 
@@ -235,25 +274,15 @@ public final class EnchantTriggerListener implements Listener {
     public void onEntityDamage(@NotNull EntityDamageEvent event) {
         if (!(event.getEntity() instanceof Player player)) return;
 
-        if (event instanceof EntityDamageByEntityEvent damageByEntity) {
-            Map<String, Object> context = createContext(player, null, damageByEntity.getDamager(), event, player);
-            context.put("attacker", damageByEntity.getDamager());
-            context.put("victim", player);
-            context.put("damage", event.getDamage());
-
-            ItemStack[] armor = player.getInventory().getArmorContents();
-            for (ItemStack piece : armor) {
-                if (piece != null) {
-                    triggerEnchants(player, piece, EnchantType.DEFENSE, context);
-                }
-            }
-        }
-
         if (event.getCause() == EntityDamageEvent.DamageCause.FALL) {
             ItemStack boots = player.getInventory().getBoots();
-            if (boots != null) {
-                Map<String, Object> context = createContext(player, null, null, event, player);
+            if (boots != null && !boots.getType().isAir()) {
+                Map<String, Object> context = new HashMap<>();
+                context.put("player", player);
+                context.put("target", player);
+                context.put("event", event);
                 context.put("damage", event.getDamage());
+
                 triggerEnchants(player, boots, EnchantType.FALL_DAMAGE, context);
             }
         }
@@ -266,29 +295,65 @@ public final class EnchantTriggerListener implements Listener {
         ItemStack item = event.getBow();
         if (item == null) return;
 
-        Map<String, Object> context = createContext(player, null, null, event, null);
-        context.put("projectile", event.getProjectile());
-        context.put("headshot", false);
-
-        triggerEnchants(player, item, EnchantType.SHOOT, context);
+        // Store shooter info in projectile metadata
+        if (event.getProjectile() instanceof Projectile projectile) {
+            projectile.getPersistentDataContainer().set(
+                    new NamespacedKey(McEnchants.getInstance(), "shooter"),
+                    PersistentDataType.STRING,
+                    player.getUniqueId().toString()
+            );
+        }
     }
 
     @EventHandler(priority = EventPriority.NORMAL)
     public void onProjectileHit(@NotNull ProjectileHitEvent event) {
-        if (!(event.getEntity().getShooter() instanceof Player shooter)) return;
+        // Only process if hit an entity
+        if (event.getHitEntity() == null) return;
         if (!(event.getHitEntity() instanceof LivingEntity target)) return;
 
         Projectile projectile = event.getEntity();
+
+        // Get shooter from metadata
+        PersistentDataContainer pdc = projectile.getPersistentDataContainer();
+        NamespacedKey key = new NamespacedKey(McEnchants.getInstance(), "shooter");
+
+        if (!pdc.has(key, PersistentDataType.STRING)) return;
+
+        String shooterUUID = pdc.get(key, PersistentDataType.STRING);
+        if (shooterUUID == null) return;
+
+        Player shooter = McEnchants.getInstance().getServer().getPlayer(UUID.fromString(shooterUUID));
+        if (shooter == null) return;
+
+        // Calculate headshot
         Location hitLocation = projectile.getLocation();
         Location eyeLocation = target.getEyeLocation();
-
         boolean isHeadshot = Math.abs(hitLocation.getY() - eyeLocation.getY()) < 0.5;
 
-        if (isHeadshot) {
-            recentHeadshots.put(shooter.getUniqueId(), true);
+        // Store hit data
+        recentProjectileHits.put(shooter.getUniqueId(), new ProjectileHitData(target, isHeadshot));
 
-            McEnchants.getInstance().getScheduler().runTaskLater(() -> recentHeadshots.remove(shooter.getUniqueId()), 2L);
+        // Get bow/crossbow from inventory
+        ItemStack bow = shooter.getInventory().getItemInMainHand();
+        if (!bow.getType().name().contains("BOW") && !bow.getType().name().contains("CROSSBOW")) {
+            bow = shooter.getInventory().getItemInOffHand();
         }
+
+        // Create context for SHOOT enchants
+        Map<String, Object> context = new HashMap<>();
+        context.put("player", shooter);
+        context.put("attacker", shooter);
+        context.put("victim", target);
+        context.put("target", target);
+        context.put("projectile", projectile);
+        context.put("headshot", isHeadshot);
+        context.put("event", event);
+
+        triggerEnchants(shooter, bow, EnchantType.SHOOT, context);
+
+        // Clean up after 1 second
+        McEnchants.getInstance().getScheduler().runTaskLater(() ->
+                recentProjectileHits.remove(shooter.getUniqueId()), 20L);
     }
 
     @EventHandler(priority = EventPriority.NORMAL, ignoreCancelled = true)
@@ -300,9 +365,13 @@ public final class EnchantTriggerListener implements Listener {
 
         ItemStack item = killer.getInventory().getItemInMainHand();
 
-        Map<String, Object> context = createContext(killer, null, victim, event, victim);
+        Map<String, Object> context = new HashMap<>();
+        context.put("player", killer);
+        context.put("attacker", killer);
         context.put("victim", victim);
+        context.put("target", victim);
         context.put("killer", killer);
+        context.put("event", event);
 
         triggerEnchants(killer, item, EnchantType.KILL_PLAYER, context);
     }
@@ -320,9 +389,13 @@ public final class EnchantTriggerListener implements Listener {
 
         int exp = event.getDroppedExp();
 
-        Map<String, Object> context = createContext(killer, null, entity, event, entity);
+        Map<String, Object> context = new HashMap<>();
+        context.put("player", killer);
+        context.put("attacker", killer);
         context.put("victim", entity);
+        context.put("target", entity);
         context.put("exp", exp);
+        context.put("event", event);
 
         triggerEnchants(killer, item, EnchantType.KILL_MOB, context);
     }
@@ -332,8 +405,11 @@ public final class EnchantTriggerListener implements Listener {
         Player player = event.getPlayer();
         ItemStack item = event.getBrokenItem();
 
-        Map<String, Object> context = createContext(player, null, null, event, null);
+        Map<String, Object> context = new HashMap<>();
+        context.put("player", player);
+        context.put("target", player);
         context.put("broken_item", item);
+        context.put("event", event);
 
         triggerEnchants(player, item, EnchantType.ITEM_BREAK, context);
     }
@@ -347,10 +423,6 @@ public final class EnchantTriggerListener implements Listener {
         Map<String, Integer> enchants = getEnchantsFromItem(item);
         if (enchants.isEmpty()) {
             return;
-        }
-
-        if (type == EnchantType.SHOOT) {
-            context.put("headshot", recentHeadshots.getOrDefault(player.getUniqueId(), false));
         }
 
         for (Map.Entry<String, Integer> entry : enchants.entrySet()) {
@@ -468,25 +540,12 @@ public final class EnchantTriggerListener implements Listener {
         });
     }
 
-    @NotNull
-    private Map<String, Object> createContext(@NotNull Player player, @Nullable Object block,
-                                              @Nullable Object entity, @Nullable Object event,
-                                              @Nullable Object target) {
-        Map<String, Object> context = new HashMap<>();
-        context.put("player", player);
-        context.put("target", target != null ? target : player);
-        if (block != null) context.put("block", block);
-        if (entity != null) context.put("entity", entity);
-        if (event != null) context.put("event", event);
-        return context;
-    }
-
     public void shutdown() {
         if (passiveCheckTask != null) {
             passiveCheckTask.cancel();
         }
         activeEffects.clear();
         cooldowns.clear();
-        recentHeadshots.clear();
+        recentProjectileHits.clear();
     }
 }

@@ -3,6 +3,7 @@ package com.mongenscave.mcenchants.executor.action.impl;
 import com.mongenscave.mcenchants.data.ActionData;
 import com.mongenscave.mcenchants.executor.action.EnchantAction;
 import com.mongenscave.mcenchants.util.LoggerUtil;
+import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
@@ -30,7 +31,27 @@ public class PotionAction extends EnchantAction {
         try {
             int amplifier = Integer.parseInt(parts[2]);
             int duration = Integer.parseInt(parts[3]);
-            player.addPotionEffect(new PotionEffect(effectType, duration, amplifier, false, true));
+
+            // Determine target
+            LivingEntity target = player;
+            if (parts.length >= 5) {
+                String targetSpec = parts[4].toUpperCase();
+                if (targetSpec.equals("@VICTIM")) {
+                    Object victim = context.get("victim");
+                    if (victim instanceof LivingEntity) {
+                        target = (LivingEntity) victim;
+                    } else {
+                        return;
+                    }
+                } else if (targetSpec.equals("@ATTACKER")) {
+                    Object attacker = context.get("attacker");
+                    if (attacker instanceof LivingEntity) {
+                        target = (LivingEntity) attacker;
+                    }
+                }
+            }
+
+            target.addPotionEffect(new PotionEffect(effectType, duration, amplifier, false, true));
         } catch (NumberFormatException exception) {
             LoggerUtil.error(exception.getMessage());
         }

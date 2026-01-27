@@ -2,7 +2,6 @@ package com.mongenscave.mcenchants.executor.action.impl;
 
 import com.mongenscave.mcenchants.data.ActionData;
 import com.mongenscave.mcenchants.executor.action.EnchantAction;
-import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 
@@ -12,22 +11,50 @@ import java.util.concurrent.ThreadLocalRandom;
 public class StealExpAction extends EnchantAction {
     @Override
     public void execute(@NotNull Player player, @NotNull ActionData actionData, @NotNull Map<String, Object> context) {
-        Entity victim = (Entity) context.get("victim");
-        if (!(victim instanceof Player victimPlayer)) return;
-
         String actionString = actionData.fullActionString();
         String[] parts = actionString.split(":");
         if (parts.length < 2) return;
 
         int expAmount = parseAmount(parts[1]);
-        int victimTotalExp = getTotalExperience(victimPlayer);
+
+        Player victim = null;
+
+        if (parts.length >= 3) {
+            String targetSpec = parts[2].toUpperCase();
+            if (targetSpec.equals("@VICTIM")) {
+                Object victimObj = context.get("victim");
+                if (victimObj instanceof Player) {
+                    victim = (Player) victimObj;
+                } else {
+                    return;
+                }
+            } else if (targetSpec.equals("@ATTACKER")) {
+                Object attackerObj = context.get("attacker");
+                if (attackerObj instanceof Player) {
+                    victim = (Player) attackerObj;
+                } else {
+                    return;
+                }
+            }
+        } else {
+            Object victimObj = context.get("victim");
+            if (victimObj instanceof Player) {
+                victim = (Player) victimObj;
+            } else {
+                return;
+            }
+        }
+
+        if (victim == null) return;
+
+        int victimTotalExp = getTotalExperience(victim);
         int actualStolen = Math.min(expAmount, victimTotalExp);
 
         if (actualStolen > 0) {
-            victimPlayer.setExp(0);
-            victimPlayer.setLevel(0);
-            victimPlayer.setTotalExperience(0);
-            victimPlayer.giveExp(victimTotalExp - actualStolen);
+            victim.setExp(0);
+            victim.setLevel(0);
+            victim.setTotalExperience(0);
+            victim.giveExp(victimTotalExp - actualStolen);
 
             player.giveExp(actualStolen);
         }

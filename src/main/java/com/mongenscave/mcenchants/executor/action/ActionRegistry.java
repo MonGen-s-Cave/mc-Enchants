@@ -15,7 +15,6 @@ public class ActionRegistry {
         register(new TNTAction());
         register(new PotionAction());
         register(new InvincibleAction());
-        register(new WaitAction());
         register(new DoubleDamageAction());
         register(new CancelEventAction());
         register(new AddDurabilityAction());

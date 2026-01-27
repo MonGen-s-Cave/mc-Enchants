@@ -16,12 +16,41 @@ import java.util.Map;
 public class DropHeadAction extends EnchantAction {
     @Override
     public void execute(@NotNull Player player, @NotNull ActionData actionData, @NotNull Map<String, Object> context) {
-        Entity victim = (Entity) context.get("victim");
-        if (victim == null) return;
+        String actionString = actionData.fullActionString();
+        String[] parts = actionString.split(":");
+
+        Entity target = null;
+        if (parts.length >= 2) {
+            String targetSpec = parts[1].toUpperCase();
+            if (targetSpec.equals("@VICTIM")) {
+                Object victim = context.get("victim");
+                if (victim instanceof Entity) {
+                    target = (Entity) victim;
+                } else {
+                    return;
+                }
+            } else if (targetSpec.equals("@ATTACKER")) {
+                Object attacker = context.get("attacker");
+                if (attacker instanceof Entity) {
+                    target = (Entity) attacker;
+                } else {
+                    return;
+                }
+            }
+        } else {
+            Object victim = context.get("victim");
+            if (victim instanceof Entity) {
+                target = (Entity) victim;
+            } else {
+                return;
+            }
+        }
+
+        if (target == null) return;
 
         ItemStack head;
 
-        if (victim instanceof Player playerVictim) {
+        if (target instanceof Player playerVictim) {
             head = new ItemStack(Material.PLAYER_HEAD);
             SkullMeta meta = (SkullMeta) head.getItemMeta();
             if (meta != null) {
@@ -29,11 +58,11 @@ public class DropHeadAction extends EnchantAction {
                 head.setItemMeta(meta);
             }
         } else {
-            head = getMobHead(victim.getType());
+            head = getMobHead(target.getType());
         }
 
         if (head != null) {
-            victim.getWorld().dropItemNaturally(victim.getLocation(), head);
+            target.getWorld().dropItemNaturally(target.getLocation(), head);
         }
     }
 

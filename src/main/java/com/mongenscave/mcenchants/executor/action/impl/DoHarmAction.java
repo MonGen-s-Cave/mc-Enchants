@@ -2,11 +2,9 @@ package com.mongenscave.mcenchants.executor.action.impl;
 
 import com.mongenscave.mcenchants.data.ActionData;
 import com.mongenscave.mcenchants.executor.action.EnchantAction;
-import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
-import org.jspecify.annotations.Nullable;
 
 import java.util.Map;
 import java.util.concurrent.ThreadLocalRandom;
@@ -14,34 +12,46 @@ import java.util.concurrent.ThreadLocalRandom;
 public class DoHarmAction extends EnchantAction {
     @Override
     public void execute(@NotNull Player player, @NotNull ActionData actionData, @NotNull Map<String, Object> context) {
-        Entity target = getTarget(context);
-        if (!(target instanceof LivingEntity livingTarget)) return;
-
         String actionString = actionData.fullActionString();
         String[] parts = actionString.split(":");
         if (parts.length < 2) return;
 
         double damage = parseDamage(parts[1], context);
 
-        livingTarget.damage(damage, player);
+        LivingEntity target = null;
+        if (parts.length >= 3) {
+            String targetSpec = parts[2].toUpperCase();
+            if (targetSpec.equals("@VICTIM")) {
+                Object victim = context.get("victim");
+                if (victim instanceof LivingEntity) {
+                    target = (LivingEntity) victim;
+                }
+            } else if (targetSpec.equals("@ATTACKER")) {
+                Object attacker = context.get("attacker");
+                if (attacker instanceof LivingEntity) {
+                    target = (LivingEntity) attacker;
+                }
+            }
+        } else {
+            Object victim = context.get("victim");
+            if (victim instanceof LivingEntity) {
+                target = (LivingEntity) victim;
+            } else {
+                Object targetObj = context.get("target");
+                if (targetObj instanceof LivingEntity) {
+                    target = (LivingEntity) targetObj;
+                }
+            }
+        }
+
+        if (target == null) return;
+
+        target.damage(damage, player);
     }
 
     @Override
     public String getActionType() {
         return "DO_HARM";
-    }
-
-    private @Nullable Entity getTarget(@NotNull Map<String, Object> context) {
-        Object victim = context.get("victim");
-        if (victim instanceof Entity) return (Entity) victim;
-
-        Object target = context.get("target");
-        if (target instanceof Entity) return (Entity) target;
-
-        Object attacker = context.get("attacker");
-        if (attacker instanceof Entity) return (Entity) attacker;
-
-        return null;
     }
 
     private double parseDamage(@NotNull String damageStr, @NotNull Map<String, Object> context) {

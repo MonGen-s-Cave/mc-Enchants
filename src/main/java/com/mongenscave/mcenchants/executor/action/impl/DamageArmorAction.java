@@ -14,16 +14,42 @@ import java.util.concurrent.ThreadLocalRandom;
 public class DamageArmorAction extends EnchantAction {
     @Override
     public void execute(@NotNull Player player, @NotNull ActionData actionData, @NotNull Map<String, Object> context) {
-        Entity victim = (Entity) context.get("victim");
-        if (!(victim instanceof Player victimPlayer)) return;
-
         String actionString = actionData.fullActionString();
         String[] parts = actionString.split(":");
         if (parts.length < 2) return;
 
         int damageAmount = parseDamageAmount(parts[1]);
 
-        ItemStack[] armor = victimPlayer.getInventory().getArmorContents();
+        Player target = null;
+        if (parts.length >= 3) {
+            String targetSpec = parts[2].toUpperCase();
+            if (targetSpec.equals("@VICTIM")) {
+                Object victim = context.get("victim");
+                if (victim instanceof Player) {
+                    target = (Player) victim;
+                } else {
+                    return;
+                }
+            } else if (targetSpec.equals("@ATTACKER")) {
+                Object attacker = context.get("attacker");
+                if (attacker instanceof Player) {
+                    target = (Player) attacker;
+                } else {
+                    target = player;
+                }
+            }
+        } else {
+            Object victim = context.get("victim");
+            if (victim instanceof Player) {
+                target = (Player) victim;
+            } else {
+                return;
+            }
+        }
+
+        if (target == null) return;
+
+        ItemStack[] armor = target.getInventory().getArmorContents();
         for (int i = 0; i < armor.length; i++) {
             ItemStack piece = armor[i];
             if (piece != null && !piece.getType().isAir()) {
@@ -44,7 +70,7 @@ public class DamageArmorAction extends EnchantAction {
             }
         }
 
-        victimPlayer.getInventory().setArmorContents(armor);
+        target.getInventory().setArmorContents(armor);
     }
 
     @Override

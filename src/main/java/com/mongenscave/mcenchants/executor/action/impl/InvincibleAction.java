@@ -10,15 +10,8 @@ import java.util.Map;
 public class InvincibleAction extends EnchantAction {
     @Override
     public void execute(@NotNull Player player, @NotNull ActionData actionData, @NotNull Map<String, Object> context) {
-        boolean isActive = context.containsKey("invincible_active");
-
-        if (!isActive) {
-            player.setInvulnerable(true);
-            context.put("invincible_active", true);
-        } else {
-            player.setInvulnerable(false);
-            context.remove("invincible_active");
-        }
+        boolean currentState = player.isInvulnerable();
+        player.setInvulnerable(!currentState);
     }
 
     @Override

@@ -82,17 +82,17 @@ enchants:
         chance: 13
         cooldown: 4
         actions:
-          - "POTION:NAUSEA:0:40"
+          - "POTION:NAUSEA:0:40:@Victim"
       2:
         chance: 19
         cooldown: 5
         actions:
-          - "POTION:NAUSEA:0:80"
+          - "POTION:NAUSEA:0:80:@Victim"
       3:
         chance: 24
         cooldown: 6
         actions:
-          - "POTION:NAUSEA:0:120"
+          - "POTION:NAUSEA:0:120:@Victim"
 
   experience:
     name: "{categoryColor}Tapasztalat"
@@ -179,51 +179,51 @@ enchants:
         chance: 10
         cooldown: 10
         actions:
-          - "POTION:SLOW:0:40"
-          - "POTION:NAUSEA:0:40"
-          - "POTION:FATIGUE:0:60"
+          - "POTION:SLOW:0:40:@Victim"
+          - "POTION:NAUSEA:0:40:@Victim"
+          - "POTION:FATIGUE:0:60:@Victim"
       2:
         chance: 12
         cooldown: 10
         actions:
-          - "POTION:SLOW:0:80"
-          - "POTION:NAUSEA:0:80"
-          - "POTION:FATIGUE:0:100"
+          - "POTION:SLOW:0:80:@Victim"
+          - "POTION:NAUSEA:0:80:@Victim"
+          - "POTION:FATIGUE:0:100:@Victim"
       3:
         chance: 14
         cooldown: 10
         actions:
-          - "POTION:SLOW:1:100"
-          - "POTION:NAUSEA:1:100"
-          - "POTION:FATIGUE:1:120"
+          - "POTION:SLOW:1:100:@Victim"
+          - "POTION:NAUSEA:1:100:@Victim"
+          - "POTION:FATIGUE:1:120:@Victim"
       4:
         chance: 16
         cooldown: 9
         actions:
-          - "POTION:SLOW:1:120"
-          - "POTION:NAUSEA:1:120"
-          - "POTION:FATIGUE:1:140"
+          - "POTION:SLOW:1:120:@Victim"
+          - "POTION:NAUSEA:1:120:@Victim"
+          - "POTION:FATIGUE:1:140:@Victim"
       5:
         chance: 18
         cooldown: 9
         actions:
-          - "POTION:SLOW:1:140"
-          - "POTION:NAUSEA:1:140"
-          - "POTION:FATIGUE:1:160"
+          - "POTION:SLOW:1:140:@Victim"
+          - "POTION:NAUSEA:1:140:@Victim"
+          - "POTION:FATIGUE:1:160:@Victim"
       6:
         chance: 20
         cooldown: 8
         actions:
-          - "POTION:SLOW:1:180"
-          - "POTION:NAUSEA:1:180"
-          - "POTION:FATIGUE:1:200"
+          - "POTION:SLOW:1:180:@Victim"
+          - "POTION:NAUSEA:1:180:@Victim"
+          - "POTION:FATIGUE:1:200:@Victim"
       7:
         chance: 22
         cooldown: 8
         actions:
-          - "POTION:SLOW:2:80"
-          - "POTION:NAUSEA:2:80"
-          - "POTION:FATIGUE:2:100"
+          - "POTION:SLOW:2:80:@Victim"
+          - "POTION:NAUSEA:2:80:@Victim"
+          - "POTION:FATIGUE:2:100:@Victim"
 
   lightning:
     name: "{categoryColor}Villámcsapás"
@@ -244,17 +244,17 @@ enchants:
         chance: 24
         cooldown: 3
         actions:
-          - "LIGHTNING"
+          - "LIGHTNING:@Victim"
       2:
         chance: 32
         cooldown: 3
         actions:
-          - "LIGHTNING"
+          - "LIGHTNING:@Victim"
       3:
         chance: 40
         cooldown: 3
         actions:
-          - "LIGHTNING"
+          - "LIGHTNING:@Victim"
 
   headless:
     name: "{categoryColor}Fejvadász"
@@ -274,15 +274,15 @@ enchants:
       1:
         chance: 20
         actions:
-          - "DROP_HEAD"
+          - "DROP_HEAD:@Victim"
       2:
         chance: 40
         actions:
-          - "DROP_HEAD"
+          - "DROP_HEAD:@Victim"
       3:
         chance: 60
         actions:
-          - "DROP_HEAD"
+          - "DROP_HEAD:@Victim"
 
   shuffle:
     name: "{categoryColor}Felkeverés"
@@ -302,17 +302,17 @@ enchants:
         chance: 5
         cooldown: 20
         actions:
-          - "SHUFFLE_HOTBAR"
+          - "SHUFFLE_HOTBAR:@Attacker"
       2:
         chance: 6
         cooldown: 18
         actions:
-          - "SHUFFLE_HOTBAR"
+          - "SHUFFLE_HOTBAR:@Attacker"
       3:
         chance: 8
         cooldown: 15
         actions:
-          - "SHUFFLE_HOTBAR"
+          - "SHUFFLE_HOTBAR:@Attacker"
 
   famine:
     name: "{categoryColor}Éhínség"
@@ -333,22 +333,22 @@ enchants:
         chance: 12
         cooldown: 8
         actions:
-          - "POTION:HUNGER:0:80"
+          - "POTION:HUNGER:0:80:@Victim"
       2:
         chance: 15
         cooldown: 8
         actions:
-          - "POTION:HUNGER:0:120"
+          - "POTION:HUNGER:0:120:@Victim"
       3:
         chance: 18
         cooldown: 8
         actions:
-          - "POTION:HUNGER:1:80"
+          - "POTION:HUNGER:1:80:@Victim"
       4:
         chance: 22
         cooldown: 8
         actions:
-          - "POTION:HUNGER:1:120"
+          - "POTION:HUNGER:1:120:@Victim"
 
   featherweight:
     name: "{categoryColor}Könnyűsúly"
@@ -369,17 +369,17 @@ enchants:
         chance: 35
         cooldown: 2
         actions:
-          - "POTION:HASTE:0:60"
+          - "POTION:HASTE:0:60:@Attacker"
       2:
         chance: 55
         cooldown: 2
         actions:
-          - "POTION:HASTE:1:80"
+          - "POTION:HASTE:1:80:@Attacker"
       3:
         chance: 75
         cooldown: 2
         actions:
-          - "POTION:HASTE:2:100"
+          - "POTION:HASTE:2:100:@Attacker"
 
   sustain:
     name: "{categoryColor}Fenntartás"
@@ -400,22 +400,22 @@ enchants:
         chance: 12
         cooldown: 8
         actions:
-          - "ADD_FOOD:1-4"
+          - "ADD_FOOD:1-4:@Victim"
       2:
         chance: 14
         cooldown: 8
         actions:
-          - "ADD_FOOD:1-4"
+          - "ADD_FOOD:1-4:@Victim"
       3:
         chance: 16
         cooldown: 8
         actions:
-          - "ADD_FOOD:1-4"
+          - "ADD_FOOD:1-4:@Victim"
       4:
         chance: 20
         cooldown: 8
         actions:
-          - "ADD_FOOD:1-4"
+          - "ADD_FOOD:1-4:@Victim"
 
   skillswipe:
     name: "{categoryColor}Tudáslópás"
@@ -436,27 +436,27 @@ enchants:
         chance: 15
         cooldown: 5
         actions:
-          - "STEAL_EXP:25-125"
+          - "STEAL_EXP:25-125:@Victim"
       2:
         chance: 17
         cooldown: 5
         actions:
-          - "STEAL_EXP:25-175"
+          - "STEAL_EXP:25-175:@Victim"
       3:
         chance: 19
         cooldown: 5
         actions:
-          - "STEAL_EXP:25-225"
+          - "STEAL_EXP:25-225:@Victim"
       4:
         chance: 21
         cooldown: 5
         actions:
-          - "STEAL_EXP:25-275"
+          - "STEAL_EXP:25-275:@Victim"
       5:
         chance: 23
         cooldown: 5
         actions:
-          - "STEAL_EXP:25-350"
+          - "STEAL_EXP:25-350:@Victim"
 
   virus:
     name: "{categoryColor}Vírus"
@@ -480,8 +480,8 @@ enchants:
           - "{has_wither} != true => stop"
           - "{has_poison} != true => stop"
         actions:
-          - "POTION:WITHER:2:60"
-          - "POTION:POISON:2:60"
+          - "POTION:WITHER:2:60:@Victim"
+          - "POTION:POISON:2:60:@Victim"
       2:
         chance: 16
         cooldown: 3
@@ -489,8 +489,8 @@ enchants:
           - "{has_wither} != true => stop"
           - "{has_poison} != true => stop"
         actions:
-          - "POTION:WITHER:2:60"
-          - "POTION:POISON:2:60"
+          - "POTION:WITHER:2:60:@Victim"
+          - "POTION:POISON:2:60:@Victim"
       3:
         chance: 20
         cooldown: 3
@@ -498,8 +498,8 @@ enchants:
           - "{has_wither} != true => stop"
           - "{has_poison} != true => stop"
         actions:
-          - "POTION:WITHER:2:60"
-          - "POTION:POISON:2:60"
+          - "POTION:WITHER:2:60:@Victim"
+          - "POTION:POISON:2:60:@Victim"
       4:
         chance: 24
         cooldown: 3
@@ -507,8 +507,8 @@ enchants:
           - "{has_wither} != true => stop"
           - "{has_poison} != true => stop"
         actions:
-          - "POTION:WITHER:2:60"
-          - "POTION:POISON:2:60"
+          - "POTION:WITHER:2:60:@Victim"
+          - "POTION:POISON:2:60:@Victim"
 
   blind:
     name: "{categoryColor}Vakítás"
@@ -529,17 +529,17 @@ enchants:
         chance: 17
         cooldown: 3
         actions:
-          - "POTION:BLINDNESS:0:60"
+          - "POTION:BLINDNESS:0:60:@Victim"
       2:
         chance: 25
         cooldown: 3
         actions:
-          - "POTION:BLINDNESS:1:80"
+          - "POTION:BLINDNESS:1:80:@Victim"
       3:
         chance: 33
         cooldown: 3
         actions:
-          - "POTION:BLINDNESS:2:100"
+          - "POTION:BLINDNESS:2:100:@Victim"
 
   frozen:
     name: "{categoryColor}Fagyasztás"
@@ -560,17 +560,17 @@ enchants:
         chance: 19
         cooldown: 6
         actions:
-          - "POTION:SLOW:0:100"
+          - "POTION:SLOW:0:100:@Attacker"
       2:
         chance: 19
         cooldown: 6
         actions:
-          - "POTION:SLOW:1:100"
+          - "POTION:SLOW:1:100:@Attacker"
       3:
         chance: 26
         cooldown: 6
         actions:
-          - "POTION:SLOW:1:100"
+          - "POTION:SLOW:1:100:@Attacker"
 
   poison:
     name: "{categoryColor}Mérgező Penge"
@@ -590,17 +590,17 @@ enchants:
         chance: 6
         cooldown: 2
         actions:
-          - "POTION:POISON:0:80"
+          - "POTION:POISON:0:80:@Victim"
       2:
         chance: 12
         cooldown: 2
         actions:
-          - "POTION:POISON:0:120"
+          - "POTION:POISON:0:120:@Victim"
       3:
         chance: 19
         cooldown: 2
         actions:
-          - "POTION:POISON:1:80"
+          - "POTION:POISON:1:80:@Victim"
 
   demonforged:
     name: "{categoryColor}Démonkovácsolt"
@@ -621,22 +621,22 @@ enchants:
         chance: 8
         cooldown: 6
         actions:
-          - "DAMAGE_ARMOR:1-3"
+          - "DAMAGE_ARMOR:1-3:@Victim"
       2:
         chance: 12
         cooldown: 6
         actions:
-          - "DAMAGE_ARMOR:1-3"
+          - "DAMAGE_ARMOR:1-3:@Victim"
       3:
         chance: 15
         cooldown: 6
         actions:
-          - "DAMAGE_ARMOR:1-3"
+          - "DAMAGE_ARMOR:1-3:@Victim"
       4:
         chance: 17
         cooldown: 6
         actions:
-          - "DAMAGE_ARMOR:1-3"
+          - "DAMAGE_ARMOR:1-3:@Victim"
 
   voodoo:
     name: "{categoryColor}Vudu Átok"
@@ -656,32 +656,32 @@ enchants:
         chance: 5
         cooldown: 2
         actions:
-          - "POTION:WEAKNESS:0:60"
+          - "POTION:WEAKNESS:0:60:@Attacker"
       2:
         chance: 7
         cooldown: 2
         actions:
-          - "POTION:WEAKNESS:0:100"
+          - "POTION:WEAKNESS:0:100:@Attacker"
       3:
         chance: 9
         cooldown: 2
         actions:
-          - "POTION:WEAKNESS:0:140"
+          - "POTION:WEAKNESS:0:140:@Attacker"
       4:
         chance: 13
         cooldown: 2
         actions:
-          - "POTION:WEAKNESS:1:60"
+          - "POTION:WEAKNESS:1:60:@Attacker"
       5:
         chance: 16
         cooldown: 2
         actions:
-          - "POTION:WEAKNESS:1:100"
+          - "POTION:WEAKNESS:1:100:@Attacker"
       6:
         chance: 21
         cooldown: 2
         actions:
-          - "POTION:WEAKNESS:1:120"
+          - "POTION:WEAKNESS:1:120:@Attacker"
 
   # ========== ULTIMATE GROUP ==========
 
@@ -804,27 +804,27 @@ enchants:
         chance: 9
         cooldown: 7
         actions:
-          - "ADD_HEALTH:1-3"
+          - "ADD_HEALTH:1-3:@Victim"
       2:
         chance: 14
         cooldown: 9
         actions:
-          - "ADD_HEALTH:1-3"
+          - "ADD_HEALTH:1-3:@Victim"
       3:
         chance: 17
         cooldown: 11
         actions:
-          - "ADD_HEALTH:1-3"
+          - "ADD_HEALTH:1-3:@Victim"
       4:
         chance: 26
         cooldown: 13
         actions:
-          - "ADD_HEALTH:1-4"
+          - "ADD_HEALTH:1-4:@Victim"
       5:
         chance: 34
         cooldown: 15
         actions:
-          - "ADD_HEALTH:1-4"
+          - "ADD_HEALTH:1-4:@Victim"
 
   detonate:
     name: "{categoryColor}Robbantás"
@@ -898,21 +898,21 @@ enchants:
         conditions:
           - "{health} > 6 => stop"
         actions:
-          - "DO_HARM:1-4"
+          - "DO_HARM:1-4:@Victim"
       2:
         chance: 27
         cooldown: 5
         conditions:
           - "{health} > 6 => stop"
         actions:
-          - "DO_HARM:1-4"
+          - "DO_HARM:1-4:@Victim"
       3:
         chance: 33
         cooldown: 5
         conditions:
           - "{health} > 6 => stop"
         actions:
-          - "DO_HARM:1-4"
+          - "DO_HARM:1-4:@Victim"
 
   obsidianshield:
     name: "{categoryColor}Obszidián Pajzs"
@@ -952,20 +952,20 @@ enchants:
         chance: 9
         cooldown: 2
         actions:
-          - "CURE:FIRE_RESISTANCE"
-          - "CURE_PERMANENT:FIRE_RESISTANCE"
+          - "CURE:FIRE_RESISTANCE:@Victim"
+          - "CURE_PERMANENT:FIRE_RESISTANCE:@Victim"
       2:
         chance: 14
         cooldown: 2
         actions:
-          - "CURE:FIRE_RESISTANCE"
-          - "CURE_PERMANENT:FIRE_RESISTANCE"
+          - "CURE:FIRE_RESISTANCE:@Victim"
+          - "CURE_PERMANENT:FIRE_RESISTANCE:@Victim"
       3:
         chance: 20
         cooldown: 2
         actions:
-          - "CURE:FIRE_RESISTANCE"
-          - "CURE_PERMANENT:FIRE_RESISTANCE"
+          - "CURE:FIRE_RESISTANCE:@Victim"
+          - "CURE_PERMANENT:FIRE_RESISTANCE:@Victim"
 
   piercing:
     name: "{categoryColor}Átütő"
@@ -1070,22 +1070,22 @@ enchants:
         chance: 12
         cooldown: 2
         actions:
-          - "DAMAGE_ARMOR:2"
+          - "DAMAGE_ARMOR:2:@Victim"
       2:
         chance: 25
         cooldown: 2
         actions:
-          - "DAMAGE_ARMOR:2"
+          - "DAMAGE_ARMOR:2:@Victim"
       3:
         chance: 39
         cooldown: 2
         actions:
-          - "DAMAGE_ARMOR:2"
+          - "DAMAGE_ARMOR:2:@Victim"
       4:
         chance: 46
         cooldown: 2
         actions:
-          - "DAMAGE_ARMOR:2"
+          - "DAMAGE_ARMOR:2:@Victim"
 
   dominate:
     name: "{categoryColor}Uralom"
@@ -1106,22 +1106,22 @@ enchants:
         chance: 15
         cooldown: 3
         actions:
-          - "POTION:WEAKNESS:0:80"
+          - "POTION:WEAKNESS:0:80:@Attacker"
       2:
         chance: 22
         cooldown: 3
         actions:
-          - "POTION:WEAKNESS:0:80"
+          - "POTION:WEAKNESS:0:80:@Attacker"
       3:
         chance: 28
         cooldown: 3
         actions:
-          - "POTION:WEAKNESS:0:80"
+          - "POTION:WEAKNESS:0:80:@Attacker"
       4:
         chance: 35
         cooldown: 3
         actions:
-          - "POTION:WEAKNESS:0:80"
+          - "POTION:WEAKNESS:0:80:@Attacker"
 
   longbow:
     name: "{categoryColor}Hosszú Íj"
@@ -1189,25 +1189,25 @@ enchants:
         cooldown: 26
         actions:
           - "DOUBLE_DAMAGE"
-          - "POTION:SLOW:4:20"
+          - "POTION:SLOW:4:20:@Victim"
       2:
         chance: 6
         cooldown: 24
         actions:
           - "DOUBLE_DAMAGE"
-          - "POTION:SLOW:4:40"
+          - "POTION:SLOW:4:40:@Victim"
       3:
         chance: 8
         cooldown: 22
         actions:
           - "DOUBLE_DAMAGE"
-          - "POTION:SLOW:4:60"
+          - "POTION:SLOW:4:60:@Victim"
       4:
         chance: 10
         cooldown: 20
         actions:
           - "DOUBLE_DAMAGE"
-          - "POTION:SLOW:4:80"
+          - "POTION:SLOW:4:80:@Victim"
 
   stun:
     name: "{categoryColor}Bénítás"
@@ -1228,26 +1228,26 @@ enchants:
         chance: 15
         cooldown: 6
         actions:
-          - "POTION:SLOW:0:120"
-          - "CURE:SLOW"
-          - "CURE_PERMANENT:SLOW"
-          - "POTION:WEAKNESS:0:80"
+          - "POTION:SLOW:0:120:@Victim"
+          - "CURE:SLOW:@Attacker"
+          - "CURE_PERMANENT:SLOW:@Attacker"
+          - "POTION:WEAKNESS:0:80:@Victim"
       2:
         chance: 23
         cooldown: 6
         actions:
-          - "POTION:SLOW:0:120"
-          - "CURE:SLOW"
-          - "CURE_PERMANENT:SLOW"
-          - "POTION:WEAKNESS:0:80"
+          - "POTION:SLOW:0:120:@Victim"
+          - "CURE:SLOW:@Attacker"
+          - "CURE_PERMANENT:SLOW:@Attacker"
+          - "POTION:WEAKNESS:0:80:@Victim"
       3:
         chance: 35
         cooldown: 6
         actions:
-          - "POTION:SLOW:1:120"
-          - "CURE:SLOW"
-          - "CURE_PERMANENT:SLOW"
-          - "POTION:WEAKNESS:0:80"
+          - "POTION:SLOW:1:120:@Victim"
+          - "CURE:SLOW:@Attacker"
+          - "CURE_PERMANENT:SLOW:@Attacker"
+          - "POTION:WEAKNESS:0:80:@Victim"
 
   fat:
     name: "{categoryColor}Kövér Test"
@@ -1279,25 +1279,25 @@ enchants:
         cooldown: 10
         actions:
           - "NEGATE_DAMAGE:30"
-          - "POTION:ABSORPTION:3:60"
+          - "POTION:ABSORPTION:3:60:@Victim"
       4:
         chance: 15
         cooldown: 10
         actions:
           - "NEGATE_DAMAGE:40"
-          - "POTION:ABSORPTION:4:80"
+          - "POTION:ABSORPTION:4:80:@Victim"
       5:
         chance: 18
         cooldown: 10
         actions:
           - "NEGATE_DAMAGE:50"
-          - "POTION:ABSORPTION:4:80"
+          - "POTION:ABSORPTION:4:80:@Victim"
       6:
         chance: 20
         cooldown: 10
         actions:
           - "NEGATE_DAMAGE:60"
-          - "POTION:ABSORPTION:5:100"
+          - "POTION:ABSORPTION:5:100:@Victim"
 
   barbarian:
     name: "{categoryColor}Barbár Erő"
@@ -1360,13 +1360,14 @@ enchants:
     levels:
       1:
         actions:
-          - "CURE:BLINDNESS"
+          - "CURE:BLINDNESS:@Victim"
       2:
         actions:
-          - "CURE:BLINDNESS"
+          - "CURE:BLINDNESS:@Victim"
       3:
         actions:
-          - "CURE:BLINDNESS"
+          - "CURE:BLINDNESS:@Victim"
+
   enlighted:
     name: "{categoryColor}Megvilágosodott"
     category: "legendary"
@@ -1386,17 +1387,17 @@ enchants:
         chance: 6
         cooldown: 30
         actions:
-          - "ADD_HEALTH:1-3"
+          - "ADD_HEALTH:1-3:@Victim"
       2:
         chance: 9
         cooldown: 30
         actions:
-          - "ADD_HEALTH:1-3"
+          - "ADD_HEALTH:1-3:@Victim"
       3:
         chance: 12
         cooldown: 30
         actions:
-          - "ADD_HEALTH:1-3"
+          - "ADD_HEALTH:1-3:@Victim"
 
   gears:
     name: "{categoryColor}Sebességfokozó"
@@ -1519,27 +1520,27 @@ enchants:
         chance: 9
         cooldown: 15
         actions:
-          - "STEAL_HEALTH:1-3"
+          - "STEAL_HEALTH:1-3:@Victim"
       2:
         chance: 13
         cooldown: 15
         actions:
-          - "STEAL_HEALTH:1-3"
+          - "STEAL_HEALTH:1-3:@Victim"
       3:
         chance: 17
         cooldown: 15
         actions:
-          - "STEAL_HEALTH:1-4"
+          - "STEAL_HEALTH:1-4:@Victim"
       4:
         chance: 21
         cooldown: 15
         actions:
-          - "STEAL_HEALTH:1-5"
+          - "STEAL_HEALTH:1-5:@Victim"
       5:
         chance: 25
         cooldown: 15
         actions:
-          - "STEAL_HEALTH:1-5"
+          - "STEAL_HEALTH:1-5:@Victim"
 
   overload:
     name: "{categoryColor}Túlterhelés"
@@ -1638,62 +1639,11 @@ enchants:
         actions:
           - "DOUBLE_DAMAGE"
 
-  sniper:
-    name: "{categoryColor}Mesterlövész"
-    category: "legendary"
-    applies-to: "bow,crossbow"
-    item-lore:
-      enabled: true
-      lines:
-        - "{categoryColor}Mesterlövész &8[&#94A3B8{level}&8]"
-    book-lore:
-      enabled: true
-      lines:
-        - "Fejlövések akár 3,5-szeres"
-        - "sebzést is okozhatnak."
-    type: "SHOOT"
-    levels:
-      1:
-        chance: 15
-        cooldown: 5
-        conditions:
-          - "{headshot} = true => allow"
-        actions:
-          - "INCREASE_DAMAGE:100-350"
-      2:
-        chance: 20
-        cooldown: 5
-        conditions:
-          - "{headshot} = true => allow"
-        actions:
-          - "INCREASE_DAMAGE:100-350"
-      3:
-        chance: 25
-        cooldown: 5
-        conditions:
-          - "{headshot} = false => stop"
-        actions:
-          - "INCREASE_DAMAGE:100-350"
-      4:
-        chance: 30
-        cooldown: 5
-        conditions:
-          - "{headshot} = false => stop"
-        actions:
-          - "INCREASE_DAMAGE:100-350"
-      5:
-        chance: 35
-        cooldown: 5
-        conditions:
-          - "{headshot} = false => stop"
-        actions:
-          - "INCREASE_DAMAGE:100-350"
-
-  # ========== ULTIMATE GROUP ==========
+  # ========== MYTHIC GROUP ==========
 
   skullrift:
     name: "{categoryColor}Koponyahasadék"
-    category: "ultimate"
+    category: "mythic"
     applies-to: "sword"
     item-lore:
       enabled: true
@@ -1710,11 +1660,11 @@ enchants:
         chance: 20
         cooldown: 8
         actions:
-          - "TNT:0;4;0"
+          - "TNT:0;4;0:@Victim"
 
   voidcaller:
     name: "{categoryColor}Üresség Hívója"
-    category: "ultimate"
+    category: "mythic"
     applies-to: "sword"
     item-lore:
       enabled: true
@@ -1733,12 +1683,12 @@ enchants:
           - "{sneaking} = true => allow"
         cooldown: 30
         actions:
-          - "POTION:INVISIBILITY:0:200"
-          - "POTION:SPEED:1:200"
+          - "POTION:INVISIBILITY:0:200:@Attacker"
+          - "POTION:SPEED:1:200:@Attacker"
 
   malgron:
     name: "{categoryColor}Malgron Pecsétje"
-    category: "ultimate"
+    category: "mythic"
     applies-to: "sword"
     item-lore:
       enabled: true
