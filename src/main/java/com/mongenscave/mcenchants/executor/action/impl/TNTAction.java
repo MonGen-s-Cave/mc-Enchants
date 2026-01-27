@@ -4,10 +4,11 @@ import com.mongenscave.mcenchants.data.ActionData;
 import com.mongenscave.mcenchants.executor.action.EnchantAction;
 import com.mongenscave.mcenchants.util.LoggerUtil;
 import org.bukkit.Location;
+import org.bukkit.Particle;
 import org.bukkit.Sound;
 import org.bukkit.entity.Entity;
+import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
-import org.bukkit.entity.TNTPrimed;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Map;
@@ -15,28 +16,49 @@ import java.util.Map;
 public class TNTAction extends EnchantAction {
     @Override
     public void execute(@NotNull Player player, @NotNull ActionData actionData, @NotNull Map<String, Object> context) {
-        LoggerUtil.info("TNT: Starting execution");
+        Object targetObj = context.get("target");
+        Entity targetEntity = null;
 
-        Entity targetEntity = (Entity) context.get("victim");
+        if (targetObj instanceof Entity) {
+            targetEntity = (Entity) targetObj;
+        }
+
         if (targetEntity == null) {
-            LoggerUtil.warn("TNT: No victim entity in context");
-            return;
+            Object victimObj = context.get("victim");
+            if (victimObj instanceof Entity) {
+                targetEntity = (Entity) victimObj;
+            }
+        }
+
+        if (targetEntity == null) {
+            targetEntity = player;
         }
 
         Location location = targetEntity.getLocation();
-        int power = (int) actionData.multiplier();
-        int fuseTicks = actionData.duration();
-        int amount = actionData.radius();
+        float power = (float) actionData.multiplier();
+        int radius = actionData.radius();
 
-        LoggerUtil.info("TNT: Spawning " + amount + " TNT with power " + power);
+        float explosionPower = radius > 0 ? radius : power;
 
-        for (int i = 0; i < amount; i++) {
-            TNTPrimed tnt = location.getWorld().spawn(location, TNTPrimed.class);
-            tnt.setFuseTicks(fuseTicks);
-            tnt.setYield(power);
-        }
+        location.getWorld().createExplosion(
+                location.getX(),
+                location.getY(),
+                location.getZ(),
+                explosionPower,
+                false,
+                false,
+                player
+        );
 
-        player.playSound(player.getLocation(), Sound.ENTITY_TNT_PRIMED, 1.0f, 1.0f);
+        location.getWorld().spawnParticle(
+                Particle.EXPLOSION,
+                location,
+                3,
+                0.5, 0.5, 0.5,
+                0.1
+        );
+
+        location.getWorld().playSound(location, Sound.ENTITY_GENERIC_EXPLODE, 2.0f, 0.8f);
     }
 
     @Override
@@ -46,6 +68,6 @@ public class TNTAction extends EnchantAction {
 
     @Override
     public boolean canExecute(@NotNull Map<String, Object> context) {
-        return context.containsKey("victim");
+        return context.containsKey("player");
     }
 }

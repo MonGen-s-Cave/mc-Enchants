@@ -1,40 +1,90 @@
 enchants:
-  planter:
-    name: "{categoryColor}Ültető Mester"
-    category: "legendary"
-    applies-to: "hoe"
+  # ========== PASSZÍV/EFFECT_STATIC ENCHANTOK (ARMOR) ==========
+
+  aquatic:
+    name: "{categoryColor}Vízi Áldás"
+    category: "common"
+    applies-to: "helmet"
     item-lore:
       enabled: true
       lines:
-        - "{categoryColor}Ültető Mester &8[&#94A3B8{level}&8]"
+        - "{categoryColor}Vízi Áldás &8[&#94A3B8{level}&8]"
     book-lore:
       enabled: true
       lines:
-        - "Shift + Jobb katt, és"
-        - "3x3-as területen kapál!"
-    type: "RIGHT_CLICK"
+        - "Állandó víz alatt lélegzés,"
+        - "amíg a sisak rajta van."
+    type: "EFFECT_STATIC"  # <-- EFFECT_STATIC típus, passzívan működik
     levels:
       1:
         chance: 100
-        conditions:
-          - "{sneaking} = true => allow"
-        cooldown: 3
-        actions:
-          - "PLANT_SEEDS:1"  # radius = 1 -> 3x3 terület
-      2:
-        chance: 100
-        conditions:
-          - "{sneaking} = true => allow"
-        cooldown: 2
-        actions:
-          - "PLANT_SEEDS:1"  # radius = 1 -> 3x3 terület
-      3:
-        chance: 100
-        conditions:
-          - "{sneaking} = true => allow"
         cooldown: 0
         actions:
-          - "PLANT_SEEDS:1"  # radius = 1 -> 3x3 terület
+          - "POTION:WATER_BREATHING:0:999999"  # Nagy duration, rendszeresen frissül
+
+  shuffle:
+    name: "{categoryColor}Felkeverés"
+    category: "common"
+    applies-to: "armor"
+    item-lore:
+      enabled: true
+      lines:
+        - "{categoryColor}Felkeverés &8[&#94A3B8{level}&8]"
+    book-lore:
+      enabled: true
+      lines:
+        - "Összekeveri az ellenfél gyorstárát,"
+        - "amikor megtámadnak téged."
+    type: "DEFENSE"  # <-- DEFENSE típus, amikor téged támadnak
+    levels:
+      1:
+        chance: 5
+        cooldown: 20
+        actions:
+          - "SHUFFLE_HOTBAR"
+      2:
+        chance: 6
+        cooldown: 18
+        actions:
+          - "SHUFFLE_HOTBAR"
+      3:
+        chance: 8
+        cooldown: 15
+        actions:
+          - "SHUFFLE_HOTBAR"
+
+  jellylegs:
+    name: "{categoryColor}Kocsonyalábak"
+    category: "legendary"
+    applies-to: "boots"
+    item-lore:
+      enabled: true
+      lines:
+        - "{categoryColor}Kocsonyalábak &8[&#94A3B8{level}&8]"
+    book-lore:
+      enabled: true
+      lines:
+        - "Eséllyel semlegesíti az esési sebzést,"
+        - "amíg a csizma rajta van."
+    type: "FALL_DAMAGE"  # <-- FALL_DAMAGE típus
+    levels:
+      1:
+        chance: 40
+        cooldown: 0
+        actions:
+          - "CANCEL_EVENT"
+      2:
+        chance: 80
+        cooldown: 0
+        actions:
+          - "CANCEL_EVENT"
+      3:
+        chance: 100
+        cooldown: 0
+        actions:
+          - "CANCEL_EVENT"
+
+  # ========== TÁMADÁS ENCHANTOK (FEGYVER) ==========
 
   skullrift:
     name: "{categoryColor}Koponyahasadék"
@@ -49,13 +99,155 @@ enchants:
       lines:
         - "Eséllyel hatalmas robbanást idéz"
         - "elő az ellenfélnél támadáskor."
-    type: "ATTACK"
+    type: "ATTACK"  # <-- ATTACK típus, amikor megtámadsz valakit
     levels:
       1:
         chance: 20
         cooldown: 8
         actions:
-          - "TNT:10;3;3"
+          - "TNT:0;4;0"  # radius=0 (nem használt), power=4.0, duration=0 (nem használt)
+          # A robbanás az ÁLDOZAT helyén történik automatikusan
+          # power = robbanás ereje (4.0 = erős robbanás)
+          # Nem spawn-ol TNT entitást, csak robbanás effekt és sebzés!
+
+  impact:
+    name: "{categoryColor}Becsapódás"
+    category: "epic"
+    applies-to: "sword,axe,trident"
+    item-lore:
+      enabled: true
+      lines:
+        - "{categoryColor}Becsapódás &8[&#94A3B8{level}&8]"
+    book-lore:
+      enabled: true
+      lines:
+        - "Eséllyel dupla sebzést okoz"
+        - "az ellenfelnek."
+    type: "ATTACK"
+    levels:
+      1:
+        chance: 5
+        cooldown: 3
+        actions:
+          - "DOUBLE_DAMAGE"
+      2:
+        chance: 8
+        cooldown: 3
+        actions:
+          - "DOUBLE_DAMAGE"
+      3:
+        chance: 11
+        cooldown: 5
+        actions:
+          - "DOUBLE_DAMAGE"
+      4:
+        chance: 14
+        cooldown: 6
+        actions:
+          - "DOUBLE_DAMAGE"
+
+  confusion:
+    name: "{categoryColor}Káosz"
+    category: "common"
+    applies-to: "axe"
+    item-lore:
+      enabled: true
+      lines:
+        - "{categoryColor}Káosz &8[&#94A3B8{level}&8]"
+    book-lore:
+      enabled: true
+      lines:
+        - "Eséllyel hányingert okoz"
+        - "az áldozatnak támadáskor."
+    type: "ATTACK"
+    levels:
+      1:
+        chance: 13
+        cooldown: 4
+        actions:
+          - "POTION:NAUSEA:0:40"  # JAVÍTVA: CONFUSION -> NAUSEA
+      2:
+        chance: 19
+        cooldown: 5
+        actions:
+          - "POTION:NAUSEA:0:80"  # JAVÍTVA: CONFUSION -> NAUSEA
+      3:
+        chance: 24
+        cooldown: 6
+        actions:
+          - "POTION:NAUSEA:0:120"  # JAVÍTVA: CONFUSION -> NAUSEA
+
+  # ========== MINING/BÁNYÁSZAT ENCHANTOK ==========
+
+  autosmelt:
+    name: "{categoryColor}Automatikus Olvasztás"
+    category: "common"
+    applies-to: "pickaxe"
+    item-lore:
+      enabled: true
+      lines:
+        - "{categoryColor}Automatikus Olvasztás &8[&#94A3B8{level}&8]"
+    book-lore:
+      enabled: true
+      lines:
+        - "Az ércek automatikusan beolvadnak"
+        - "kibányászáskor."
+    type: "MINING"  # <-- MINING típus, amikor blokkot törsz
+    levels:
+      1:
+        chance: 41
+        cooldown: 0
+        actions:
+          - "SMELT"
+      2:
+        chance: 62
+        cooldown: 0
+        actions:
+          - "SMELT"
+      3:
+        chance: 100
+        cooldown: 0
+        actions:
+          - "SMELT"
+
+  # ========== INTERAKCIÓS ENCHANTOK ==========
+
+  planter:
+    name: "{categoryColor}Ültető Mester"
+    category: "legendary"
+    applies-to: "hoe"
+    item-lore:
+      enabled: true
+      lines:
+        - "{categoryColor}Ültető Mester &8[&#94A3B8{level}&8]"
+    book-lore:
+      enabled: true
+      lines:
+        - "Shift + Jobb katt, és"
+        - "3x3-as területen kapál!"
+    type: "RIGHT_CLICK"  # <-- RIGHT_CLICK típus
+    levels:
+      1:
+        chance: 100
+        conditions:
+          - "{sneaking} = true => allow"
+        cooldown: 3
+        actions:
+          - "PLANT_SEEDS:1"  # radius = 1 -> 3x3 terület
+      2:
+        chance: 100
+        conditions:
+          - "{sneaking} = true => allow"
+        cooldown: 2
+        actions:
+          - "PLANT_SEEDS:1"
+      3:
+        chance: 100
+        conditions:
+          - "{sneaking} = true => allow"
+        cooldown: 0
+        actions:
+          - "PLANT_SEEDS:1"
 
   voidcaller:
     name: "{categoryColor}Üresség Hívója"
@@ -105,182 +297,5 @@ enchants:
           - "INVINCIBLE"
           - "WAIT:60"
           - "INVINCIBLE"
-
-  impact:
-    name: "{categoryColor}Becsapódás"
-    category: "epic"
-    applies-to: "trident"
-    item-lore:
-      enabled: true
-      lines:
-        - "{categoryColor}Becsapódás &8[&#94A3B8{level}&8]"
-    book-lore:
-      enabled: true
-      lines:
-        - "Eséllyel dupla sebzést okoz."
-    type: "ATTACK"
-    levels:
-      1:
-        chance: 5
-        cooldown: 3
-        actions:
-          - "DOUBLE_DAMAGE"
-      2:
-        chance: 8
-        cooldown: 3
-        actions:
-          - "DOUBLE_DAMAGE"
-      3:
-        chance: 11
-        cooldown: 5
-        actions:
-          - "DOUBLE_DAMAGE"
-      4:
-        chance: 14
-        cooldown: 6
-        actions:
-          - "DOUBLE_DAMAGE"
-
-  jellylegs:
-    name: "{categoryColor}Kocsonyalábak"
-    category: "legendary"
-    applies-to: "boots"
-    item-lore:
-      enabled: true
-      lines:
-        - "{categoryColor}Kocsonyalábak &8[&#94A3B8{level}&8]"
-    book-lore:
-      enabled: true
-      lines:
-        - "Eséllyel semlegesíti az esési sebzést."
-    type: "FALL_DAMAGE"
-    levels:
-      1:
-        chance: 40
-        cooldown: 0
-        actions:
-          - "CANCEL_EVENT"
-      2:
-        chance: 80
-        cooldown: 0
-        actions:
-          - "CANCEL_EVENT"
-      3:
-        chance: 100
-        cooldown: 0
-        actions:
-          - "CANCEL_EVENT"
-
-  shuffle:
-    name: "{categoryColor}Felkeverés"
-    category: "common"
-    applies-to: "armor"
-    item-lore:
-      enabled: true
-      lines:
-        - "{categoryColor}Felkeverés &8[&#94A3B8{level}&8]"
-    book-lore:
-      enabled: true
-      lines:
-        - "Összekeveri az ellenfél gyorstárát."
-    type: "DEFENSE"
-    levels:
-      1:
-        chance: 5
-        cooldown: 20
-        actions:
-          - "SHUFFLE_HOTBAR"
-      2:
-        chance: 6
-        cooldown: 18
-        actions:
-          - "SHUFFLE_HOTBAR"
-      3:
-        chance: 8
-        cooldown: 15
-        actions:
-          - "SHUFFLE_HOTBAR"
-
-  aquatic:
-    name: "{categoryColor}Vízi Áldás"
-    category: "common"
-    applies-to: "helmet"
-    item-lore:
-      enabled: true
-      lines:
-        - "{categoryColor}Vízi Áldás &8[&#94A3B8{level}&8]"
-    book-lore:
-      enabled: true
-      lines:
-        - "Állandó víz alatt lélegzés."
-    type: "EFFECT_STATIC"
-    levels:
-      1:
-        chance: 100
-        cooldown: 0
-        actions:
-          - "POTION:WATER_BREATHING:0:999999"
-
-  autosmelt:
-    name: "{categoryColor}Automatikus Olvasztás"
-    category: "common"
-    applies-to: "pickaxe"
-    item-lore:
-      enabled: true
-      lines:
-        - "{categoryColor}Automatikus Olvasztás &8[&#94A3B8{level}&8]"
-    book-lore:
-      enabled: true
-      lines:
-        - "Az ércek automatikusan beolvadnak"
-        - "kibányászáskor."
-    type: "MINING"
-    levels:
-      1:
-        chance: 41
-        cooldown: 0
-        actions:
-          - "SMELT"
-      2:
-        chance: 62
-        cooldown: 0
-        actions:
-          - "SMELT"
-      3:
-        chance: 100
-        cooldown: 0
-        actions:
-          - "SMELT"
-
-  confusion:
-    name: "{categoryColor}Káosz"
-    category: "common"
-    applies-to: "axe"
-    item-lore:
-      enabled: true
-      lines:
-        - "{categoryColor}Káosz &8[&#94A3B8{level}&8]"
-    book-lore:
-      enabled: true
-      lines:
-        - "Eséllyel hányingert okoz"
-        - "az áldozatnak."
-    type: "ATTACK"
-    levels:
-      1:
-        chance: 13
-        cooldown: 4
-        actions:
-          - "POTION:CONFUSION:0:40"
-      2:
-        chance: 19
-        cooldown: 5
-        actions:
-          - "POTION:CONFUSION:0:80"
-      3:
-        chance: 24
-        cooldown: 6
-        actions:
-          - "POTION:CONFUSION:0:120"
 
 version: '1'

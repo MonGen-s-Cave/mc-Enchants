@@ -43,11 +43,8 @@ public final class EnchantApplyListener implements Listener {
         ItemStack cursor = event.getCursor();
         ItemStack clicked = event.getCurrentItem();
 
-        // Ellenőrizzük, hogy van-e cursor-on enchant book és inventory-ban tárgy
-        if (cursor == null || clicked == null) return;
+        if (clicked == null) return;
         if (cursor.getType() == Material.AIR || clicked.getType() == Material.AIR) return;
-
-        // Csak akkor folytatjuk, ha revealed book van a cursoron
         if (!bookManager.isRevealedBook(cursor)) return;
 
         event.setCancelled(true);

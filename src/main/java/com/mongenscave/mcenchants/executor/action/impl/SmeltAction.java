@@ -15,11 +15,8 @@ import java.util.Map;
 public class SmeltAction extends EnchantAction {
     @Override
     public void execute(@NotNull Player player, @NotNull ActionData actionData, @NotNull Map<String, Object> context) {
-        LoggerUtil.info("SMELT: Starting execution");
-
         Block block = (Block) context.get("block");
         if (block == null) {
-            LoggerUtil.warn("SMELT: No block in context");
             return;
         }
 
@@ -27,9 +24,6 @@ public class SmeltAction extends EnchantAction {
         if (smelted != null) {
             block.setType(Material.AIR);
             block.getWorld().dropItemNaturally(block.getLocation(), new ItemStack(smelted));
-            LoggerUtil.info("SMELT: Smelted " + block.getType() + " to " + smelted);
-        } else {
-            LoggerUtil.warn("SMELT: No smelted material for " + block.getType());
         }
     }
 

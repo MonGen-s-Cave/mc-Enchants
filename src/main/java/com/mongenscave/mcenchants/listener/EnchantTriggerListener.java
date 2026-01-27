@@ -1,7 +1,10 @@
 package com.mongenscave.mcenchants.listener;
 
+import com.github.Anon8281.universalScheduler.scheduling.tasks.MyScheduledTask;
 import com.mongenscave.mcenchants.McEnchants;
+import com.mongenscave.mcenchants.data.ActionData;
 import com.mongenscave.mcenchants.executor.EnchantActionExecutor;
+import com.mongenscave.mcenchants.executor.action.EnchantAction;
 import com.mongenscave.mcenchants.identifier.EnchantType;
 import com.mongenscave.mcenchants.manager.EnchantManager;
 import com.mongenscave.mcenchants.model.Enchant;
@@ -17,16 +20,22 @@ import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
+import org.bukkit.event.player.PlayerItemHeldEvent;
+import org.bukkit.event.player.PlayerJoinEvent;
+import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.persistence.PersistentDataContainer;
 import org.bukkit.persistence.PersistentDataType;
+import org.bukkit.potion.PotionEffect;
+import org.bukkit.potion.PotionEffectType;
+import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.NonNull;
 
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ThreadLocalRandom;
 
@@ -34,15 +43,131 @@ public final class EnchantTriggerListener implements Listener {
     private final EnchantManager enchantManager;
     private final EnchantActionExecutor actionExecutor;
     private final Map<String, Long> cooldowns = new ConcurrentHashMap<>();
-    private static final boolean DEBUG = true;
+    private final Map<UUID, Set<String>> activeEffects = new ConcurrentHashMap<>();
+    private MyScheduledTask passiveCheckTask;
 
     public EnchantTriggerListener() {
         this.enchantManager = McEnchants.getInstance().getManagerRegistry().getEnchantManager();
         this.actionExecutor = new EnchantActionExecutor();
 
-        if (DEBUG) {
-            LoggerUtil.info("EnchantTriggerListener initialized!");
+        startPassiveEnchantChecker();
+    }
+
+    private void startPassiveEnchantChecker() {
+        passiveCheckTask = McEnchants.getInstance().getScheduler().runTaskTimer(() -> {
+            for (Player player : McEnchants.getInstance().getServer().getOnlinePlayers()) {
+                checkAndApplyPassiveEnchants(player);
+            }
+        }, 20L, 20L);
+    }
+
+    private void checkAndApplyPassiveEnchants(@NotNull Player player) {
+        Set<String> currentEffects = new HashSet<>();
+
+        ItemStack[] armor = player.getInventory().getArmorContents();
+        for (ItemStack piece : armor) {
+            if (piece == null || piece.getType().isAir()) continue;
+
+            Map<String, Integer> enchants = getEnchantsFromItem(piece);
+            for (Map.Entry<String, Integer> entry : enchants.entrySet()) {
+                String enchantId = entry.getKey();
+                int level = entry.getValue();
+
+                Enchant enchant = enchantManager.getEnchant(enchantId);
+                if (enchant == null) continue;
+
+                if (enchant.getType() != EnchantType.PASSIVE &&
+                        enchant.getType() != EnchantType.EFFECT_STATIC) continue;
+
+                EnchantLevel enchantLevel = enchant.getLevel(level);
+                if (enchantLevel == null) continue;
+
+                currentEffects.add(enchantId);
+
+                if (enchant.getType() == EnchantType.EFFECT_STATIC) {
+                    applyEffectEnchant(player, enchantLevel);
+                }
+            }
         }
+
+        Set<String> previousEffects = activeEffects.getOrDefault(player.getUniqueId(), new HashSet<>());
+
+        for (String oldEffect : previousEffects) {
+            if (!currentEffects.contains(oldEffect)) {
+                removeEffectEnchant(player, oldEffect);
+            }
+        }
+
+        activeEffects.put(player.getUniqueId(), currentEffects);
+    }
+
+    private void applyEffectEnchant(@NotNull Player player, @NotNull EnchantLevel level) {
+        level.getActions().forEach(action -> {
+            String actionType = action.getActionType();
+
+            if (actionType.toUpperCase().startsWith("POTION:")) {
+                String[] parts = actionType.split(":");
+                if (parts.length >= 4) {
+                    try {
+                        String effectName = parts[1].toUpperCase();
+                        int amplifier = Integer.parseInt(parts[2]);
+                        int duration = Integer.parseInt(parts[3]);
+
+                        PotionEffectType effectType = PotionEffectType.getByName(effectName);
+                        if (effectType != null) {
+                            PotionEffect existing = player.getPotionEffect(effectType);
+
+                            if (existing == null || existing.getDuration() < 40) {
+                                player.addPotionEffect(new PotionEffect(
+                                        effectType,
+                                        duration,
+                                        amplifier,
+                                        false,
+                                        false
+                                ));
+                            }
+                        }
+                    } catch (NumberFormatException ignored) {}
+                }
+            }
+        });
+    }
+
+    private void removeEffectEnchant(@NotNull Player player, @NotNull String enchantId) {
+        Enchant enchant = enchantManager.getEnchant(enchantId);
+        if (enchant == null || enchant.getType() != EnchantType.EFFECT_STATIC) return;
+
+        EnchantLevel level = enchant.getLevel(1);
+        if (level == null) return;
+
+        level.getActions().forEach(action -> {
+            String actionType = action.getActionType();
+            if (actionType.toUpperCase().startsWith("POTION:")) {
+                String[] parts = actionType.split(":");
+                if (parts.length >= 2) {
+                    String effectName = parts[1].toUpperCase();
+                    PotionEffectType effectType = PotionEffectType.getByName(effectName);
+                    if (effectType != null) {
+                        player.removePotionEffect(effectType);
+                    }
+                }
+            }
+        });
+    }
+
+    @EventHandler
+    public void onPlayerJoin(@NotNull PlayerJoinEvent event) {
+        checkAndApplyPassiveEnchants(event.getPlayer());
+    }
+
+    @EventHandler
+    public void onPlayerQuit(@NotNull PlayerQuitEvent event) {
+        activeEffects.remove(event.getPlayer().getUniqueId());
+    }
+
+    @EventHandler
+    public void onItemHeld(@NotNull PlayerItemHeldEvent event) {
+        McEnchants.getInstance().getScheduler().runTaskLater(() -> checkAndApplyPassiveEnchants(event.getPlayer()), 1L);
     }
 
     @EventHandler(priority = EventPriority.NORMAL, ignoreCancelled = true)
@@ -55,18 +180,13 @@ public final class EnchantTriggerListener implements Listener {
         EnchantType type = null;
         if (event.getAction() == Action.RIGHT_CLICK_AIR || event.getAction() == Action.RIGHT_CLICK_BLOCK) {
             type = EnchantType.RIGHT_CLICK;
-            if (DEBUG) {
-                LoggerUtil.info("RIGHT_CLICK detected for player: " + player.getName());
-            }
         } else if (event.getAction() == Action.LEFT_CLICK_AIR || event.getAction() == Action.LEFT_CLICK_BLOCK) {
             type = EnchantType.LEFT_CLICK;
-            if (DEBUG) {
-                LoggerUtil.info("LEFT_CLICK detected for player: " + player.getName());
-            }
         }
 
         if (type != null) {
-            triggerEnchants(player, item, type, createContext(player, event.getClickedBlock(), null, null));
+            Map<String, Object> context = createContext(player, event.getClickedBlock(), null, null, null);
+            triggerEnchants(player, item, type, context);
         }
     }
 
@@ -75,15 +195,10 @@ public final class EnchantTriggerListener implements Listener {
         Player player = event.getPlayer();
         ItemStack item = player.getInventory().getItemInMainHand();
 
-        if (DEBUG) {
-            LoggerUtil.info("BREAK_BLOCK detected for player: " + player.getName());
-        }
+        Map<String, Object> context = createContext(player, event.getBlock(), null, null, null);
 
-        triggerEnchants(player, item, EnchantType.BREAK_BLOCK,
-                createContext(player, event.getBlock(), null, null));
-
-        triggerEnchants(player, item, EnchantType.MINING,
-                createContext(player, event.getBlock(), null, null));
+        triggerEnchants(player, item, EnchantType.BREAK_BLOCK, context);
+        triggerEnchants(player, item, EnchantType.MINING, context);
     }
 
     @EventHandler(priority = EventPriority.NORMAL, ignoreCancelled = true)
@@ -92,12 +207,9 @@ public final class EnchantTriggerListener implements Listener {
 
         ItemStack item = player.getInventory().getItemInMainHand();
 
-        if (DEBUG) {
-            LoggerUtil.info("ATTACK detected for player: " + player.getName());
-        }
-
-        Map<String, Object> context = createContext(player, null, event.getEntity(), event);
+        Map<String, Object> context = createContext(player, null, event.getEntity(), event, event.getEntity());
         context.put("victim", event.getEntity());
+        context.put("damager", player);
 
         triggerEnchants(player, item, EnchantType.ATTACK, context);
     }
@@ -107,12 +219,9 @@ public final class EnchantTriggerListener implements Listener {
         if (!(event.getEntity() instanceof Player player)) return;
 
         if (event instanceof EntityDamageByEntityEvent damageByEntity) {
-            Map<String, Object> context = createContext(player, null, damageByEntity.getDamager(), event);
+            Map<String, Object> context = createContext(player, null, damageByEntity.getDamager(), event, player);
             context.put("attacker", damageByEntity.getDamager());
-
-            if (DEBUG) {
-                LoggerUtil.info("DEFENSE detected for player: " + player.getName());
-            }
+            context.put("victim", player);
 
             ItemStack[] armor = player.getInventory().getArmorContents();
             for (ItemStack piece : armor) {
@@ -123,14 +232,10 @@ public final class EnchantTriggerListener implements Listener {
         }
 
         if (event.getCause() == EntityDamageEvent.DamageCause.FALL) {
-            if (DEBUG) {
-                LoggerUtil.info("FALL_DAMAGE detected for player: " + player.getName());
-            }
-
             ItemStack boots = player.getInventory().getBoots();
             if (boots != null) {
-                triggerEnchants(player, boots, EnchantType.FALL_DAMAGE,
-                        createContext(player, null, null, event));
+                Map<String, Object> context = createContext(player, null, null, event, player);
+                triggerEnchants(player, boots, EnchantType.FALL_DAMAGE, context);
             }
         }
     }
@@ -138,65 +243,36 @@ public final class EnchantTriggerListener implements Listener {
     private void triggerEnchants(@NotNull Player player, @Nullable ItemStack item, @NotNull EnchantType type,
                                  @NotNull Map<String, Object> context) {
         if (item == null || item.getType().isAir()) {
-            if (DEBUG) {
-                LoggerUtil.info("Item is null or air, skipping enchant trigger");
-            }
             return;
         }
 
         Map<String, Integer> enchants = getEnchantsFromItem(item);
         if (enchants.isEmpty()) {
-            if (DEBUG) {
-                LoggerUtil.info("No enchants found on item: " + item.getType().name());
-            }
             return;
-        }
-
-        if (DEBUG) {
-            LoggerUtil.info("Found " + enchants.size() + " enchant(s) on item: " + enchants.keySet());
         }
 
         for (Map.Entry<String, Integer> entry : enchants.entrySet()) {
             String enchantId = entry.getKey();
             int level = entry.getValue();
 
-            if (DEBUG) {
-                LoggerUtil.info("Processing enchant: " + enchantId + " level " + level);
-            }
-
             Enchant enchant = enchantManager.getEnchant(enchantId);
             if (enchant == null) {
-                if (DEBUG) {
-                    LoggerUtil.warn("Enchant not found in manager: " + enchantId);
-                }
                 continue;
             }
 
             if (enchant.getType() != type) {
-                if (DEBUG) {
-                    LoggerUtil.info("Enchant type mismatch: expected " + type + ", got " + enchant.getType());
-                }
                 continue;
             }
 
             EnchantLevel enchantLevel = enchant.getLevel(level);
             if (enchantLevel == null) {
-                if (DEBUG) {
-                    LoggerUtil.warn("Enchant level not found: " + level + " for enchant " + enchantId);
-                }
                 continue;
             }
 
             int chance = enchantLevel.getChance();
             if (chance < 100) {
                 int roll = ThreadLocalRandom.current().nextInt(1, 101);
-                if (DEBUG) {
-                    LoggerUtil.info("Chance roll: " + roll + "/" + chance);
-                }
                 if (roll > chance) {
-                    if (DEBUG) {
-                        LoggerUtil.info("Chance roll failed, skipping");
-                    }
                     continue;
                 }
             }
@@ -206,31 +282,17 @@ public final class EnchantTriggerListener implements Listener {
             Long lastUse = cooldowns.get(cooldownKey);
 
             if (lastUse != null && (now - lastUse) < enchantLevel.getCooldown() * 1000L) {
-                if (DEBUG) {
-                    long remaining = (enchantLevel.getCooldown() * 1000L - (now - lastUse)) / 1000;
-                    LoggerUtil.info("Cooldown active, " + remaining + "s remaining");
-                }
                 continue;
             }
 
             if (!checkConditions(enchantLevel, context, player)) {
-                if (DEBUG) {
-                    LoggerUtil.info("Conditions not met for enchant " + enchantId);
-                }
                 continue;
-            }
-
-            if (DEBUG) {
-                LoggerUtil.info("Executing enchant: " + enchantId + " level " + level);
             }
 
             executeActions(player, enchantLevel, context);
 
             if (enchantLevel.getCooldown() > 0) {
                 cooldowns.put(cooldownKey, now);
-                if (DEBUG) {
-                    LoggerUtil.info("Cooldown set: " + enchantLevel.getCooldown() + "s");
-                }
             }
         }
     }
@@ -240,9 +302,6 @@ public final class EnchantTriggerListener implements Listener {
         Map<String, Integer> enchants = new HashMap<>();
         ItemMeta meta = item.getItemMeta();
         if (meta == null) {
-            if (DEBUG) {
-                LoggerUtil.info("Item meta is null");
-            }
             return enchants;
         }
 
@@ -250,22 +309,12 @@ public final class EnchantTriggerListener implements Listener {
         NamespacedKey key = new NamespacedKey(McEnchants.getInstance(), "enchants");
 
         if (!pdc.has(key, PersistentDataType.STRING)) {
-            if (DEBUG) {
-                LoggerUtil.info("No 'enchants' PDC key found on item");
-            }
             return enchants;
         }
 
         String enchantsData = pdc.get(key, PersistentDataType.STRING);
         if (enchantsData == null || enchantsData.isEmpty()) {
-            if (DEBUG) {
-                LoggerUtil.info("Enchants data is null or empty");
-            }
             return enchants;
-        }
-
-        if (DEBUG) {
-            LoggerUtil.info("Raw enchants data: " + enchantsData);
         }
 
         String[] entries = enchantsData.split(";");
@@ -276,13 +325,8 @@ public final class EnchantTriggerListener implements Listener {
                     String enchantId = parts[0].trim();
                     int level = Integer.parseInt(parts[1].trim());
                     enchants.put(enchantId, level);
-                    if (DEBUG) {
-                        LoggerUtil.info("Parsed enchant: " + enchantId + " -> " + level);
-                    }
-                } catch (NumberFormatException e) {
-                    if (DEBUG) {
-                        LoggerUtil.warn("Failed to parse enchant entry: " + entry);
-                    }
+                } catch (NumberFormatException exception) {
+                    LoggerUtil.error(exception.getMessage());
                 }
             }
         }
@@ -292,61 +336,34 @@ public final class EnchantTriggerListener implements Listener {
 
     private boolean checkConditions(@NotNull EnchantLevel level, @NotNull Map<String, Object> context, @NotNull Player player) {
         if (level.getConditions().isEmpty()) {
-            if (DEBUG) {
-                LoggerUtil.info("No conditions to check");
-            }
             return true;
         }
 
         for (String condition : level.getConditions()) {
             if (!evaluateCondition(condition, context, player)) {
-                if (DEBUG) {
-                    LoggerUtil.info("Condition failed: " + condition);
-                }
                 return false;
             }
         }
 
-        if (DEBUG) {
-            LoggerUtil.info("All conditions passed");
-        }
         return true;
     }
 
     private boolean evaluateCondition(@NotNull String condition, @NotNull Map<String, Object> context, @NotNull Player player) {
         String[] parts = condition.split("=>");
         if (parts.length != 2) {
-            if (DEBUG) {
-                LoggerUtil.warn("Invalid condition format: " + condition);
-            }
             return true;
         }
 
         String check = parts[0].trim();
         String result = parts[1].trim();
 
-        if (DEBUG) {
-            LoggerUtil.info("Evaluating condition: " + check + " => " + result);
-        }
-
         if (check.contains("{sneaking}")) {
             boolean sneaking = player.isSneaking();
             boolean expected = check.contains("true");
 
-            if (DEBUG) {
-                LoggerUtil.info("Sneaking check: player=" + sneaking + ", expected=" + expected);
-            }
-
             if (sneaking == expected) {
-                boolean allowed = result.equalsIgnoreCase("allow");
-                if (DEBUG) {
-                    LoggerUtil.info("Condition matched, result: " + (allowed ? "ALLOW" : "DENY"));
-                }
-                return allowed;
+                return result.equalsIgnoreCase("allow");
             } else {
-                if (DEBUG) {
-                    LoggerUtil.info("Condition not matched, DENY");
-                }
                 return false;
             }
         }
@@ -355,26 +372,41 @@ public final class EnchantTriggerListener implements Listener {
     }
 
     private void executeActions(@NotNull Player player, @NotNull EnchantLevel level, @NotNull Map<String, Object> context) {
-        if (DEBUG) {
-            LoggerUtil.info("Executing " + level.getActions().size() + " action(s)");
-        }
+        level.getActions().forEach(modelAction -> {
+            EnchantAction executorAction =
+                    new EnchantAction() {
+                        @Override
+                        public void execute(@NotNull Player p, @NotNull ActionData actionData, @NotNull Map<String, Object> ctx) {}
 
-        level.getActions().forEach(action -> {
-            if (DEBUG) {
-                LoggerUtil.info("Action: " + action.getActionType());
-            }
-            actionExecutor.executeAction(player, action, context);
+                        @Contract(pure = true)
+                        @Override
+                        public @NonNull String getActionType() {
+                            return modelAction.getActionType();
+                        }
+                    };
+
+            actionExecutor.executeAction(player, executorAction, context);
         });
     }
 
     @NotNull
-    private Map<String, Object> createContext(@NotNull Player player, @Nullable Object block, @Nullable Object entity, @Nullable Object event) {
+    private Map<String, Object> createContext(@NotNull Player player, @Nullable Object block,
+                                              @Nullable Object entity, @Nullable Object event,
+                                              @Nullable Object target) {
         Map<String, Object> context = new HashMap<>();
         context.put("player", player);
-        context.put("target", player);
+        context.put("target", target != null ? target : player);
         if (block != null) context.put("block", block);
         if (entity != null) context.put("entity", entity);
         if (event != null) context.put("event", event);
         return context;
+    }
+
+    public void shutdown() {
+        if (passiveCheckTask != null) {
+            passiveCheckTask.cancel();
+        }
+        activeEffects.clear();
+        cooldowns.clear();
     }
 }

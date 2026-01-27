@@ -15,18 +15,12 @@ import java.util.Map;
 public class PlantSeedsAction extends EnchantAction {
     @Override
     public void execute(@NotNull Player player, @NotNull ActionData actionData, @NotNull Map<String, Object> context) {
-        LoggerUtil.info("PLANT_SEEDS: Starting execution (tilling dirt to farmland)");
-
         Block centerBlock = player.getTargetBlockExact(5);
         if (centerBlock == null) {
-            LoggerUtil.warn("PLANT_SEEDS: Target block is null");
             return;
         }
 
-        LoggerUtil.info("PLANT_SEEDS: Center block type: " + centerBlock.getType());
-
         if (!isTillable(centerBlock)) {
-            LoggerUtil.warn("PLANT_SEEDS: Center block is not tillable: " + centerBlock.getType());
             return;
         }
 
@@ -44,8 +38,6 @@ public class PlantSeedsAction extends EnchantAction {
                 }
             }
         }
-
-        LoggerUtil.info("PLANT_SEEDS: Tilled " + tilled + " blocks to farmland");
 
         if (tilled > 0) {
             player.playSound(player.getLocation(), Sound.ITEM_HOE_TILL, 1.0f, 1.0f);

@@ -13,14 +13,9 @@ import java.util.Map;
 public class CancelEventAction extends EnchantAction {
     @Override
     public void execute(@NotNull Player player, @NotNull ActionData actionData, @NotNull Map<String, Object> context) {
-        LoggerUtil.info("CANCEL_EVENT: Starting execution");
-
         Event event = (Event) context.get("event");
         if (event instanceof Cancellable cancellable) {
             cancellable.setCancelled(true);
-            LoggerUtil.info("CANCEL_EVENT: Event cancelled");
-        } else {
-            LoggerUtil.warn("CANCEL_EVENT: Event is not cancellable");
         }
     }
 

@@ -14,20 +14,14 @@ import java.util.Map;
 public class DoubleDamageAction extends EnchantAction {
     @Override
     public void execute(@NotNull Player player, @NotNull ActionData actionData, @NotNull Map<String, Object> context) {
-        LoggerUtil.info("DOUBLE_DAMAGE: Starting execution");
-
         Event event = (Event) context.get("event");
         if (!(event instanceof EntityDamageByEntityEvent damageEvent)) {
-            LoggerUtil.warn("DOUBLE_DAMAGE: Event is not EntityDamageByEntityEvent");
             return;
         }
 
         double currentDamage = damageEvent.getDamage();
         double newDamage = currentDamage * 2.0;
         damageEvent.setDamage(newDamage);
-
-        LoggerUtil.info("DOUBLE_DAMAGE: Damage doubled from " + currentDamage + " to " + newDamage);
-
         player.playSound(player.getLocation(), Sound.ENTITY_PLAYER_ATTACK_CRIT, 0.7f, 1.2f);
     }
 

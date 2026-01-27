@@ -14,11 +14,8 @@ import java.util.Map;
 public class ShuffleHotbarAction extends EnchantAction {
     @Override
     public void execute(@NotNull Player player, @NotNull ActionData actionData, @NotNull Map<String, Object> context) {
-        LoggerUtil.info("SHUFFLE_HOTBAR: Starting execution");
-
         Entity attacker = (Entity) context.get("attacker");
         if (!(attacker instanceof Player attackerPlayer)) {
-            LoggerUtil.warn("SHUFFLE_HOTBAR: Attacker is not a player");
             return;
         }
 
@@ -40,7 +37,6 @@ public class ShuffleHotbarAction extends EnchantAction {
         }
 
         attackerPlayer.playSound(attackerPlayer.getLocation(), Sound.ENTITY_ENDERMAN_TELEPORT, 0.5f, 1.5f);
-        LoggerUtil.info("SHUFFLE_HOTBAR: Hotbar shuffled");
     }
 
     @Override
