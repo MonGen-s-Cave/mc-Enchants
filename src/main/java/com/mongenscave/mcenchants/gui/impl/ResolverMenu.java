@@ -3,6 +3,7 @@ package com.mongenscave.mcenchants.gui.impl;
 import com.mongenscave.mcenchants.McEnchants;
 import com.mongenscave.mcenchants.data.MenuController;
 import com.mongenscave.mcenchants.gui.Menu;
+import com.mongenscave.mcenchants.identifier.key.ItemKey;
 import com.mongenscave.mcenchants.identifier.key.MenuKey;
 import com.mongenscave.mcenchants.identifier.key.MessageKey;
 import com.mongenscave.mcenchants.item.ItemFactory;
@@ -10,7 +11,7 @@ import com.mongenscave.mcenchants.manager.BookManager;
 import com.mongenscave.mcenchants.manager.EnchantManager;
 import com.mongenscave.mcenchants.model.Enchant;
 import com.mongenscave.mcenchants.model.EnchantedBook;
-import com.mongenscave.mcenchants.processor.MessageProcessor;
+import com.mongenscave.mcenchants.util.SoundUtil;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.InventoryClickEvent;
@@ -55,21 +56,21 @@ public final class ResolverMenu extends Menu {
         int slot = event.getSlot();
         Player player = (Player) event.getWhoClicked();
 
-        if (slot == 20) { // Accept button
+        if (ItemKey.RESOLVER_ACCEPT.matchesSlot(slot)) {
             event.setCancelled(true);
+            handleItemClick(event, player);
             acceptResolve(player);
             return;
         }
 
-        if (slot == 21) { // Deny button
+        if (ItemKey.RESOLVER_DENY.matchesSlot(slot)) {
             event.setCancelled(true);
+            handleItemClick(event, player);
             denyResolve(player);
             return;
         }
 
-        if (!placeableSlots.contains(slot)) {
-            event.setCancelled(true);
-        }
+        if (!placeableSlots.contains(slot)) event.setCancelled(true);
     }
 
     private void acceptResolve(@NotNull Player player) {
@@ -84,6 +85,7 @@ public final class ResolverMenu extends Menu {
 
         if (books.isEmpty()) {
             player.sendMessage(MessageKey.RESOLVER_EMPTY_BOOK.getMessage());
+            SoundUtil.playErrorSound(player);
             return;
         }
 
@@ -106,6 +108,7 @@ public final class ResolverMenu extends Menu {
 
         if (categoryId == null || totalDust == 0) {
             player.sendMessage(MessageKey.ERROR_DUE_RESOLVER.getMessage());
+            SoundUtil.playErrorSound(player);
             return;
         }
 
@@ -118,6 +121,7 @@ public final class ResolverMenu extends Menu {
 
         player.getInventory().addItem(dust);
         player.sendMessage(MessageKey.SUCCESS_RESOLVE.getMessage());
+        SoundUtil.playSuccessSound(player);
         player.closeInventory();
     }
 
@@ -131,6 +135,7 @@ public final class ResolverMenu extends Menu {
         }
 
         player.sendMessage(MessageKey.SUCCESS_DENY.getMessage());
+        SoundUtil.playErrorSound(player);
         player.closeInventory();
     }
 

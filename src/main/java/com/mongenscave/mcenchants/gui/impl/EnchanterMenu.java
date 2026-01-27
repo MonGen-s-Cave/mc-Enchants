@@ -3,13 +3,14 @@ package com.mongenscave.mcenchants.gui.impl;
 import com.mongenscave.mcenchants.McEnchants;
 import com.mongenscave.mcenchants.data.MenuController;
 import com.mongenscave.mcenchants.gui.Menu;
+import com.mongenscave.mcenchants.identifier.key.ItemKey;
 import com.mongenscave.mcenchants.identifier.key.MenuKey;
 import com.mongenscave.mcenchants.identifier.key.MessageKey;
 import com.mongenscave.mcenchants.item.ItemFactory;
 import com.mongenscave.mcenchants.manager.BookManager;
 import com.mongenscave.mcenchants.manager.CategoryManager;
 import com.mongenscave.mcenchants.model.Category;
-import com.mongenscave.mcenchants.processor.MessageProcessor;
+import com.mongenscave.mcenchants.util.SoundUtil;
 import org.bukkit.NamespacedKey;
 import org.bukkit.Sound;
 import org.bukkit.entity.Player;
@@ -56,7 +57,7 @@ public final class EnchanterMenu extends Menu {
 
         if (playerXP < requiredXP) {
             player.sendMessage(MessageKey.NOT_ENOUGH_XP.getMessage());
-            player.playSound(player.getLocation(), Sound.ENTITY_VILLAGER_NO, 1.0f, 1.0f);
+            SoundUtil.playErrorSound(player);
             return;
         }
 
@@ -70,7 +71,7 @@ public final class EnchanterMenu extends Menu {
         player.getInventory().addItem(mysteriousBook);
 
         player.sendMessage(MessageKey.SUCCESS_PURCHASE.getMessage());
-        player.playSound(player.getLocation(), Sound.ENTITY_PLAYER_LEVELUP, 1.0f, 1.2f);
+        SoundUtil.playSuccessSound(player);
         player.closeInventory();
     }
 

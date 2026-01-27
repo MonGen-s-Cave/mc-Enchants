@@ -99,10 +99,9 @@ public class CommandEnchant implements OrphanCommand {
         }
 
         ItemStack revealedBook = bookManager.createRevealedBook(enchantId, level, finalSuccessRate, destroyRate);
+
         revealedBook.setAmount(amount);
-
         target.getInventory().addItem(revealedBook);
-
         sender.sendMessage(MessageKey.GIVEENCHANT_SENDER.getMessage());
     }
 }

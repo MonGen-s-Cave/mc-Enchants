@@ -7,6 +7,7 @@ import com.mongenscave.mcenchants.identifier.key.MenuKey;
 import com.mongenscave.mcenchants.item.ItemFactory;
 import com.mongenscave.mcenchants.manager.BookManager;
 import com.mongenscave.mcenchants.model.EnchantedBook;
+import com.mongenscave.mcenchants.util.SoundUtil;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.InventoryClickEvent;
@@ -43,14 +44,14 @@ public final class RepairerMenu extends Menu {
             if (bookManager.isRevealedBook(item)) {
                 placeItem(item, bookInputSlot);
                 processRepair();
-
+                SoundUtil.playSuccessSound(player);
                 return;
             }
 
             if (bookManager.isDust(item)) {
                 placeItem(item, dustInputSlot);
                 processRepair();
-
+                SoundUtil.playSuccessSound(player);
                 return;
             }
 
@@ -65,6 +66,7 @@ public final class RepairerMenu extends Menu {
             inventory.setItem(outputSlot, null);
 
             player.getInventory().addItem(returnItem);
+            SoundUtil.playOpenGuiSound(player);
             return;
         }
 
@@ -77,6 +79,8 @@ public final class RepairerMenu extends Menu {
             inventory.setItem(outputSlot, null);
             inventory.setItem(bookInputSlot, null);
             inventory.setItem(dustInputSlot, null);
+
+            SoundUtil.playSuccessSound(player);
         }
     }
 

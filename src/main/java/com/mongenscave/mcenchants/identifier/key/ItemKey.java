@@ -10,7 +10,12 @@ import java.util.List;
 
 @Getter
 public enum ItemKey {
-    TESZT("placeholder");
+    MAIN_ENCHANTER("main-menu.items.enchanter"),
+    MAIN_REPAIRER("main-menu.items.repairer"),
+    MAIN_RESOLVER("main-menu.items.resolver"),
+
+    RESOLVER_ACCEPT("resolver-menu.items.accept"),
+    RESOLVER_DENY("resolver-menu.items.deny");
 
     private final String path;
 

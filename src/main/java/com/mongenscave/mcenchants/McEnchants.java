@@ -2,6 +2,8 @@ package com.mongenscave.mcenchants;
 
 import com.github.Anon8281.universalScheduler.UniversalScheduler;
 import com.github.Anon8281.universalScheduler.scheduling.schedulers.TaskScheduler;
+import com.mongenscave.mcenchants.api.McEnchantsAPI;
+import com.mongenscave.mcenchants.api.McEnchantsAPIImpl;
 import com.mongenscave.mcenchants.config.Config;
 import com.mongenscave.mcenchants.manager.ManagerRegistry;
 import com.mongenscave.mcenchants.util.RegisterUtil;
@@ -19,6 +21,7 @@ import java.io.File;
 
 public final class McEnchants extends ZapperJavaPlugin {
     @Getter private static McEnchants instance;
+    @Getter private static McEnchantsAPI api;
     @Getter private TaskScheduler scheduler;
     @Getter private ManagerRegistry managerRegistry;
     @Getter private Config language;
@@ -41,6 +44,7 @@ public final class McEnchants extends ZapperJavaPlugin {
         initializeComponents();
 
         managerRegistry = new ManagerRegistry();
+        api = new McEnchantsAPIImpl(this);
 
         RegisterUtil.registerListeners();
         RegisterUtil.registerCommands();

@@ -2,6 +2,7 @@ package com.mongenscave.mcenchants.gui.impl;
 
 import com.mongenscave.mcenchants.data.MenuController;
 import com.mongenscave.mcenchants.gui.Menu;
+import com.mongenscave.mcenchants.identifier.key.ItemKey;
 import com.mongenscave.mcenchants.identifier.key.MenuKey;
 import com.mongenscave.mcenchants.item.ItemFactory;
 import org.bukkit.entity.Player;
@@ -21,12 +22,22 @@ public final class MainMenu extends Menu {
         int slot = event.getSlot();
         Player player = (Player) event.getWhoClicked();
 
-        if (slot == 0) {
+        if (ItemKey.MAIN_ENCHANTER.matchesSlot(slot)) {
+            handleItemClick(event, player);
             new EnchanterMenu(MenuController.getMenuUtils(player)).open();
-        } else if (slot == 1) {
+            return;
+        }
+
+        if (ItemKey.MAIN_REPAIRER.matchesSlot(slot)) {
+            handleItemClick(event, player);
             new RepairerMenu(MenuController.getMenuUtils(player)).open();
-        } else if (slot == 2) {
+            return;
+        }
+
+        if (ItemKey.MAIN_RESOLVER.matchesSlot(slot)) {
+            handleItemClick(event, player);
             new ResolverMenu(MenuController.getMenuUtils(player)).open();
+            return;
         }
     }
 

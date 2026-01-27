@@ -7,6 +7,7 @@ import com.mongenscave.mcenchants.manager.EnchantManager;
 import com.mongenscave.mcenchants.model.Enchant;
 import com.mongenscave.mcenchants.model.EnchantedBook;
 import com.mongenscave.mcenchants.processor.MessageProcessor;
+import com.mongenscave.mcenchants.util.SoundUtil;
 import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
 import org.bukkit.Sound;
@@ -65,13 +66,13 @@ public final class EnchantApplyListener implements Listener {
 
         if (!enchant.canApplyTo(clicked)) {
             player.sendMessage(MessageKey.NOT_APPLIABLE.getMessage());
-            player.playSound(player.getLocation(), Sound.ENTITY_VILLAGER_NO, 1.0f, 1.0f);
+            SoundUtil.playErrorSound(player);
             return;
         }
 
         if (hasEnchant(clicked, enchant.getId())) {
             player.sendMessage(MessageKey.ALREADY_HAS.getMessage());
-            player.playSound(player.getLocation(), Sound.ENTITY_VILLAGER_NO, 1.0f, 1.0f);
+            SoundUtil.playErrorSound(player);
             return;
         }
 
@@ -85,13 +86,12 @@ public final class EnchantApplyListener implements Listener {
         if (success) {
             addEnchantToItem(item, enchant.getId(), bookData.getLevel());
             player.sendMessage(MessageKey.SUCCESS_APPLY.getMessage());
-            player.playSound(player.getLocation(), Sound.ENTITY_PLAYER_LEVELUP, 1.0f, 1.5f);
-
+            SoundUtil.playSuccessSound(player);
             player.setItemOnCursor(null);
         } else {
             event.setCurrentItem(null);
             player.sendMessage(MessageKey.APPLY_FAIL.getMessage());
-            player.playSound(player.getLocation(), Sound.ENTITY_ITEM_BREAK, 1.0f, 0.8f);
+            SoundUtil.playErrorSound(player);
             player.setItemOnCursor(null);
         }
     }

@@ -4,6 +4,7 @@ import com.mongenscave.mcenchants.McEnchants;
 import com.mongenscave.mcenchants.identifier.key.MessageKey;
 import com.mongenscave.mcenchants.manager.BookManager;
 import com.mongenscave.mcenchants.processor.MessageProcessor;
+import com.mongenscave.mcenchants.util.SoundUtil;
 import org.bukkit.Sound;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -37,14 +38,11 @@ public final class BookRevealListener implements Listener {
 
         ItemStack revealedBook = bookManager.revealBook(item);
 
-        if (item.getAmount() > 1) {
-            item.setAmount(item.getAmount() - 1);
-        } else {
-            player.getInventory().setItemInMainHand(null);
-        }
+        if (item.getAmount() > 1) item.setAmount(item.getAmount() - 1);
+        else player.getInventory().setItemInMainHand(null);
 
         player.getInventory().addItem(revealedBook);
         player.sendMessage(MessageKey.BOOK_REVEALED.getMessage());
-        player.playSound(player.getLocation(), Sound.ENTITY_PLAYER_LEVELUP, 0.7f, 1.2f);
+        SoundUtil.playSuccessSound(player);
     }
 }
