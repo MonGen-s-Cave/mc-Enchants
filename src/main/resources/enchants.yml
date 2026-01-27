@@ -1,6 +1,4 @@
 enchants:
-  # ========== PASSZÍV/EFFECT_STATIC ENCHANTOK (ARMOR) ==========
-
   aquatic:
     name: "{categoryColor}Vízi Áldás"
     category: "common"
@@ -12,15 +10,279 @@ enchants:
     book-lore:
       enabled: true
       lines:
-        - "Állandó víz alatt lélegzés,"
-        - "amíg a sisak rajta van."
-    type: "EFFECT_STATIC"  # <-- EFFECT_STATIC típus, passzívan működik
+        - "Állandó víz alatt lélegzés."
+    type: "EFFECT_STATIC"
     levels:
       1:
-        chance: 100
-        cooldown: 0
         actions:
-          - "POTION:WATER_BREATHING:0:999999"  # Nagy duration, rendszeresen frissül
+          - "POTION:WATER_BREATHING:0:999999"
+
+  glowing:
+    name: "{categoryColor}Éjjellátás"
+    category: "common"
+    applies-to: "helmet"
+    item-lore:
+      enabled: true
+      lines:
+        - "{categoryColor}Éjjellátás &8[&#94A3B8{level}&8]"
+    book-lore:
+      enabled: true
+      lines:
+        - "Állandó éjjellátást biztosít."
+    type: "EFFECT_STATIC"
+    levels:
+      1:
+        actions:
+          - "POTION:NIGHT_VISION:0:999999"
+
+  autosmelt:
+    name: "{categoryColor}Automatikus Olvasztás"
+    category: "common"
+    applies-to: "pickaxe"
+    item-lore:
+      enabled: true
+      lines:
+        - "{categoryColor}Automatikus Olvasztás &8[&#94A3B8{level}&8]"
+    book-lore:
+      enabled: true
+      lines:
+        - "Az ércek automatikusan beolvadnak"
+        - "kibányászáskor."
+    type: "MINING"
+    levels:
+      1:
+        chance: 41
+        actions:
+          - "SMELT"
+      2:
+        chance: 62
+        actions:
+          - "SMELT"
+      3:
+        chance: 100
+        actions:
+          - "SMELT"
+
+  confusion:
+    name: "{categoryColor}Káosz"
+    category: "common"
+    applies-to: "axe"
+    item-lore:
+      enabled: true
+      lines:
+        - "{categoryColor}Káosz &8[&#94A3B8{level}&8]"
+    book-lore:
+      enabled: true
+      lines:
+        - "Eséllyel hányingert okoz"
+        - "az áldozatnak."
+    type: "ATTACK"
+    levels:
+      1:
+        chance: 13
+        cooldown: 4
+        actions:
+          - "POTION:NAUSEA:0:40"
+      2:
+        chance: 19
+        cooldown: 5
+        actions:
+          - "POTION:NAUSEA:0:80"
+      3:
+        chance: 24
+        cooldown: 6
+        actions:
+          - "POTION:NAUSEA:0:120"
+
+  experience:
+    name: "{categoryColor}Tapasztalat"
+    category: "common"
+    applies-to: "pickaxe,spade,axe"
+    item-lore:
+      enabled: true
+      lines:
+        - "{categoryColor}Tapasztalat &8[&#94A3B8{level}&8]"
+    book-lore:
+      enabled: true
+      lines:
+        - "Eséllyel tapasztalati pontot ad"
+        - "bányászatkor."
+    type: "MINING"
+    levels:
+      1:
+        chance: 15
+        cooldown: 1
+        actions:
+          - "EXP:2-5"
+      2:
+        chance: 30
+        cooldown: 1
+        actions:
+          - "EXP:2-5"
+      3:
+        chance: 45
+        cooldown: 1
+        actions:
+          - "EXP:2-5"
+      4:
+        chance: 60
+        cooldown: 1
+        actions:
+          - "EXP:2-5"
+      5:
+        chance: 75
+        cooldown: 1
+        actions:
+          - "EXP:2-5"
+
+  haste:
+    name: "{categoryColor}Sietség"
+    category: "common"
+    applies-to: "pickaxe,spade,axe"
+    item-lore:
+      enabled: true
+      lines:
+        - "{categoryColor}Sietség &8[&#94A3B8{level}&8]"
+    book-lore:
+      enabled: true
+      lines:
+        - "Gyorsabban suhintasz"
+        - "az eszközeiddel."
+    type: "EFFECT_STATIC"
+    levels:
+      1:
+        actions:
+          - "POTION:FAST_DIGGING:0:999999"
+      2:
+        actions:
+          - "POTION:FAST_DIGGING:1:999999"
+      3:
+        actions:
+          - "POTION:FAST_DIGGING:2:999999"
+
+  insomnia:
+    name: "{categoryColor}Álmatlanság"
+    category: "common"
+    applies-to: "sword"
+    item-lore:
+      enabled: true
+      lines:
+        - "{categoryColor}Álmatlanság &8[&#94A3B8{level}&8]"
+    book-lore:
+      enabled: true
+      lines:
+        - "Lassulást, lassú csapást"
+        - "és zavartságot okoz."
+    type: "ATTACK"
+    levels:
+      1:
+        chance: 10
+        cooldown: 10
+        actions:
+          - "POTION:SLOW:0:40"
+          - "POTION:NAUSEA:0:40"
+          - "POTION:SLOW_DIGGING:0:60"
+      2:
+        chance: 12
+        cooldown: 10
+        actions:
+          - "POTION:SLOW:0:80"
+          - "POTION:NAUSEA:0:80"
+          - "POTION:SLOW_DIGGING:0:100"
+      3:
+        chance: 14
+        cooldown: 10
+        actions:
+          - "POTION:SLOW:1:100"
+          - "POTION:NAUSEA:1:100"
+          - "POTION:SLOW_DIGGING:1:120"
+      4:
+        chance: 16
+        cooldown: 9
+        actions:
+          - "POTION:SLOW:1:120"
+          - "POTION:NAUSEA:1:120"
+          - "POTION:SLOW_DIGGING:1:140"
+      5:
+        chance: 18
+        cooldown: 9
+        actions:
+          - "POTION:SLOW:1:140"
+          - "POTION:NAUSEA:1:140"
+          - "POTION:SLOW_DIGGING:1:160"
+      6:
+        chance: 20
+        cooldown: 8
+        actions:
+          - "POTION:SLOW:1:180"
+          - "POTION:NAUSEA:1:180"
+          - "POTION:SLOW_DIGGING:1:200"
+      7:
+        chance: 22
+        cooldown: 8
+        actions:
+          - "POTION:SLOW:2:80"
+          - "POTION:NAUSEA:2:80"
+          - "POTION:SLOW_DIGGING:2:100"
+
+  lightning:
+    name: "{categoryColor}Villámcsapás"
+    category: "common"
+    applies-to: "bow,crossbow"
+    item-lore:
+      enabled: true
+      lines:
+        - "{categoryColor}Villámcsapás &8[&#94A3B8{level}&8]"
+    book-lore:
+      enabled: true
+      lines:
+        - "Eséllyel villámot csap le"
+        - "az ellenfélre."
+    type: "SHOOT"
+    levels:
+      1:
+        chance: 24
+        cooldown: 3
+        actions:
+          - "LIGHTNING"
+      2:
+        chance: 32
+        cooldown: 3
+        actions:
+          - "LIGHTNING"
+      3:
+        chance: 40
+        cooldown: 3
+        actions:
+          - "LIGHTNING"
+
+  headless:
+    name: "{categoryColor}Fejvadász"
+    category: "common"
+    applies-to: "sword"
+    item-lore:
+      enabled: true
+      lines:
+        - "{categoryColor}Fejvadász &8[&#94A3B8{level}&8]"
+    book-lore:
+      enabled: true
+      lines:
+        - "Az áldozatok eséllyel elejtik"
+        - "a fejüket halálkor."
+    type: "KILL_PLAYER"
+    levels:
+      1:
+        chance: 20
+        actions:
+          - "DROP_HEAD"
+      2:
+        chance: 40
+        actions:
+          - "DROP_HEAD"
+      3:
+        chance: 60
+        actions:
+          - "DROP_HEAD"
 
   shuffle:
     name: "{categoryColor}Felkeverés"
@@ -33,9 +295,8 @@ enchants:
     book-lore:
       enabled: true
       lines:
-        - "Összekeveri az ellenfél gyorstárát,"
-        - "amikor megtámadnak téged."
-    type: "DEFENSE"  # <-- DEFENSE típus, amikor téged támadnak
+        - "Összekeveri az ellenfél gyorstárát."
+    type: "DEFENSE"
     levels:
       1:
         chance: 5
@@ -53,168 +314,380 @@ enchants:
         actions:
           - "SHUFFLE_HOTBAR"
 
-  jellylegs:
-    name: "{categoryColor}Kocsonyalábak"
-    category: "legendary"
-    applies-to: "boots"
+  famine:
+    name: "{categoryColor}Éhínség"
+    category: "rare"
+    applies-to: "sword,axe"
     item-lore:
       enabled: true
       lines:
-        - "{categoryColor}Kocsonyalábak &8[&#94A3B8{level}&8]"
+        - "{categoryColor}Éhínség &8[&#94A3B8{level}&8]"
     book-lore:
       enabled: true
       lines:
-        - "Eséllyel semlegesíti az esési sebzést,"
-        - "amíg a csizma rajta van."
-    type: "FALL_DAMAGE"  # <-- FALL_DAMAGE típus
+        - "Eséllyel éhezési hatást ad"
+        - "az ellenfélnek."
+    type: "ATTACK"
     levels:
       1:
-        chance: 40
-        cooldown: 0
+        chance: 12
+        cooldown: 8
         actions:
-          - "CANCEL_EVENT"
+          - "POTION:HUNGER:0:80"
       2:
-        chance: 80
-        cooldown: 0
+        chance: 15
+        cooldown: 8
         actions:
-          - "CANCEL_EVENT"
+          - "POTION:HUNGER:0:120"
       3:
-        chance: 100
-        cooldown: 0
+        chance: 18
+        cooldown: 8
         actions:
-          - "CANCEL_EVENT"
+          - "POTION:HUNGER:1:80"
+      4:
+        chance: 22
+        cooldown: 8
+        actions:
+          - "POTION:HUNGER:1:120"
 
-  # ========== TÁMADÁS ENCHANTOK (FEGYVER) ==========
-
-  skullrift:
-    name: "{categoryColor}Koponyahasadék"
-    category: "mythic"
+  featherweight:
+    name: "{categoryColor}Könnyűsúly"
+    category: "rare"
     applies-to: "sword"
     item-lore:
       enabled: true
       lines:
-        - "{categoryColor}Koponyahasadék &8[&#94A3B8{level}&8]"
+        - "{categoryColor}Könnyűsúly &8[&#94A3B8{level}&8]"
     book-lore:
       enabled: true
       lines:
-        - "Eséllyel hatalmas robbanást idéz"
-        - "elő az ellenfélnél támadáskor."
-    type: "ATTACK"  # <-- ATTACK típus, amikor megtámadsz valakit
+        - "Eséllyel gyors bányászási"
+        - "löketet ad."
+    type: "ATTACK"
     levels:
       1:
+        chance: 35
+        cooldown: 2
+        actions:
+          - "POTION:FAST_DIGGING:0:60"
+      2:
+        chance: 55
+        cooldown: 2
+        actions:
+          - "POTION:FAST_DIGGING:1:80"
+      3:
+        chance: 75
+        cooldown: 2
+        actions:
+          - "POTION:FAST_DIGGING:2:100"
+
+  sustain:
+    name: "{categoryColor}Fenntartás"
+    category: "rare"
+    applies-to: "armor"
+    item-lore:
+      enabled: true
+      lines:
+        - "{categoryColor}Fenntartás &8[&#94A3B8{level}&8]"
+    book-lore:
+      enabled: true
+      lines:
+        - "Eséllyel visszaszerzi az éhséget"
+        - "találatkor."
+    type: "DEFENSE"
+    levels:
+      1:
+        chance: 12
+        cooldown: 8
+        actions:
+          - "ADD_FOOD:1-4"
+      2:
+        chance: 14
+        cooldown: 8
+        actions:
+          - "ADD_FOOD:1-4"
+      3:
+        chance: 16
+        cooldown: 8
+        actions:
+          - "ADD_FOOD:1-4"
+      4:
         chance: 20
         cooldown: 8
         actions:
-          - "TNT:0;4;0"  # radius=0 (nem használt), power=4.0, duration=0 (nem használt)
-          # A robbanás az ÁLDOZAT helyén történik automatikusan
-          # power = robbanás ereje (4.0 = erős robbanás)
-          # Nem spawn-ol TNT entitást, csak robbanás effekt és sebzés!
+          - "ADD_FOOD:1-4"
 
-  impact:
-    name: "{categoryColor}Becsapódás"
-    category: "epic"
-    applies-to: "sword,axe,trident"
+  skillswipe:
+    name: "{categoryColor}Tudáslópás"
+    category: "rare"
+    applies-to: "sword"
     item-lore:
       enabled: true
       lines:
-        - "{categoryColor}Becsapódás &8[&#94A3B8{level}&8]"
+        - "{categoryColor}Tudáslópás &8[&#94A3B8{level}&8]"
     book-lore:
       enabled: true
       lines:
-        - "Eséllyel dupla sebzést okoz"
-        - "az ellenfelnek."
+        - "Eséllyel ellop egy kis tapasztalati"
+        - "pontot az ellenségtől."
     type: "ATTACK"
     levels:
       1:
-        chance: 5
-        cooldown: 3
-        actions:
-          - "DOUBLE_DAMAGE"
-      2:
-        chance: 8
-        cooldown: 3
-        actions:
-          - "DOUBLE_DAMAGE"
-      3:
-        chance: 11
+        chance: 15
         cooldown: 5
         actions:
-          - "DOUBLE_DAMAGE"
-      4:
-        chance: 14
-        cooldown: 6
-        actions:
-          - "DOUBLE_DAMAGE"
-
-  confusion:
-    name: "{categoryColor}Káosz"
-    category: "common"
-    applies-to: "axe"
-    item-lore:
-      enabled: true
-      lines:
-        - "{categoryColor}Káosz &8[&#94A3B8{level}&8]"
-    book-lore:
-      enabled: true
-      lines:
-        - "Eséllyel hányingert okoz"
-        - "az áldozatnak támadáskor."
-    type: "ATTACK"
-    levels:
-      1:
-        chance: 13
-        cooldown: 4
-        actions:
-          - "POTION:NAUSEA:0:40"  # JAVÍTVA: CONFUSION -> NAUSEA
+          - "STEAL_EXP:25-125"
       2:
+        chance: 17
+        cooldown: 5
+        actions:
+          - "STEAL_EXP:25-175"
+      3:
         chance: 19
         cooldown: 5
         actions:
-          - "POTION:NAUSEA:0:80"  # JAVÍTVA: CONFUSION -> NAUSEA
-      3:
-        chance: 24
-        cooldown: 6
+          - "STEAL_EXP:25-225"
+      4:
+        chance: 21
+        cooldown: 5
         actions:
-          - "POTION:NAUSEA:0:120"  # JAVÍTVA: CONFUSION -> NAUSEA
+          - "STEAL_EXP:25-275"
+      5:
+        chance: 23
+        cooldown: 5
+        actions:
+          - "STEAL_EXP:25-350"
 
-  # ========== MINING/BÁNYÁSZAT ENCHANTOK ==========
-
-  autosmelt:
-    name: "{categoryColor}Automatikus Olvasztás"
-    category: "common"
-    applies-to: "pickaxe"
+  virus:
+    name: "{categoryColor}Vírus"
+    category: "rare"
+    applies-to: "bow,crossbow"
     item-lore:
       enabled: true
       lines:
-        - "{categoryColor}Automatikus Olvasztás &8[&#94A3B8{level}&8]"
+        - "{categoryColor}Vírus &8[&#94A3B8{level}&8]"
     book-lore:
       enabled: true
       lines:
-        - "Az ércek automatikusan beolvadnak"
-        - "kibányászáskor."
-    type: "MINING"  # <-- MINING típus, amikor blokkot törsz
+        - "Megsokszorozza az összes Hervadás"
+        - "és Mérgezés hatást."
+    type: "SHOOT"
     levels:
       1:
-        chance: 41
-        cooldown: 0
+        chance: 12
+        cooldown: 3
+        conditions:
+          - "{has_wither} != true => stop"
+          - "{has_poison} != true => stop"
         actions:
-          - "SMELT"
+          - "POTION:WITHER:2:60"
+          - "POTION:POISON:2:60"
       2:
-        chance: 62
-        cooldown: 0
+        chance: 16
+        cooldown: 3
+        conditions:
+          - "{has_wither} != true => stop"
+          - "{has_poison} != true => stop"
         actions:
-          - "SMELT"
+          - "POTION:WITHER:2:60"
+          - "POTION:POISON:2:60"
       3:
-        chance: 100
-        cooldown: 0
+        chance: 20
+        cooldown: 3
+        conditions:
+          - "{has_wither} != true => stop"
+          - "{has_poison} != true => stop"
         actions:
-          - "SMELT"
+          - "POTION:WITHER:2:60"
+          - "POTION:POISON:2:60"
+      4:
+        chance: 24
+        cooldown: 3
+        conditions:
+          - "{has_wither} != true => stop"
+          - "{has_poison} != true => stop"
+        actions:
+          - "POTION:WITHER:2:60"
+          - "POTION:POISON:2:60"
 
-  # ========== INTERAKCIÓS ENCHANTOK ==========
+  blind:
+    name: "{categoryColor}Vakítás"
+    category: "epic"
+    applies-to: "sword"
+    item-lore:
+      enabled: true
+      lines:
+        - "{categoryColor}Vakítás &8[&#94A3B8{level}&8]"
+    book-lore:
+      enabled: true
+      lines:
+        - "Eséllyel vakságot okoz"
+        - "támadáskor."
+    type: "ATTACK"
+    levels:
+      1:
+        chance: 17
+        cooldown: 3
+        actions:
+          - "POTION:BLINDNESS:0:60"
+      2:
+        chance: 25
+        cooldown: 3
+        actions:
+          - "POTION:BLINDNESS:1:80"
+      3:
+        chance: 33
+        cooldown: 3
+        actions:
+          - "POTION:BLINDNESS:2:100"
+
+  frozen:
+    name: "{categoryColor}Fagyasztás"
+    category: "epic"
+    applies-to: "armor"
+    item-lore:
+      enabled: true
+      lines:
+        - "{categoryColor}Fagyasztás &8[&#94A3B8{level}&8]"
+    book-lore:
+      enabled: true
+      lines:
+        - "Lassulást okozhat a támadónak"
+        - "védekezéskor."
+    type: "DEFENSE"
+    levels:
+      1:
+        chance: 19
+        cooldown: 6
+        actions:
+          - "POTION:SLOW:0:100"
+      2:
+        chance: 19
+        cooldown: 6
+        actions:
+          - "POTION:SLOW:1:100"
+      3:
+        chance: 26
+        cooldown: 6
+        actions:
+          - "POTION:SLOW:1:100"
+
+  poison:
+    name: "{categoryColor}Mérgező Penge"
+    category: "epic"
+    applies-to: "sword,axe"
+    item-lore:
+      enabled: true
+      lines:
+        - "{categoryColor}Mérgező Penge &8[&#94A3B8{level}&8]"
+    book-lore:
+      enabled: true
+      lines:
+        - "Eséllyel mérgezést okoz."
+    type: "ATTACK"
+    levels:
+      1:
+        chance: 6
+        cooldown: 2
+        actions:
+          - "POTION:POISON:0:80"
+      2:
+        chance: 12
+        cooldown: 2
+        actions:
+          - "POTION:POISON:0:120"
+      3:
+        chance: 19
+        cooldown: 2
+        actions:
+          - "POTION:POISON:1:80"
+
+  demonforged:
+    name: "{categoryColor}Démonkovácsolt"
+    category: "epic"
+    applies-to: "sword"
+    item-lore:
+      enabled: true
+      lines:
+        - "{categoryColor}Démonkovácsolt &8[&#94A3B8{level}&8]"
+    book-lore:
+      enabled: true
+      lines:
+        - "Fokozott tartósságvesztést okoz"
+        - "az ellenség páncélján."
+    type: "ATTACK"
+    levels:
+      1:
+        chance: 8
+        cooldown: 6
+        actions:
+          - "DAMAGE_ARMOR:1-3"
+      2:
+        chance: 12
+        cooldown: 6
+        actions:
+          - "DAMAGE_ARMOR:1-3"
+      3:
+        chance: 15
+        cooldown: 6
+        actions:
+          - "DAMAGE_ARMOR:1-3"
+      4:
+        chance: 17
+        cooldown: 6
+        actions:
+          - "DAMAGE_ARMOR:1-3"
+
+  voodoo:
+    name: "{categoryColor}Vudu Átok"
+    category: "epic"
+    applies-to: "armor"
+    item-lore:
+      enabled: true
+      lines:
+        - "{categoryColor}Vudu Átok &8[&#94A3B8{level}&8]"
+    book-lore:
+      enabled: true
+      lines:
+        - "Eséllyel gyengeséget okoz."
+    type: "DEFENSE"
+    levels:
+      1:
+        chance: 5
+        cooldown: 2
+        actions:
+          - "POTION:WEAKNESS:0:60"
+      2:
+        chance: 7
+        cooldown: 2
+        actions:
+          - "POTION:WEAKNESS:0:100"
+      3:
+        chance: 9
+        cooldown: 2
+        actions:
+          - "POTION:WEAKNESS:0:140"
+      4:
+        chance: 13
+        cooldown: 2
+        actions:
+          - "POTION:WEAKNESS:1:60"
+      5:
+        chance: 16
+        cooldown: 2
+        actions:
+          - "POTION:WEAKNESS:1:100"
+      6:
+        chance: 21
+        cooldown: 2
+        actions:
+          - "POTION:WEAKNESS:1:120"
+
+  # ========== ULTIMATE GROUP ==========
 
   planter:
     name: "{categoryColor}Ültető Mester"
-    category: "legendary"
+    category: "ultimate"
     applies-to: "hoe"
     item-lore:
       enabled: true
@@ -225,7 +698,7 @@ enchants:
       lines:
         - "Shift + Jobb katt, és"
         - "3x3-as területen kapál!"
-    type: "RIGHT_CLICK"  # <-- RIGHT_CLICK típus
+    type: "RIGHT_CLICK"
     levels:
       1:
         chance: 100
@@ -233,7 +706,7 @@ enchants:
           - "{sneaking} = true => allow"
         cooldown: 3
         actions:
-          - "PLANT_SEEDS:1"  # radius = 1 -> 3x3 terület
+          - "PLANT_SEEDS:1"
       2:
         chance: 100
         conditions:
@@ -245,13 +718,1022 @@ enchants:
         chance: 100
         conditions:
           - "{sneaking} = true => allow"
-        cooldown: 0
         actions:
           - "PLANT_SEEDS:1"
 
+  jellylegs:
+    name: "{categoryColor}Kocsonyalábak"
+    category: "ultimate"
+    applies-to: "boots"
+    item-lore:
+      enabled: true
+      lines:
+        - "{categoryColor}Kocsonyalábak &8[&#94A3B8{level}&8]"
+    book-lore:
+      enabled: true
+      lines:
+        - "Eséllyel semlegesíti"
+        - "az esési sebzést."
+    type: "FALL_DAMAGE"
+    levels:
+      1:
+        chance: 40
+        actions:
+          - "CANCEL_EVENT"
+      2:
+        chance: 80
+        actions:
+          - "CANCEL_EVENT"
+      3:
+        chance: 100
+        actions:
+          - "CANCEL_EVENT"
+
+  restore:
+    name: "{categoryColor}Helyreállítás"
+    category: "ultimate"
+    applies-to: "pickaxe,spade,axe"
+    item-lore:
+      enabled: true
+      lines:
+        - "{categoryColor}Helyreállítás &8[&#94A3B8{level}&8]"
+    book-lore:
+      enabled: true
+      lines:
+        - "Eltöréskor a tárgy eséllyel"
+        - "visszaszerzi tartóssága felét."
+    type: "ITEM_BREAK"
+    levels:
+      1:
+        chance: 40
+        actions:
+          - "REMOVE_ENCHANT:restore"
+          - "ADD_DURABILITY_ITEM:50%"
+      2:
+        chance: 60
+        actions:
+          - "REMOVE_ENCHANT:restore"
+          - "ADD_DURABILITY_ITEM:50%"
+      3:
+        chance: 80
+        actions:
+          - "REMOVE_ENCHANT:restore"
+          - "ADD_DURABILITY_ITEM:50%"
+      4:
+        chance: 100
+        actions:
+          - "REMOVE_ENCHANT:restore"
+          - "ADD_DURABILITY_ITEM:50%"
+
+  angelic:
+    name: "{categoryColor}Angyali Érintés"
+    category: "ultimate"
+    applies-to: "armor"
+    item-lore:
+      enabled: true
+      lines:
+        - "{categoryColor}Angyali Érintés &8[&#94A3B8{level}&8]"
+    book-lore:
+      enabled: true
+      lines:
+        - "Életpontot gyógyít"
+        - "sebzés esetén."
+    type: "DEFENSE"
+    levels:
+      1:
+        chance: 9
+        cooldown: 7
+        actions:
+          - "ADD_HEALTH:1-3"
+      2:
+        chance: 14
+        cooldown: 9
+        actions:
+          - "ADD_HEALTH:1-3"
+      3:
+        chance: 17
+        cooldown: 11
+        actions:
+          - "ADD_HEALTH:1-3"
+      4:
+        chance: 26
+        cooldown: 13
+        actions:
+          - "ADD_HEALTH:1-4"
+      5:
+        chance: 34
+        cooldown: 15
+        actions:
+          - "ADD_HEALTH:1-4"
+
+  detonate:
+    name: "{categoryColor}Robbantás"
+    category: "ultimate"
+    applies-to: "pickaxe,spade"
+    item-lore:
+      enabled: true
+      lines:
+        - "{categoryColor}Robbantás &8[&#94A3B8{level}&8]"
+    book-lore:
+      enabled: true
+      lines:
+        - "Eséllyel 3x3-as területen"
+        - "töri a blokkokat."
+    type: "MINING"
+    levels:
+      1:
+        chance: 13
+        actions:
+          - "BREAK_BLOCK:3"
+      2:
+        chance: 26
+        actions:
+          - "BREAK_BLOCK:3"
+      3:
+        chance: 36
+        actions:
+          - "BREAK_BLOCK:3"
+      4:
+        chance: 49
+        actions:
+          - "BREAK_BLOCK:3"
+      5:
+        chance: 59
+        actions:
+          - "BREAK_BLOCK:3"
+      6:
+        chance: 72
+        actions:
+          - "BREAK_BLOCK:3"
+      7:
+        chance: 85
+        actions:
+          - "BREAK_BLOCK:3"
+      8:
+        chance: 90
+        actions:
+          - "BREAK_BLOCK:3"
+      9:
+        chance: 100
+        actions:
+          - "BREAK_BLOCK:3"
+  enrage:
+    name: "{categoryColor}Tombolás"
+    category: "ultimate"
+    applies-to: "sword"
+    item-lore:
+      enabled: true
+      lines:
+        - "{categoryColor}Tombolás &8[&#94A3B8{level}&8]"
+    book-lore:
+      enabled: true
+      lines:
+        - "Nagyobb sebzést okoz"
+        - "alacsony HP-n."
+    type: "ATTACK"
+    levels:
+      1:
+        chance: 21
+        cooldown: 5
+        conditions:
+          - "{health} > 6 => stop"
+        actions:
+          - "DO_HARM:1-4"
+      2:
+        chance: 27
+        cooldown: 5
+        conditions:
+          - "{health} > 6 => stop"
+        actions:
+          - "DO_HARM:1-4"
+      3:
+        chance: 33
+        cooldown: 5
+        conditions:
+          - "{health} > 6 => stop"
+        actions:
+          - "DO_HARM:1-4"
+
+  obsidianshield:
+    name: "{categoryColor}Obszidián Pajzs"
+    category: "ultimate"
+    applies-to: "armor"
+    item-lore:
+      enabled: true
+      lines:
+        - "{categoryColor}Obszidián Pajzs &8[&#94A3B8{level}&8]"
+    book-lore:
+      enabled: true
+      lines:
+        - "Állandó tűzállóságot"
+        - "biztosít."
+    type: "EFFECT_STATIC"
+    levels:
+      1:
+        actions:
+          - "POTION:FIRE_RESISTANCE:0:999999"
+
+  demonic:
+    name: "{categoryColor}Démoni Harag"
+    category: "ultimate"
+    applies-to: "armor"
+    item-lore:
+      enabled: true
+      lines:
+        - "{categoryColor}Démoni Harag &8[&#94A3B8{level}&8]"
+    book-lore:
+      enabled: true
+      lines:
+        - "Eséllyel eltávolítja a tűzállóságot"
+        - "az ellenségtől."
+    type: "ATTACK"
+    levels:
+      1:
+        chance: 9
+        cooldown: 2
+        actions:
+          - "CURE:FIRE_RESISTANCE"
+          - "CURE_PERMANENT:FIRE_RESISTANCE"
+      2:
+        chance: 14
+        cooldown: 2
+        actions:
+          - "CURE:FIRE_RESISTANCE"
+          - "CURE_PERMANENT:FIRE_RESISTANCE"
+      3:
+        chance: 20
+        cooldown: 2
+        actions:
+          - "CURE:FIRE_RESISTANCE"
+          - "CURE_PERMANENT:FIRE_RESISTANCE"
+
+  piercing:
+    name: "{categoryColor}Átütő"
+    category: "ultimate"
+    applies-to: "bow,crossbow"
+    item-lore:
+      enabled: true
+      lines:
+        - "{categoryColor}Átütő &8[&#94A3B8{level}&8]"
+    book-lore:
+      enabled: true
+      lines:
+        - "Nagyobb sebzést okoz."
+    type: "SHOOT"
+    levels:
+      1:
+        chance: 13
+        cooldown: 3
+        actions:
+          - "INCREASE_DAMAGE:50-150"
+      2:
+        chance: 19
+        cooldown: 3
+        actions:
+          - "INCREASE_DAMAGE:50-150"
+      3:
+        chance: 25
+        cooldown: 3
+        actions:
+          - "INCREASE_DAMAGE:50-150"
+      4:
+        chance: 32
+        cooldown: 3
+        actions:
+          - "INCREASE_DAMAGE:50-150"
+      5:
+        chance: 37
+        cooldown: 3
+        actions:
+          - "INCREASE_DAMAGE:50-150"
+
+  marksman:
+    name: "{categoryColor}Mesterlövész"
+    category: "ultimate"
+    applies-to: "armor"
+    item-lore:
+      enabled: true
+      lines:
+        - "{categoryColor}Mesterlövész &8[&#94A3B8{level}&8]"
+    book-lore:
+      enabled: true
+      lines:
+        - "Növeli az íjakkal"
+        - "okozott sebzést."
+    type: "ATTACK"
+    levels:
+      1:
+        chance: 13
+        cooldown: 3
+        conditions:
+          - "{holding_bow} = true => allow"
+        actions:
+          - "INCREASE_DAMAGE:50-150"
+      2:
+        chance: 19
+        cooldown: 3
+        conditions:
+          - "{holding_bow} = true => allow"
+        actions:
+          - "INCREASE_DAMAGE:50-150"
+      3:
+        chance: 25
+        cooldown: 3
+        conditions:
+          - "{holding_bow} = true => allow"
+        actions:
+          - "INCREASE_DAMAGE:50-150"
+      4:
+        chance: 32
+        cooldown: 3
+        conditions:
+          - "{holding_bow} = true => allow"
+        actions:
+          - "INCREASE_DAMAGE:50-150"
+
+  disintegrate:
+    name: "{categoryColor}Szétesés"
+    category: "ultimate"
+    applies-to: "sword"
+    item-lore:
+      enabled: true
+      lines:
+        - "{categoryColor}Szétesés &8[&#94A3B8{level}&8]"
+    book-lore:
+      enabled: true
+      lines:
+        - "Eséllyel extra tartósságvesztést"
+        - "okoz minden ellenséges páncéldarabnak."
+    type: "ATTACK"
+    levels:
+      1:
+        chance: 12
+        cooldown: 2
+        actions:
+          - "DAMAGE_ARMOR:2"
+      2:
+        chance: 25
+        cooldown: 2
+        actions:
+          - "DAMAGE_ARMOR:2"
+      3:
+        chance: 39
+        cooldown: 2
+        actions:
+          - "DAMAGE_ARMOR:2"
+      4:
+        chance: 46
+        cooldown: 2
+        actions:
+          - "DAMAGE_ARMOR:2"
+
+  dominate:
+    name: "{categoryColor}Uralom"
+    category: "ultimate"
+    applies-to: "sword"
+    item-lore:
+      enabled: true
+      lines:
+        - "{categoryColor}Uralom &8[&#94A3B8{level}&8]"
+    book-lore:
+      enabled: true
+      lines:
+        - "Eséllyel meggyengíti az ellenséges"
+        - "játékosokat támadáskor."
+    type: "DEFENSE"
+    levels:
+      1:
+        chance: 15
+        cooldown: 3
+        actions:
+          - "POTION:WEAKNESS:0:80"
+      2:
+        chance: 22
+        cooldown: 3
+        actions:
+          - "POTION:WEAKNESS:0:80"
+      3:
+        chance: 28
+        cooldown: 3
+        actions:
+          - "POTION:WEAKNESS:0:80"
+      4:
+        chance: 35
+        cooldown: 3
+        actions:
+          - "POTION:WEAKNESS:0:80"
+
+  longbow:
+    name: "{categoryColor}Hosszú Íj"
+    category: "ultimate"
+    applies-to: "bow,crossbow"
+    item-lore:
+      enabled: true
+      lines:
+        - "{categoryColor}Hosszú Íj &8[&#94A3B8{level}&8]"
+    book-lore:
+      enabled: true
+      lines:
+        - "Jelentősen megnöveli az okozott sebzést"
+        - "olyan ellenfelek ellen, akik íjat tartanak."
+    type: "SHOOT"
+    levels:
+      1:
+        chance: 12
+        cooldown: 4
+        conditions:
+          - "{holding_bow} = true => allow"
+        actions:
+          - "INCREASE_DAMAGE:25-50"
+      2:
+        chance: 17
+        cooldown: 4
+        conditions:
+          - "{holding_bow} = true => allow"
+        actions:
+          - "INCREASE_DAMAGE:25-50"
+      3:
+        chance: 25
+        cooldown: 4
+        conditions:
+          - "{holding_bow} = true => allow"
+        actions:
+          - "INCREASE_DAMAGE:50-100"
+      4:
+        chance: 33
+        cooldown: 4
+        conditions:
+          - "{holding_bow} = true => allow"
+        actions:
+          - "INCREASE_DAMAGE:50-100"
+
+  # ========== LEGENDARY GROUP ==========
+
+  lavawalker:
+    name: "{categoryColor}Lávajáró"
+    category: "legendary"
+    applies-to: "boots"
+    item-lore:
+      enabled: true
+      lines:
+        - "{categoryColor}Lávajáró &8[&#94A3B8{level}&8]"
+    book-lore:
+      enabled: true
+      lines:
+        - "Lávára léphetsz"
+        - "biztonságosan."
+    type: "EFFECT_STATIC"
+    levels:
+      1:
+        actions:
+          - "LAVA_WALKER"
+
+  impale:
+    name: "{categoryColor}Leszúrás"
+    category: "legendary"
+    applies-to: "bow,crossbow"
+    item-lore:
+      enabled: true
+      lines:
+        - "{categoryColor}Leszúrás &8[&#94A3B8{level}&8]"
+    book-lore:
+      enabled: true
+      lines:
+        - "Eséllyel HATALMAS sebzést okoz"
+        - "az ellenfélnek."
+    type: "SHOOT"
+    levels:
+      1:
+        chance: 4
+        cooldown: 26
+        actions:
+          - "DOUBLE_DAMAGE"
+          - "POTION:SLOW:4:20"
+      2:
+        chance: 6
+        cooldown: 24
+        actions:
+          - "DOUBLE_DAMAGE"
+          - "POTION:SLOW:4:40"
+      3:
+        chance: 8
+        cooldown: 22
+        actions:
+          - "DOUBLE_DAMAGE"
+          - "POTION:SLOW:4:60"
+      4:
+        chance: 10
+        cooldown: 20
+        actions:
+          - "DOUBLE_DAMAGE"
+          - "POTION:SLOW:4:80"
+
+  stun:
+    name: "{categoryColor}Bénítás"
+    category: "legendary"
+    applies-to: "sword,axe"
+    item-lore:
+      enabled: true
+      lines:
+        - "{categoryColor}Bénítás &8[&#94A3B8{level}&8]"
+    book-lore:
+      enabled: true
+      lines:
+        - "Eséllyel lelassítja az ellenfelet,"
+        - "meggyengíti és eltávolítja rólad a lassulást."
+    type: "ATTACK"
+    levels:
+      1:
+        chance: 15
+        cooldown: 6
+        actions:
+          - "POTION:SLOW:0:120"
+          - "CURE:SLOW"
+          - "CURE_PERMANENT:SLOW"
+          - "POTION:WEAKNESS:0:80"
+      2:
+        chance: 23
+        cooldown: 6
+        actions:
+          - "POTION:SLOW:0:120"
+          - "CURE:SLOW"
+          - "CURE_PERMANENT:SLOW"
+          - "POTION:WEAKNESS:0:80"
+      3:
+        chance: 35
+        cooldown: 6
+        actions:
+          - "POTION:SLOW:1:120"
+          - "CURE:SLOW"
+          - "CURE_PERMANENT:SLOW"
+          - "POTION:WEAKNESS:0:80"
+
+  fat:
+    name: "{categoryColor}Kövér Test"
+    category: "legendary"
+    applies-to: "chestplate"
+    item-lore:
+      enabled: true
+      lines:
+        - "{categoryColor}Kövér Test &8[&#94A3B8{level}&8]"
+    book-lore:
+      enabled: true
+      lines:
+        - "Eséllyel megnövelt sebzéscsökkentést"
+        - "kap sebzéskor."
+    type: "DEFENSE"
+    levels:
+      1:
+        chance: 5
+        cooldown: 10
+        actions:
+          - "NEGATE_DAMAGE:10"
+      2:
+        chance: 10
+        cooldown: 10
+        actions:
+          - "NEGATE_DAMAGE:20"
+      3:
+        chance: 12
+        cooldown: 10
+        actions:
+          - "NEGATE_DAMAGE:30"
+          - "POTION:ABSORPTION:3:60"
+      4:
+        chance: 15
+        cooldown: 10
+        actions:
+          - "NEGATE_DAMAGE:40"
+          - "POTION:ABSORPTION:4:80"
+      5:
+        chance: 18
+        cooldown: 10
+        actions:
+          - "NEGATE_DAMAGE:50"
+          - "POTION:ABSORPTION:4:80"
+      6:
+        chance: 20
+        cooldown: 10
+        actions:
+          - "NEGATE_DAMAGE:60"
+          - "POTION:ABSORPTION:5:100"
+
+  barbarian:
+    name: "{categoryColor}Barbár Erő"
+    category: "legendary"
+    applies-to: "axe"
+    item-lore:
+      enabled: true
+      lines:
+        - "{categoryColor}Barbár Erő &8[&#94A3B8{level}&8]"
+    book-lore:
+      enabled: true
+      lines:
+        - "Eséllyel megnövelt"
+        - "baltasebzést okoz."
+    type: "ATTACK"
+    levels:
+      1:
+        chance: 8
+        cooldown: 2
+        conditions:
+          - "{holding_axe} = true => allow"
+        actions:
+          - "INCREASE_DAMAGE:25-100"
+      2:
+        chance: 15
+        cooldown: 2
+        conditions:
+          - "{holding_axe} = true => allow"
+        actions:
+          - "INCREASE_DAMAGE:25-100"
+      3:
+        chance: 19
+        cooldown: 2
+        conditions:
+          - "{holding_axe} = true => allow"
+        actions:
+          - "INCREASE_DAMAGE:25-100"
+      4:
+        chance: 25
+        cooldown: 2
+        conditions:
+          - "{holding_axe} = true => allow"
+        actions:
+          - "INCREASE_DAMAGE:25-100"
+
+  clarity:
+    name: "{categoryColor}Tiszta Elme"
+    category: "legendary"
+    applies-to: "armor"
+    item-lore:
+      enabled: true
+      lines:
+        - "{categoryColor}Tiszta Elme &8[&#94A3B8{level}&8]"
+    book-lore:
+      enabled: true
+      lines:
+        - "Gyógyítja a vakságot"
+        - "támadáskor."
+    type: "DEFENSE"
+    levels:
+      1:
+        actions:
+          - "CURE:BLINDNESS"
+      2:
+        actions:
+          - "CURE:BLINDNESS"
+      3:
+        actions:
+          - "CURE:BLINDNESS"
+  enlighted:
+    name: "{categoryColor}Megvilágosodott"
+    category: "legendary"
+    applies-to: "armor"
+    item-lore:
+      enabled: true
+      lines:
+        - "{categoryColor}Megvilágosodott &8[&#94A3B8{level}&8]"
+    book-lore:
+      enabled: true
+      lines:
+        - "Életpontokat gyógyíthat"
+        - "sebzés közben."
+    type: "DEFENSE"
+    levels:
+      1:
+        chance: 6
+        cooldown: 30
+        actions:
+          - "ADD_HEALTH:1-3"
+      2:
+        chance: 9
+        cooldown: 30
+        actions:
+          - "ADD_HEALTH:1-3"
+      3:
+        chance: 12
+        cooldown: 30
+        actions:
+          - "ADD_HEALTH:1-3"
+
+  gears:
+    name: "{categoryColor}Sebességfokozó"
+    category: "legendary"
+    applies-to: "boots"
+    item-lore:
+      enabled: true
+      lines:
+        - "{categoryColor}Sebességfokozó &8[&#94A3B8{level}&8]"
+    book-lore:
+      enabled: true
+      lines:
+        - "Fokozott sebességet ad"
+        - "felhelyezéskor."
+    type: "EFFECT_STATIC"
+    levels:
+      1:
+        actions:
+          - "POTION:SPEED:0:999999"
+      2:
+        actions:
+          - "POTION:SPEED:1:999999"
+      3:
+        actions:
+          - "POTION:SPEED:2:999999"
+
+  killaura:
+    name: "{categoryColor}Killaura"
+    category: "legendary"
+    applies-to: "sword"
+    item-lore:
+      enabled: true
+      lines:
+        - "{categoryColor}Killaura &8[&#94A3B8{level}&8]"
+    book-lore:
+      enabled: true
+      lines:
+        - "Eséllyel több szörnyet öl meg"
+        - "egyszerre minden halálkor."
+    type: "ATTACK_MOB"
+    levels:
+      1:
+        chance: 5
+        cooldown: 3
+        actions:
+          - "KILL:2-3"
+      2:
+        chance: 8
+        cooldown: 4
+        actions:
+          - "KILL:2-4"
+      3:
+        chance: 12
+        cooldown: 5
+        actions:
+          - "KILL:2-4"
+      4:
+        chance: 15
+        cooldown: 5
+        actions:
+          - "KILL:2-5"
+      5:
+        chance: 18
+        cooldown: 6
+        actions:
+          - "KILL:3-5"
+
+  inquisitive:
+    name: "{categoryColor}Kíváncsi Lélek"
+    category: "legendary"
+    applies-to: "sword"
+    item-lore:
+      enabled: true
+      lines:
+        - "{categoryColor}Kíváncsi Lélek &8[&#94A3B8{level}&8]"
+    book-lore:
+      enabled: true
+      lines:
+        - "Eséllyel megnöveli a szörnyekből"
+        - "kapott XP-t."
+    type: "KILL_MOB"
+    levels:
+      1:
+        chance: 30
+        cooldown: 4
+        actions:
+          - "EXP:%exp%*1.25"
+      2:
+        chance: 35
+        cooldown: 4
+        actions:
+          - "EXP:%exp%*1.5"
+      3:
+        chance: 40
+        cooldown: 4
+        actions:
+          - "EXP:%exp%*1.75"
+      4:
+        chance: 45
+        cooldown: 4
+        actions:
+          - "EXP:%exp%*2.0"
+
+  lifesteal:
+    name: "{categoryColor}Életerő-lopás"
+    category: "legendary"
+    applies-to: "sword"
+    item-lore:
+      enabled: true
+      lines:
+        - "{categoryColor}Életerő-lopás &8[&#94A3B8{level}&8]"
+    book-lore:
+      enabled: true
+      lines:
+        - "Eséllyel ellop életpontot"
+        - "támadáskor."
+    type: "ATTACK"
+    levels:
+      1:
+        chance: 9
+        cooldown: 15
+        actions:
+          - "STEAL_HEALTH:1-3"
+      2:
+        chance: 13
+        cooldown: 15
+        actions:
+          - "STEAL_HEALTH:1-3"
+      3:
+        chance: 17
+        cooldown: 15
+        actions:
+          - "STEAL_HEALTH:1-4"
+      4:
+        chance: 21
+        cooldown: 15
+        actions:
+          - "STEAL_HEALTH:1-5"
+      5:
+        chance: 25
+        cooldown: 15
+        actions:
+          - "STEAL_HEALTH:1-5"
+
+  overload:
+    name: "{categoryColor}Túlterhelés"
+    category: "legendary"
+    applies-to: "armor"
+    item-lore:
+      enabled: true
+      lines:
+        - "{categoryColor}Túlterhelés &8[&#94A3B8{level}&8]"
+    book-lore:
+      enabled: true
+      lines:
+        - "Állandó életemelést"
+        - "biztosít."
+    type: "EFFECT_STATIC"
+    levels:
+      1:
+        actions:
+          - "POTION:HEALTH_BOOST:0:999999"
+      2:
+        actions:
+          - "POTION:HEALTH_BOOST:1:999999"
+      3:
+        actions:
+          - "POTION:HEALTH_BOOST:2:999999"
+
+  insanity:
+    name: "{categoryColor}Őrület"
+    category: "legendary"
+    applies-to: "axe"
+    item-lore:
+      enabled: true
+      lines:
+        - "{categoryColor}Őrület &8[&#94A3B8{level}&8]"
+    book-lore:
+      enabled: true
+      lines:
+        - "Eséllyel dupla sebzést okoz olyan"
+        - "ellenfelek ellen, akik kardot tartanak."
+    type: "ATTACK"
+    levels:
+      1:
+        chance: 17
+        cooldown: 1
+        conditions:
+          - "{holding_sword} = true => allow"
+        actions:
+          - "DOUBLE_DAMAGE"
+      2:
+        chance: 23
+        cooldown: 1
+        conditions:
+          - "{holding_sword} = true => allow"
+        actions:
+          - "DOUBLE_DAMAGE"
+      3:
+        chance: 29
+        cooldown: 1
+        conditions:
+          - "{holding_sword} = true => allow"
+        actions:
+          - "DOUBLE_DAMAGE"
+      4:
+        chance: 35
+        cooldown: 1
+        conditions:
+          - "{holding_sword} = true => allow"
+        actions:
+          - "DOUBLE_DAMAGE"
+      5:
+        chance: 41
+        cooldown: 1
+        conditions:
+          - "{holding_sword} = true => allow"
+        actions:
+          - "DOUBLE_DAMAGE"
+      6:
+        chance: 49
+        cooldown: 1
+        conditions:
+          - "{holding_sword} = true => allow"
+        actions:
+          - "DOUBLE_DAMAGE"
+      7:
+        chance: 52
+        cooldown: 1
+        conditions:
+          - "{holding_sword} = true => allow"
+        actions:
+          - "DOUBLE_DAMAGE"
+      8:
+        chance: 56
+        cooldown: 1
+        conditions:
+          - "{holding_sword} = true => allow"
+        actions:
+          - "DOUBLE_DAMAGE"
+
+  sniper:
+    name: "{categoryColor}Mesterlövész"
+    category: "legendary"
+    applies-to: "bow,crossbow"
+    item-lore:
+      enabled: true
+      lines:
+        - "{categoryColor}Mesterlövész &8[&#94A3B8{level}&8]"
+    book-lore:
+      enabled: true
+      lines:
+        - "Fejlövések akár 3,5-szeres"
+        - "sebzést is okozhatnak."
+    type: "SHOOT"
+    levels:
+      1:
+        chance: 15
+        cooldown: 5
+        conditions:
+          - "{headshot} = true => allow"
+        actions:
+          - "INCREASE_DAMAGE:100-350"
+      2:
+        chance: 20
+        cooldown: 5
+        conditions:
+          - "{headshot} = true => allow"
+        actions:
+          - "INCREASE_DAMAGE:100-350"
+      3:
+        chance: 25
+        cooldown: 5
+        conditions:
+          - "{headshot} = false => stop"
+        actions:
+          - "INCREASE_DAMAGE:100-350"
+      4:
+        chance: 30
+        cooldown: 5
+        conditions:
+          - "{headshot} = false => stop"
+        actions:
+          - "INCREASE_DAMAGE:100-350"
+      5:
+        chance: 35
+        cooldown: 5
+        conditions:
+          - "{headshot} = false => stop"
+        actions:
+          - "INCREASE_DAMAGE:100-350"
+
+  # ========== ULTIMATE GROUP ==========
+
+  skullrift:
+    name: "{categoryColor}Koponyahasadék"
+    category: "ultimate"
+    applies-to: "sword"
+    item-lore:
+      enabled: true
+      lines:
+        - "{categoryColor}Koponyahasadék &8[&#94A3B8{level}&8]"
+    book-lore:
+      enabled: true
+      lines:
+        - "Eséllyel hatalmas robbanást idéz"
+        - "elő az ellenfélnél támadáskor."
+    type: "ATTACK"
+    levels:
+      1:
+        chance: 20
+        cooldown: 8
+        actions:
+          - "TNT:0;4;0"
+
   voidcaller:
     name: "{categoryColor}Üresség Hívója"
-    category: "mythic"
+    category: "ultimate"
     applies-to: "sword"
     item-lore:
       enabled: true
@@ -268,14 +1750,14 @@ enchants:
         chance: 100
         conditions:
           - "{sneaking} = true => allow"
-        cooldown: 5
+        cooldown: 30
         actions:
           - "POTION:INVISIBILITY:0:200"
           - "POTION:SPEED:1:200"
 
   malgron:
     name: "{categoryColor}Malgron Pecsétje"
-    category: "mythic"
+    category: "ultimate"
     applies-to: "sword"
     item-lore:
       enabled: true

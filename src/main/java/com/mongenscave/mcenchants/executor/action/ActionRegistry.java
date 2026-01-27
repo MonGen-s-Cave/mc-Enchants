@@ -21,6 +21,17 @@ public class ActionRegistry {
         register(new AddDurabilityAction());
         register(new ShuffleHotbarAction());
         register(new SmeltAction());
+        register(new AddFoodAction());
+        register(new AddHealthAction());
+        register(new BreakBlockAction());
+        register(new CureAction());
+        register(new DamageArmorAction());
+        register(new DoHarmAction());
+        register(new DropHeadAction());
+        register(new IncreaseDamageAction());
+        register(new LightningAction());
+        register(new NegateDamageAction());
+        register(new StealExpAction());
     }
 
     private static void register(@NotNull EnchantAction action) {
