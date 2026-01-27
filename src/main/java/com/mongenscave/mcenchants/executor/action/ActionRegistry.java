@@ -32,6 +32,11 @@ public class ActionRegistry {
         register(new LightningAction());
         register(new NegateDamageAction());
         register(new StealExpAction());
+        register(new ExpAction());
+        register(new KillAction());
+        register(new StealHealthAction());
+        register(new CurePermanentAction());
+        register(new RemoveEnchantAction());
     }
 
     private static void register(@NotNull EnchantAction action) {

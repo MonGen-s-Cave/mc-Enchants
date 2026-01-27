@@ -152,13 +152,13 @@ enchants:
     levels:
       1:
         actions:
-          - "POTION:FAST_DIGGING:0:999999"
+          - "POTION:HASTE:0:999999"
       2:
         actions:
-          - "POTION:FAST_DIGGING:1:999999"
+          - "POTION:HASTE:1:999999"
       3:
         actions:
-          - "POTION:FAST_DIGGING:2:999999"
+          - "POTION:HASTE:2:999999"
 
   insomnia:
     name: "{categoryColor}Álmatlanság"
@@ -181,49 +181,49 @@ enchants:
         actions:
           - "POTION:SLOW:0:40"
           - "POTION:NAUSEA:0:40"
-          - "POTION:SLOW_DIGGING:0:60"
+          - "POTION:FATIGUE:0:60"
       2:
         chance: 12
         cooldown: 10
         actions:
           - "POTION:SLOW:0:80"
           - "POTION:NAUSEA:0:80"
-          - "POTION:SLOW_DIGGING:0:100"
+          - "POTION:FATIGUE:0:100"
       3:
         chance: 14
         cooldown: 10
         actions:
           - "POTION:SLOW:1:100"
           - "POTION:NAUSEA:1:100"
-          - "POTION:SLOW_DIGGING:1:120"
+          - "POTION:FATIGUE:1:120"
       4:
         chance: 16
         cooldown: 9
         actions:
           - "POTION:SLOW:1:120"
           - "POTION:NAUSEA:1:120"
-          - "POTION:SLOW_DIGGING:1:140"
+          - "POTION:FATIGUE:1:140"
       5:
         chance: 18
         cooldown: 9
         actions:
           - "POTION:SLOW:1:140"
           - "POTION:NAUSEA:1:140"
-          - "POTION:SLOW_DIGGING:1:160"
+          - "POTION:FATIGUE:1:160"
       6:
         chance: 20
         cooldown: 8
         actions:
           - "POTION:SLOW:1:180"
           - "POTION:NAUSEA:1:180"
-          - "POTION:SLOW_DIGGING:1:200"
+          - "POTION:FATIGUE:1:200"
       7:
         chance: 22
         cooldown: 8
         actions:
           - "POTION:SLOW:2:80"
           - "POTION:NAUSEA:2:80"
-          - "POTION:SLOW_DIGGING:2:100"
+          - "POTION:FATIGUE:2:100"
 
   lightning:
     name: "{categoryColor}Villámcsapás"
@@ -369,17 +369,17 @@ enchants:
         chance: 35
         cooldown: 2
         actions:
-          - "POTION:FAST_DIGGING:0:60"
+          - "POTION:HASTE:0:60"
       2:
         chance: 55
         cooldown: 2
         actions:
-          - "POTION:FAST_DIGGING:1:80"
+          - "POTION:HASTE:1:80"
       3:
         chance: 75
         cooldown: 2
         actions:
-          - "POTION:FAST_DIGGING:2:100"
+          - "POTION:HASTE:2:100"
 
   sustain:
     name: "{categoryColor}Fenntartás"
@@ -1168,25 +1168,6 @@ enchants:
           - "INCREASE_DAMAGE:50-100"
 
   # ========== LEGENDARY GROUP ==========
-
-  lavawalker:
-    name: "{categoryColor}Lávajáró"
-    category: "legendary"
-    applies-to: "boots"
-    item-lore:
-      enabled: true
-      lines:
-        - "{categoryColor}Lávajáró &8[&#94A3B8{level}&8]"
-    book-lore:
-      enabled: true
-      lines:
-        - "Lávára léphetsz"
-        - "biztonságosan."
-    type: "EFFECT_STATIC"
-    levels:
-      1:
-        actions:
-          - "LAVA_WALKER"
 
   impale:
     name: "{categoryColor}Leszúrás"

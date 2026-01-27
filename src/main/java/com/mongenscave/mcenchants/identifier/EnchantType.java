@@ -11,5 +11,8 @@ public enum EnchantType {
     ITEM_BREAK,
     MINING,
     EFFECT_STATIC,
-    PASSIVE
+    PASSIVE,
+    KILL_PLAYER,
+    KILL_MOB,
+    ATTACK_MOB
 }
