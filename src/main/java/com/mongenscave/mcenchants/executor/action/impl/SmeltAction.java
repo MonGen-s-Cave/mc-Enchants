@@ -2,7 +2,6 @@ package com.mongenscave.mcenchants.executor.action.impl;
 
 import com.mongenscave.mcenchants.data.ActionData;
 import com.mongenscave.mcenchants.executor.action.EnchantAction;
-import com.mongenscave.mcenchants.util.LoggerUtil;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Player;

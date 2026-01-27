@@ -54,19 +54,14 @@ public class RemoveEnchantAction extends EnchantAction {
                 String enchantId = enchantParts[0].trim();
 
                 if (!enchantId.equals(enchantIdToRemove)) {
-                    if (!newEnchantsData.isEmpty()) {
-                        newEnchantsData.append(";");
-                    }
+                    if (!newEnchantsData.isEmpty()) newEnchantsData.append(";");
                     newEnchantsData.append(entry);
                 }
             }
         }
 
-        if (!newEnchantsData.isEmpty()) {
-            pdc.set(key, PersistentDataType.STRING, newEnchantsData.toString());
-        } else {
-            pdc.remove(key);
-        }
+        if (!newEnchantsData.isEmpty()) pdc.set(key, PersistentDataType.STRING, newEnchantsData.toString());
+        else pdc.remove(key);
 
         item.setItemMeta(meta);
     }

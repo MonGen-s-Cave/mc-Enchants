@@ -1,6 +1,7 @@
 package com.mongenscave.mcenchants.listener;
 
 import com.mongenscave.mcenchants.McEnchants;
+import com.mongenscave.mcenchants.identifier.key.MessageKey;
 import com.mongenscave.mcenchants.manager.BookManager;
 import com.mongenscave.mcenchants.processor.MessageProcessor;
 import org.bukkit.Sound;
@@ -43,7 +44,7 @@ public final class BookRevealListener implements Listener {
         }
 
         player.getInventory().addItem(revealedBook);
-        player.sendMessage(MessageProcessor.process("&aFelfedted a könyvet!"));
+        player.sendMessage(MessageKey.BOOK_REVEALED.getMessage());
         player.playSound(player.getLocation(), Sound.ENTITY_PLAYER_LEVELUP, 0.7f, 1.2f);
     }
 }

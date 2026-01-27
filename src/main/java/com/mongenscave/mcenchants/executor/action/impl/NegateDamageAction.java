@@ -17,11 +17,8 @@ public class NegateDamageAction extends EnchantAction {
         Event event = (Event) context.get("event");
         EntityDamageEvent damageEvent = null;
 
-        if (event instanceof EntityDamageByEntityEvent) {
-            damageEvent = (EntityDamageByEntityEvent) event;
-        } else if (event instanceof EntityDamageEvent) {
-            damageEvent = (EntityDamageEvent) event;
-        }
+        if (event instanceof EntityDamageByEntityEvent) damageEvent = (EntityDamageByEntityEvent) event;
+        else if (event instanceof EntityDamageEvent) damageEvent = (EntityDamageEvent) event;
 
         if (damageEvent == null) return;
 

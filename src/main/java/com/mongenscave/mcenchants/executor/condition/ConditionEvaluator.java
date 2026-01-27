@@ -9,9 +9,7 @@ public class ConditionEvaluator {
 
     public static boolean evaluateCondition(@NotNull String condition, @NotNull Map<String, Object> context, @NotNull Player player) {
         String[] parts = condition.split("=>");
-        if (parts.length != 2) {
-            return true;
-        }
+        if (parts.length != 2) return true;
 
         String checkPart = parts[0].trim();
         String result = parts[1].trim();
@@ -50,25 +48,16 @@ public class ConditionEvaluator {
 
         EnchantCondition enchantCondition = null;
 
-        if (conditionKey != null) {
-            enchantCondition = ConditionRegistry.getCondition(conditionKey);
-        }
+        if (conditionKey != null) enchantCondition = ConditionRegistry.getCondition(conditionKey);
 
         boolean conditionMet;
         if (enchantCondition != null) {
             conditionMet = enchantCondition.evaluate(player, value, context);
 
-            if (operator.equals("!=")) {
-                conditionMet = !conditionMet;
-            }
-        } else {
-            return result.equalsIgnoreCase("allow");
-        }
+            if (operator.equals("!=")) conditionMet = !conditionMet;
+        } else return result.equalsIgnoreCase("allow");
 
-        if (conditionMet) {
-            return result.equalsIgnoreCase("allow");
-        } else {
-            return result.equalsIgnoreCase("stop");
-        }
+        if (conditionMet) return result.equalsIgnoreCase("allow");
+        else return result.equalsIgnoreCase("stop");
     }
 }

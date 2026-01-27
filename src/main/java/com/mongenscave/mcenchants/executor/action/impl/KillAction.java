@@ -10,7 +10,6 @@ import org.jetbrains.annotations.NotNull;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ThreadLocalRandom;
-import java.util.stream.Collectors;
 
 public class KillAction extends EnchantAction {
     @Override
@@ -35,9 +34,7 @@ public class KillAction extends EnchantAction {
                 .toList();
 
         for (Entity entity : nearbyEntities) {
-            if (entity instanceof LivingEntity living) {
-                living.setHealth(0);
-            }
+            if (entity instanceof LivingEntity living) living.setHealth(0);
         }
     }
 

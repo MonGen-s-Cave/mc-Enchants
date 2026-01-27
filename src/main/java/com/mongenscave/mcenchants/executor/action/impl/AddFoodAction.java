@@ -2,7 +2,6 @@ package com.mongenscave.mcenchants.executor.action.impl;
 
 import com.mongenscave.mcenchants.data.ActionData;
 import com.mongenscave.mcenchants.executor.action.EnchantAction;
-import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 
@@ -23,16 +22,11 @@ public class AddFoodAction extends EnchantAction {
             String targetSpec = parts[2].toUpperCase();
             if (targetSpec.equals("@VICTIM")) {
                 Object victim = context.get("victim");
-                if (victim instanceof Player) {
-                    target = (Player) victim;
-                } else {
-                    return;
-                }
+                if (victim instanceof Player) target = (Player) victim;
+                else return;
             } else if (targetSpec.equals("@ATTACKER")) {
                 Object attacker = context.get("attacker");
-                if (attacker instanceof Player) {
-                    target = (Player) attacker;
-                }
+                if (attacker instanceof Player) target = (Player) attacker;
             }
         }
 

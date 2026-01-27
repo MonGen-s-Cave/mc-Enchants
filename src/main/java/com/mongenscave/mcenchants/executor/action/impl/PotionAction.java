@@ -32,22 +32,16 @@ public class PotionAction extends EnchantAction {
             int amplifier = Integer.parseInt(parts[2]);
             int duration = Integer.parseInt(parts[3]);
 
-            // Determine target
             LivingEntity target = player;
             if (parts.length >= 5) {
                 String targetSpec = parts[4].toUpperCase();
                 if (targetSpec.equals("@VICTIM")) {
                     Object victim = context.get("victim");
-                    if (victim instanceof LivingEntity) {
-                        target = (LivingEntity) victim;
-                    } else {
-                        return;
-                    }
+                    if (victim instanceof LivingEntity) target = (LivingEntity) victim;
+                    else return;
                 } else if (targetSpec.equals("@ATTACKER")) {
                     Object attacker = context.get("attacker");
-                    if (attacker instanceof LivingEntity) {
-                        target = (LivingEntity) attacker;
-                    }
+                    if (attacker instanceof LivingEntity) target = (LivingEntity) attacker;
                 }
             }
 

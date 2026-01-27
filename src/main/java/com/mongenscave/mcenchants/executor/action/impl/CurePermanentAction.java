@@ -25,22 +25,15 @@ public class CurePermanentAction extends EnchantAction {
             String targetSpec = parts[2].toUpperCase();
             if (targetSpec.equals("@VICTIM")) {
                 Object victim = context.get("victim");
-                if (victim instanceof LivingEntity) {
-                    target = (LivingEntity) victim;
-                } else {
-                    return;
-                }
+                if (victim instanceof LivingEntity) target = (LivingEntity) victim;
+                else return;
             } else if (targetSpec.equals("@ATTACKER")) {
                 Object attacker = context.get("attacker");
-                if (attacker instanceof LivingEntity) {
-                    target = (LivingEntity) attacker;
-                }
+                if (attacker instanceof LivingEntity) target = (LivingEntity) attacker;
             }
         }
 
-        if (target.hasPotionEffect(effectType)) {
-            target.removePotionEffect(effectType);
-        }
+        if (target.hasPotionEffect(effectType)) target.removePotionEffect(effectType);
     }
 
     @Override

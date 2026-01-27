@@ -6,6 +6,7 @@ import com.mongenscave.mcenchants.annotation.Enchant;
 import com.mongenscave.mcenchants.data.MenuController;
 import com.mongenscave.mcenchants.gui.impl.MainMenu;
 import com.mongenscave.mcenchants.identifier.key.MessageKey;
+import com.mongenscave.mcenchants.listener.EnchantTriggerListener;
 import com.mongenscave.mcenchants.manager.BookManager;
 import com.mongenscave.mcenchants.manager.EnchantManager;
 import com.mongenscave.mcenchants.processor.MessageProcessor;
@@ -13,6 +14,7 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Range;
 import revxrsal.commands.annotation.CommandPlaceholder;
 import revxrsal.commands.annotation.Default;
 import revxrsal.commands.annotation.Optional;
@@ -43,7 +45,6 @@ public class CommandEnchant implements OrphanCommand {
         plugin.getCategory().reload();
         plugin.getApply().reload();
         plugin.getLevels().reload();
-
         plugin.getManagerRegistry().reload();
 
         sender.sendMessage(MessageKey.RELOAD.getMessage());
@@ -51,29 +52,13 @@ public class CommandEnchant implements OrphanCommand {
 
     @Subcommand("givebook")
     @CommandPermission("mcenchants.admin.givebook")
-    public void giveBook(
-            @NotNull CommandSender sender,
-            @NotNull Player target,
-            @Category @NotNull String categoryId,
-            @Default("1") int amount
-    ) {
-        if (amount < 1 || amount > 64) {
-            sender.sendMessage(MessageProcessor.process("&cAz összegnek 1 és 64 között kell lennie!"));
-            return;
-        }
-
+    public void giveBook(@NotNull CommandSender sender, @NotNull Player target, @Category @NotNull String categoryId, @Default("1") @Range(from = 1, to = 64) int amount) {
         ItemStack mysteriousBook = bookManager.createMysteriousBook(categoryId);
         mysteriousBook.setAmount(amount);
 
         target.getInventory().addItem(mysteriousBook);
 
-        sender.sendMessage(MessageProcessor.process(
-                "&aAdtál &e" + amount + "&a db &e" + categoryId + "&a mysterious könyvet &e" + target.getName() + "&a játékosnak!"
-        ));
-
-        target.sendMessage(MessageProcessor.process(
-                "&aKaptál &e" + amount + "&a db &e" + categoryId + "&a mysterious könyvet!"
-        ));
+        sender.sendMessage(MessageKey.GIVEBOOK_SENDER.getMessage());
     }
 
     @Subcommand("giveenchant")
@@ -84,22 +69,16 @@ public class CommandEnchant implements OrphanCommand {
             @Enchant @NotNull String enchantId,
             @Default("1") int level,
             @Optional Integer successRate,
-            @Default("1") int amount
-    ) {
+            @Default("1") @Range(from = 1, to = 64) int amount) {
         com.mongenscave.mcenchants.model.Enchant enchant = enchantManager.getEnchant(enchantId);
 
         if (enchant == null) {
-            sender.sendMessage(MessageProcessor.process("&cEz az enchant nem létezik: &e" + enchantId));
+            sender.sendMessage("No enchant like this SHEESH");
             return;
         }
 
         if (level < 1 || level > enchant.getMaxLevel()) {
-            sender.sendMessage(MessageProcessor.process("&cA szint 1 és " + enchant.getMaxLevel() + " között kell legyen!"));
-            return;
-        }
-
-        if (amount < 1 || amount > 64) {
-            sender.sendMessage(MessageProcessor.process("&cAz összegnek 1 és 64 között kell lennie!"));
+            sender.sendMessage("Wrong level!");
             return;
         }
 
@@ -107,11 +86,9 @@ public class CommandEnchant implements OrphanCommand {
         int destroyRate;
 
         if (successRate == null) {
-            // Random success rate between 50-80%
             finalSuccessRate = ThreadLocalRandom.current().nextInt(50, 81);
             destroyRate = 100 - finalSuccessRate;
         } else {
-            // Custom success rate or 100%
             if (successRate == 100) {
                 finalSuccessRate = 100;
                 destroyRate = 0;
@@ -126,12 +103,6 @@ public class CommandEnchant implements OrphanCommand {
 
         target.getInventory().addItem(revealedBook);
 
-        sender.sendMessage(MessageProcessor.process(
-                "&aAdtál &e" + amount + "&a db &e" + enchant.getName() + " " + level + "&a könyvet (&e" + finalSuccessRate + "%&a siker) &e" + target.getName() + "&a játékosnak!"
-        ));
-
-        target.sendMessage(MessageProcessor.process(
-                "&aKaptál &e" + amount + "&a db &e" + enchant.getName() + " " + level + "&a könyvet (&e" + finalSuccessRate + "%&a siker)!"
-        ));
+        sender.sendMessage(MessageKey.GIVEENCHANT_SENDER.getMessage());
     }
 }

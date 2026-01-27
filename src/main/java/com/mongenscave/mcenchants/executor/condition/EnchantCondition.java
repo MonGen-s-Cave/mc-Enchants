@@ -25,7 +25,7 @@ public abstract class EnchantCondition {
     protected double parseDouble(@NotNull String value, double defaultValue) {
         try {
             return Double.parseDouble(value);
-        } catch (NumberFormatException e) {
+        } catch (NumberFormatException exception) {
             return defaultValue;
         }
     }

@@ -5,6 +5,7 @@ import com.mongenscave.mcenchants.executor.action.EnchantAction;
 import org.bukkit.entity.Player;
 import org.bukkit.event.Event;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
+import org.bukkit.event.entity.ProjectileHitEvent;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Map;
@@ -14,7 +15,13 @@ public class IncreaseDamageAction extends EnchantAction {
     @Override
     public void execute(@NotNull Player player, @NotNull ActionData actionData, @NotNull Map<String, Object> context) {
         Event event = (Event) context.get("event");
-        if (!(event instanceof EntityDamageByEntityEvent damageEvent)) return;
+
+        EntityDamageByEntityEvent damageEvent = null;
+
+        if (event instanceof EntityDamageByEntityEvent) damageEvent = (EntityDamageByEntityEvent) event;
+        else if (event instanceof ProjectileHitEvent) return;
+
+        if (damageEvent == null) return;
 
         String actionString = actionData.fullActionString();
         String[] parts = actionString.split(":");
@@ -35,7 +42,7 @@ public class IncreaseDamageAction extends EnchantAction {
     @Override
     public boolean canExecute(@NotNull Map<String, Object> context) {
         Event event = (Event) context.get("event");
-        return event instanceof EntityDamageByEntityEvent;
+        return event instanceof EntityDamageByEntityEvent || event instanceof ProjectileHitEvent;
     }
 
     private double parsePercentage(@NotNull String percentStr) {

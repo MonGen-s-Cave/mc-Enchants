@@ -18,9 +18,7 @@ public class ExpAction extends EnchantAction {
         String expString = parts[1];
         int expAmount = calculateExp(expString, context);
 
-        if (expAmount > 0) {
-            player.giveExp(expAmount);
-        }
+        if (expAmount > 0) player.giveExp(expAmount);
     }
 
     @Override
@@ -33,8 +31,8 @@ public class ExpAction extends EnchantAction {
             Object expObj = context.get("exp");
             if (expObj instanceof Number) {
                 double baseExp = ((Number) expObj).doubleValue();
-
                 String[] parts = expString.split("\\*");
+
                 if (parts.length == 2) {
                     try {
                         double multiplier = Double.parseDouble(parts[1]);

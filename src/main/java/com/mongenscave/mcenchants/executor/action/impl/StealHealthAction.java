@@ -26,30 +26,20 @@ public class StealHealthAction extends EnchantAction {
             String targetSpec = parts[2].toUpperCase();
             if (targetSpec.equals("@VICTIM")) {
                 Object victimObj = context.get("victim");
-                if (victimObj instanceof LivingEntity) {
-                    victim = (LivingEntity) victimObj;
-                } else {
-                    return;
-                }
+                if (victimObj instanceof LivingEntity) victim = (LivingEntity) victimObj;
+                else return;
             } else if (targetSpec.equals("@ATTACKER")) {
                 Object attackerObj = context.get("attacker");
-                if (attackerObj instanceof LivingEntity) {
-                    victim = (LivingEntity) attackerObj;
-                } else {
-                    return;
-                }
+                if (attackerObj instanceof LivingEntity) victim = (LivingEntity) attackerObj;
+                else return;
             }
         } else {
             Object victimObj = context.get("victim");
-            if (victimObj instanceof LivingEntity) {
-                victim = (LivingEntity) victimObj;
-            } else {
+            if (victimObj instanceof LivingEntity) victim = (LivingEntity) victimObj;
+            else {
                 Object target = context.get("target");
-                if (target instanceof LivingEntity) {
-                    victim = (LivingEntity) target;
-                } else {
-                    return;
-                }
+                if (target instanceof LivingEntity) victim = (LivingEntity) target;
+                else return;
             }
         }
 

@@ -16,25 +16,15 @@ public class EnchantActionExecutor {
             ActionData actionData = ActionData.fromString(actionTypeString);
             String baseType = actionData.actionType();
 
-            LoggerUtil.info("Executing action - Full: " + actionTypeString + ", Base: " + baseType);
-
             EnchantAction action = ActionRegistry.getAction(baseType);
 
-            if (action == null) {
-                LoggerUtil.warn("Unknown action type: " + baseType);
-                return;
-            }
-
-            if (!action.canExecute(context)) {
-                LoggerUtil.warn("Action " + baseType + " cannot be executed with current context");
-                return;
-            }
+            if (action == null) return;
+            if (!action.canExecute(context)) return;
 
             action.execute(player, actionData, context);
 
         } catch (Exception exception) {
-            LoggerUtil.error("Error executing action " + actionModel.getActionType() + ": " + exception.getMessage());
-            exception.printStackTrace();
+            LoggerUtil.error(exception.getMessage());
         }
     }
 }

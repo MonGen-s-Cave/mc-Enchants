@@ -23,26 +23,17 @@ public class StealExpAction extends EnchantAction {
             String targetSpec = parts[2].toUpperCase();
             if (targetSpec.equals("@VICTIM")) {
                 Object victimObj = context.get("victim");
-                if (victimObj instanceof Player) {
-                    victim = (Player) victimObj;
-                } else {
-                    return;
-                }
+                if (victimObj instanceof Player) victim = (Player) victimObj;
+                else return;
             } else if (targetSpec.equals("@ATTACKER")) {
                 Object attackerObj = context.get("attacker");
-                if (attackerObj instanceof Player) {
-                    victim = (Player) attackerObj;
-                } else {
-                    return;
-                }
+                if (attackerObj instanceof Player) victim = (Player) attackerObj;
+                else return;
             }
         } else {
             Object victimObj = context.get("victim");
-            if (victimObj instanceof Player) {
-                victim = (Player) victimObj;
-            } else {
-                return;
-            }
+            if (victimObj instanceof Player) victim = (Player) victimObj;
+            else return;
         }
 
         if (victim == null) return;
@@ -51,10 +42,8 @@ public class StealExpAction extends EnchantAction {
         int actualStolen = Math.min(expAmount, victimTotalExp);
 
         if (actualStolen > 0) {
-            victim.setExp(0);
-            victim.setLevel(0);
-            victim.setTotalExperience(0);
-            victim.giveExp(victimTotalExp - actualStolen);
+            int newVictimExp = victimTotalExp - actualStolen;
+            setTotalExperience(victim, newVictimExp);
 
             player.giveExp(actualStolen);
         }
@@ -84,22 +73,26 @@ public class StealExpAction extends EnchantAction {
 
     private int getTotalExperience(@NotNull Player player) {
         int level = player.getLevel();
-        int totalExp = Math.round(player.getExp() * getExpToLevel(level));
+        int exp = Math.round(player.getExp() * getExpToLevel(level));
 
         for (int i = 0; i < level; i++) {
-            totalExp += getExpToLevel(i);
+            exp += getExpToLevel(i);
         }
 
-        return totalExp;
+        return exp;
+    }
+
+    private void setTotalExperience(@NotNull Player player, int exp) {
+        player.setExp(0);
+        player.setLevel(0);
+        player.setTotalExperience(0);
+
+        if (exp > 0) player.giveExp(exp);
     }
 
     private int getExpToLevel(int level) {
-        if (level <= 15) {
-            return 2 * level + 7;
-        } else if (level <= 30) {
-            return 5 * level - 38;
-        } else {
-            return 9 * level - 158;
-        }
+        if (level <= 15) return 2 * level + 7;
+        else if (level <= 30) return 5 * level - 38;
+        else return 9 * level - 158;
     }
 }

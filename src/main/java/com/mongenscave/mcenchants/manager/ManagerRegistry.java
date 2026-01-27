@@ -1,5 +1,6 @@
 package com.mongenscave.mcenchants.manager;
 
+import com.mongenscave.mcenchants.executor.action.impl.BreakBlockAction;
 import lombok.Getter;
 
 @Getter
@@ -17,5 +18,6 @@ public final class ManagerRegistry {
     public void reload() {
         categoryManager.reload();
         enchantManager.reload();
+        BreakBlockAction.reloadIgnoredMaterials();
     }
 }

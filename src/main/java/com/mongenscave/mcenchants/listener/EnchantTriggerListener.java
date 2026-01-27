@@ -43,12 +43,14 @@ import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ThreadLocalRandom;
 
+@SuppressWarnings("deprecation")
 public final class EnchantTriggerListener implements Listener {
     private final EnchantManager enchantManager;
     private final EnchantActionExecutor actionExecutor;
     private final Map<String, Long> cooldowns = new ConcurrentHashMap<>();
     private final Map<UUID, Set<String>> activeEffects = new ConcurrentHashMap<>();
     private final Map<UUID, ProjectileHitData> recentProjectileHits = new ConcurrentHashMap<>();
+    private final Set<String> blacklistedWorlds = new HashSet<>();
     private MyScheduledTask passiveCheckTask;
 
     private static class ProjectileHitData {
@@ -67,13 +69,26 @@ public final class EnchantTriggerListener implements Listener {
         this.enchantManager = McEnchants.getInstance().getManagerRegistry().getEnchantManager();
         this.actionExecutor = new EnchantActionExecutor();
 
+        loadBlacklistedWorlds();
         startPassiveEnchantChecker();
+    }
+
+    private void loadBlacklistedWorlds() {
+        blacklistedWorlds.clear();
+        List<String> worlds = McEnchants.getInstance().getConfiguration().getStringList("blacklisted-worlds");
+        blacklistedWorlds.addAll(worlds);
+    }
+
+    private boolean isWorldBlacklisted(@NotNull Player player) {
+        return blacklistedWorlds.contains(player.getWorld().getName());
     }
 
     private void startPassiveEnchantChecker() {
         passiveCheckTask = McEnchants.getInstance().getScheduler().runTaskTimer(() -> {
             for (Player player : McEnchants.getInstance().getServer().getOnlinePlayers()) {
-                checkAndApplyPassiveEnchants(player);
+                if (!isWorldBlacklisted(player)) {
+                    checkAndApplyPassiveEnchants(player);
+                }
             }
         }, 20L, 20L);
     }
@@ -174,7 +189,9 @@ public final class EnchantTriggerListener implements Listener {
 
     @EventHandler
     public void onPlayerJoin(@NotNull PlayerJoinEvent event) {
-        checkAndApplyPassiveEnchants(event.getPlayer());
+        if (!isWorldBlacklisted(event.getPlayer())) {
+            checkAndApplyPassiveEnchants(event.getPlayer());
+        }
     }
 
     @EventHandler
@@ -185,12 +202,15 @@ public final class EnchantTriggerListener implements Listener {
 
     @EventHandler
     public void onItemHeld(@NotNull PlayerItemHeldEvent event) {
-        McEnchants.getInstance().getScheduler().runTaskLater(() -> checkAndApplyPassiveEnchants(event.getPlayer()), 1L);
+        if (!isWorldBlacklisted(event.getPlayer())) {
+            McEnchants.getInstance().getScheduler().runTaskLater(() -> checkAndApplyPassiveEnchants(event.getPlayer()), 1L);
+        }
     }
 
     @EventHandler(priority = EventPriority.NORMAL, ignoreCancelled = true)
     public void onPlayerInteract(@NotNull PlayerInteractEvent event) {
         if (event.getHand() != EquipmentSlot.HAND) return;
+        if (isWorldBlacklisted(event.getPlayer())) return;
 
         Player player = event.getPlayer();
         ItemStack item = player.getInventory().getItemInMainHand();
@@ -217,6 +237,8 @@ public final class EnchantTriggerListener implements Listener {
 
     @EventHandler(priority = EventPriority.NORMAL, ignoreCancelled = true)
     public void onBlockBreak(@NotNull BlockBreakEvent event) {
+        if (isWorldBlacklisted(event.getPlayer())) return;
+
         Player player = event.getPlayer();
         ItemStack item = player.getInventory().getItemInMainHand();
 
@@ -232,8 +254,9 @@ public final class EnchantTriggerListener implements Listener {
 
     @EventHandler(priority = EventPriority.NORMAL, ignoreCancelled = true)
     public void onEntityDamageByEntity(@NotNull EntityDamageByEntityEvent event) {
-        // ATTACK - when player damages entity
         if (event.getDamager() instanceof Player attacker) {
+            if (isWorldBlacklisted(attacker)) return;
+
             ItemStack item = attacker.getInventory().getItemInMainHand();
 
             Map<String, Object> context = new HashMap<>();
@@ -251,8 +274,9 @@ public final class EnchantTriggerListener implements Listener {
             }
         }
 
-        // DEFENSE - when player receives damage
         if (event.getEntity() instanceof Player victim) {
+            if (isWorldBlacklisted(victim)) return;
+
             Map<String, Object> context = new HashMap<>();
             context.put("player", victim);
             context.put("victim", victim);
@@ -273,6 +297,7 @@ public final class EnchantTriggerListener implements Listener {
     @EventHandler(priority = EventPriority.NORMAL, ignoreCancelled = true)
     public void onEntityDamage(@NotNull EntityDamageEvent event) {
         if (!(event.getEntity() instanceof Player player)) return;
+        if (isWorldBlacklisted(player)) return;
 
         if (event.getCause() == EntityDamageEvent.DamageCause.FALL) {
             ItemStack boots = player.getInventory().getBoots();
@@ -291,11 +316,11 @@ public final class EnchantTriggerListener implements Listener {
     @EventHandler(priority = EventPriority.NORMAL, ignoreCancelled = true)
     public void onEntityShootBow(@NotNull EntityShootBowEvent event) {
         if (!(event.getEntity() instanceof Player player)) return;
+        if (isWorldBlacklisted(player)) return;
 
         ItemStack item = event.getBow();
         if (item == null) return;
 
-        // Store shooter info in projectile metadata
         if (event.getProjectile() instanceof Projectile projectile) {
             projectile.getPersistentDataContainer().set(
                     new NamespacedKey(McEnchants.getInstance(), "shooter"),
@@ -305,15 +330,13 @@ public final class EnchantTriggerListener implements Listener {
         }
     }
 
-    @EventHandler(priority = EventPriority.NORMAL)
+    @EventHandler(priority = EventPriority.HIGH)
     public void onProjectileHit(@NotNull ProjectileHitEvent event) {
-        // Only process if hit an entity
         if (event.getHitEntity() == null) return;
         if (!(event.getHitEntity() instanceof LivingEntity target)) return;
 
         Projectile projectile = event.getEntity();
 
-        // Get shooter from metadata
         PersistentDataContainer pdc = projectile.getPersistentDataContainer();
         NamespacedKey key = new NamespacedKey(McEnchants.getInstance(), "shooter");
 
@@ -324,22 +347,19 @@ public final class EnchantTriggerListener implements Listener {
 
         Player shooter = McEnchants.getInstance().getServer().getPlayer(UUID.fromString(shooterUUID));
         if (shooter == null) return;
+        if (isWorldBlacklisted(shooter)) return;
 
-        // Calculate headshot
         Location hitLocation = projectile.getLocation();
         Location eyeLocation = target.getEyeLocation();
         boolean isHeadshot = Math.abs(hitLocation.getY() - eyeLocation.getY()) < 0.5;
 
-        // Store hit data
         recentProjectileHits.put(shooter.getUniqueId(), new ProjectileHitData(target, isHeadshot));
 
-        // Get bow/crossbow from inventory
         ItemStack bow = shooter.getInventory().getItemInMainHand();
         if (!bow.getType().name().contains("BOW") && !bow.getType().name().contains("CROSSBOW")) {
             bow = shooter.getInventory().getItemInOffHand();
         }
 
-        // Create context for SHOOT enchants
         Map<String, Object> context = new HashMap<>();
         context.put("player", shooter);
         context.put("attacker", shooter);
@@ -351,9 +371,7 @@ public final class EnchantTriggerListener implements Listener {
 
         triggerEnchants(shooter, bow, EnchantType.SHOOT, context);
 
-        // Clean up after 1 second
-        McEnchants.getInstance().getScheduler().runTaskLater(() ->
-                recentProjectileHits.remove(shooter.getUniqueId()), 20L);
+        McEnchants.getInstance().getScheduler().runTaskLater(() -> recentProjectileHits.remove(shooter.getUniqueId()), 20L);
     }
 
     @EventHandler(priority = EventPriority.NORMAL, ignoreCancelled = true)
@@ -362,6 +380,7 @@ public final class EnchantTriggerListener implements Listener {
         Player killer = victim.getKiller();
 
         if (killer == null) return;
+        if (isWorldBlacklisted(killer)) return;
 
         ItemStack item = killer.getInventory().getItemInMainHand();
 
@@ -384,6 +403,7 @@ public final class EnchantTriggerListener implements Listener {
 
         Player killer = entity.getKiller();
         if (killer == null) return;
+        if (isWorldBlacklisted(killer)) return;
 
         ItemStack item = killer.getInventory().getItemInMainHand();
 
@@ -402,6 +422,8 @@ public final class EnchantTriggerListener implements Listener {
 
     @EventHandler(priority = EventPriority.NORMAL, ignoreCancelled = true)
     public void onItemBreak(@NotNull PlayerItemBreakEvent event) {
+        if (isWorldBlacklisted(event.getPlayer())) return;
+
         Player player = event.getPlayer();
         ItemStack item = event.getBrokenItem();
 
@@ -541,11 +563,13 @@ public final class EnchantTriggerListener implements Listener {
     }
 
     public void shutdown() {
-        if (passiveCheckTask != null) {
-            passiveCheckTask.cancel();
-        }
+        if (passiveCheckTask != null) passiveCheckTask.cancel();
         activeEffects.clear();
         cooldowns.clear();
         recentProjectileHits.clear();
+    }
+
+    public void reloadBlacklistedWorlds() {
+        loadBlacklistedWorlds();
     }
 }

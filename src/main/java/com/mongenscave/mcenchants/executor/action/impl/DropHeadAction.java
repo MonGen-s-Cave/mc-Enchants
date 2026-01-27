@@ -24,26 +24,17 @@ public class DropHeadAction extends EnchantAction {
             String targetSpec = parts[1].toUpperCase();
             if (targetSpec.equals("@VICTIM")) {
                 Object victim = context.get("victim");
-                if (victim instanceof Entity) {
-                    target = (Entity) victim;
-                } else {
-                    return;
-                }
+                if (victim instanceof Entity) target = (Entity) victim;
+                else return;
             } else if (targetSpec.equals("@ATTACKER")) {
                 Object attacker = context.get("attacker");
-                if (attacker instanceof Entity) {
-                    target = (Entity) attacker;
-                } else {
-                    return;
-                }
+                if (attacker instanceof Entity) target = (Entity) attacker;
+                else return;
             }
         } else {
             Object victim = context.get("victim");
-            if (victim instanceof Entity) {
-                target = (Entity) victim;
-            } else {
-                return;
-            }
+            if (victim instanceof Entity) target = (Entity) victim;
+            else return;
         }
 
         if (target == null) return;
@@ -53,17 +44,14 @@ public class DropHeadAction extends EnchantAction {
         if (target instanceof Player playerVictim) {
             head = new ItemStack(Material.PLAYER_HEAD);
             SkullMeta meta = (SkullMeta) head.getItemMeta();
+
             if (meta != null) {
                 meta.setOwningPlayer(playerVictim);
                 head.setItemMeta(meta);
             }
-        } else {
-            head = getMobHead(target.getType());
-        }
+        } else head = getMobHead(target.getType());
 
-        if (head != null) {
-            target.getWorld().dropItemNaturally(target.getLocation(), head);
-        }
+        if (head != null) target.getWorld().dropItemNaturally(target.getLocation(), head);
     }
 
     @Override

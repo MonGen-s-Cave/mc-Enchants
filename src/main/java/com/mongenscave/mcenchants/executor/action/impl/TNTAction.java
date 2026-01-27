@@ -19,15 +19,11 @@ public class TNTAction extends EnchantAction {
         Object targetObj = context.get("target");
         Entity targetEntity = null;
 
-        if (targetObj instanceof Entity) {
-            targetEntity = (Entity) targetObj;
-        }
+        if (targetObj instanceof Entity) targetEntity = (Entity) targetObj;
 
         if (targetEntity == null) {
             Object victimObj = context.get("victim");
-            if (victimObj instanceof Entity) {
-                targetEntity = (Entity) victimObj;
-            }
+            if (victimObj instanceof Entity) targetEntity = (Entity) victimObj;
         }
 
         if (targetEntity == null) {

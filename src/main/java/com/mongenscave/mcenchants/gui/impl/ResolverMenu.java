@@ -4,6 +4,7 @@ import com.mongenscave.mcenchants.McEnchants;
 import com.mongenscave.mcenchants.data.MenuController;
 import com.mongenscave.mcenchants.gui.Menu;
 import com.mongenscave.mcenchants.identifier.key.MenuKey;
+import com.mongenscave.mcenchants.identifier.key.MessageKey;
 import com.mongenscave.mcenchants.item.ItemFactory;
 import com.mongenscave.mcenchants.manager.BookManager;
 import com.mongenscave.mcenchants.manager.EnchantManager;
@@ -37,7 +38,7 @@ public final class ResolverMenu extends Menu {
         List<Integer> slots = new ArrayList<>();
         String slotsStr = MenuKey.MENU_RESOLVER_PLACEABLE_SLOTS.getString();
 
-        if (slotsStr == null || slotsStr.isEmpty()) return slots;
+        if (slotsStr.isEmpty()) return slots;
 
         String[] parts = slotsStr.split(",");
         for (String part : parts) {
@@ -82,7 +83,7 @@ public final class ResolverMenu extends Menu {
         }
 
         if (books.isEmpty()) {
-            player.sendMessage(MessageProcessor.process("&cNincs könyv a felbontó menüben!"));
+            player.sendMessage(MessageKey.RESOLVER_EMPTY_BOOK.getMessage());
             return;
         }
 
@@ -98,14 +99,13 @@ public final class ResolverMenu extends Menu {
 
             categoryId = enchant.getCategory().getId();
 
-            // Calculate dust based on success rate
             int successRate = bookData.getSuccessRate();
             int dustAmount = calculateDustAmount(successRate);
             totalDust += dustAmount * book.getAmount();
         }
 
         if (categoryId == null || totalDust == 0) {
-            player.sendMessage(MessageProcessor.process("&cHiba történt a felbontás során!"));
+            player.sendMessage(MessageKey.ERROR_DUE_RESOLVER.getMessage());
             return;
         }
 
@@ -117,7 +117,7 @@ public final class ResolverMenu extends Menu {
         dust.setAmount(Math.min(totalDust, 64));
 
         player.getInventory().addItem(dust);
-        player.sendMessage(MessageProcessor.process("&aSikeresen felbon tottál &e" + totalDust + "&a darab port!"));
+        player.sendMessage(MessageKey.SUCCESS_RESOLVE.getMessage());
         player.closeInventory();
     }
 
@@ -130,7 +130,7 @@ public final class ResolverMenu extends Menu {
             }
         }
 
-        player.sendMessage(MessageProcessor.process("&cFelbontás visszavonva!"));
+        player.sendMessage(MessageKey.SUCCESS_DENY.getMessage());
         player.closeInventory();
     }
 

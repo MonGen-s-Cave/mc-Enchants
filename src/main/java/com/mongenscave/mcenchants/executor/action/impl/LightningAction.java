@@ -20,30 +20,20 @@ public class LightningAction extends EnchantAction {
             String targetSpec = parts[1].toUpperCase();
             if (targetSpec.equals("@VICTIM")) {
                 Object victim = context.get("victim");
-                if (victim instanceof Entity) {
-                    target = (Entity) victim;
-                } else {
-                    return;
-                }
+                if (victim instanceof Entity) target = (Entity) victim;
+                else return;
             } else if (targetSpec.equals("@ATTACKER")) {
                 Object attacker = context.get("attacker");
-                if (attacker instanceof Entity) {
-                    target = (Entity) attacker;
-                } else {
-                    target = player;
-                }
+                if (attacker instanceof Entity) target = (Entity) attacker;
+                else target = player;
             }
         } else {
             Object victim = context.get("victim");
-            if (victim instanceof Entity) {
-                target = (Entity) victim;
-            } else {
+            if (victim instanceof Entity) target = (Entity) victim;
+            else {
                 Object targetObj = context.get("target");
-                if (targetObj instanceof Entity) {
-                    target = (Entity) targetObj;
-                } else {
-                    return;
-                }
+                if (targetObj instanceof Entity) target = (Entity) targetObj;
+                else return;
             }
         }
 

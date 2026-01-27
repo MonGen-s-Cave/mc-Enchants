@@ -15,10 +15,6 @@ public class EnchantedBook {
     private int destroyRate;
     private boolean revealed;
 
-    public EnchantedBook(@NotNull String enchantId, int level, int successRate, int destroyRate) {
-        this(enchantId, level, successRate, destroyRate, false);
-    }
-
     public void repair(int amount) {
         this.successRate = Math.min(100, this.successRate + amount);
         this.destroyRate = Math.max(0, this.destroyRate - amount);

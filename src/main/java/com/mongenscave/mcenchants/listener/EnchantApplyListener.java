@@ -1,6 +1,7 @@
 package com.mongenscave.mcenchants.listener;
 
 import com.mongenscave.mcenchants.McEnchants;
+import com.mongenscave.mcenchants.identifier.key.MessageKey;
 import com.mongenscave.mcenchants.manager.BookManager;
 import com.mongenscave.mcenchants.manager.EnchantManager;
 import com.mongenscave.mcenchants.model.Enchant;
@@ -25,6 +26,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ThreadLocalRandom;
 
+@SuppressWarnings("deprecation")
 public final class EnchantApplyListener implements Listener {
     private final BookManager bookManager;
     private final EnchantManager enchantManager;
@@ -51,24 +53,24 @@ public final class EnchantApplyListener implements Listener {
 
         EnchantedBook bookData = bookManager.getBookData(cursor);
         if (bookData == null) {
-            player.sendMessage(MessageProcessor.process("&cHibás könyv adat!"));
+            player.sendMessage(MessageKey.WRONG_BOOK.getMessage());
             return;
         }
 
         Enchant enchant = enchantManager.getEnchant(bookData.getEnchantId());
         if (enchant == null) {
-            player.sendMessage(MessageProcessor.process("&cEz az enchant nem létezik!"));
+            player.sendMessage(MessageKey.WRONG_ENCHANT.getMessage());
             return;
         }
 
         if (!enchant.canApplyTo(clicked)) {
-            player.sendMessage(MessageProcessor.process("&cEz az enchant nem alkalmazható erre a tárgyra!"));
+            player.sendMessage(MessageKey.NOT_APPLIABLE.getMessage());
             player.playSound(player.getLocation(), Sound.ENTITY_VILLAGER_NO, 1.0f, 1.0f);
             return;
         }
 
         if (hasEnchant(clicked, enchant.getId())) {
-            player.sendMessage(MessageProcessor.process("&cEzen a tárgyon már van ilyen enchant!"));
+            player.sendMessage(MessageKey.ALREADY_HAS.getMessage());
             player.playSound(player.getLocation(), Sound.ENTITY_VILLAGER_NO, 1.0f, 1.0f);
             return;
         }
@@ -76,30 +78,20 @@ public final class EnchantApplyListener implements Listener {
         applyEnchant(player, clicked, enchant, bookData, event);
     }
 
-    private void applyEnchant(@NotNull Player player, @NotNull ItemStack item, @NotNull Enchant enchant,
-                              @NotNull EnchantedBook bookData, @NotNull InventoryClickEvent event) {
+    private void applyEnchant(@NotNull Player player, @NotNull ItemStack item, @NotNull Enchant enchant, @NotNull EnchantedBook bookData, @NotNull InventoryClickEvent event) {
         int roll = ThreadLocalRandom.current().nextInt(1, 101);
         boolean success = roll <= bookData.getSuccessRate();
 
         if (success) {
             addEnchantToItem(item, enchant.getId(), bookData.getLevel());
-            player.sendMessage(MessageProcessor.process("&aSikeresen alkalmaztad az enchantot! &7(" + roll + "%)"));
+            player.sendMessage(MessageKey.SUCCESS_APPLY.getMessage());
             player.playSound(player.getLocation(), Sound.ENTITY_PLAYER_LEVELUP, 1.0f, 1.5f);
 
             player.setItemOnCursor(null);
         } else {
-            int destroyRoll = ThreadLocalRandom.current().nextInt(1, 101);
-            boolean destroyed = destroyRoll <= bookData.getDestroyRate();
-
-            if (destroyed) {
-                event.setCurrentItem(null);
-                player.sendMessage(MessageProcessor.process("&cNem sikerült és a tárgy megsemmisült! &7(" + roll + "%)"));
-                player.playSound(player.getLocation(), Sound.ENTITY_ITEM_BREAK, 1.0f, 0.8f);
-            } else {
-                player.sendMessage(MessageProcessor.process("&eNem sikerült, de a tárgy megmaradt! &7(" + roll + "%)"));
-                player.playSound(player.getLocation(), Sound.ENTITY_VILLAGER_NO, 1.0f, 1.0f);
-            }
-
+            event.setCurrentItem(null);
+            player.sendMessage(MessageKey.APPLY_FAIL.getMessage());
+            player.playSound(player.getLocation(), Sound.ENTITY_ITEM_BREAK, 1.0f, 0.8f);
             player.setItemOnCursor(null);
         }
     }
@@ -129,11 +121,8 @@ public final class EnchantApplyListener implements Listener {
         String currentEnchants = pdc.getOrDefault(key, PersistentDataType.STRING, "");
         String newEnchant = enchantId + ":" + level;
 
-        if (currentEnchants.isEmpty()) {
-            pdc.set(key, PersistentDataType.STRING, newEnchant);
-        } else {
-            pdc.set(key, PersistentDataType.STRING, currentEnchants + ";" + newEnchant);
-        }
+        if (currentEnchants.isEmpty()) pdc.set(key, PersistentDataType.STRING, newEnchant);
+        else pdc.set(key, PersistentDataType.STRING, currentEnchants + ";" + newEnchant);
 
         Enchant enchant = enchantManager.getEnchant(enchantId);
         if (enchant != null && enchant.isItemLoreEnabled()) {

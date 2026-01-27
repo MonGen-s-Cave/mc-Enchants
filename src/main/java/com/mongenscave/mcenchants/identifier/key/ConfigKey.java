@@ -10,7 +10,11 @@ import java.util.List;
 
 @Getter
 public enum ConfigKey {
-    ALIASES("aliases");
+    ALIASES("aliases"),
+
+    SOUND_ERROR("sounds.error"),
+    SOUND_SUCCESS("sounds.success"),
+    SOUND_OPEN_GUI("sounds.open-gui");
 
     private final String path;
     private static final Config config = McEnchants.getInstance().getConfiguration();

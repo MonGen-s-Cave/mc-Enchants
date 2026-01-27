@@ -20,26 +20,17 @@ public class ShuffleHotbarAction extends EnchantAction {
             String targetSpec = parts[1].toUpperCase();
             if (targetSpec.equals("@VICTIM")) {
                 Object victim = context.get("victim");
-                if (victim instanceof Player) {
-                    target = (Player) victim;
-                } else {
-                    return;
-                }
+                if (victim instanceof Player) target = (Player) victim;
+                else return;
             } else if (targetSpec.equals("@ATTACKER")) {
                 Object attacker = context.get("attacker");
-                if (attacker instanceof Player) {
-                    target = (Player) attacker;
-                } else {
-                    return;
-                }
+                if (attacker instanceof Player) target = (Player) attacker;
+                else return;
             }
         } else {
             Object attacker = context.get("attacker");
-            if (attacker instanceof Player) {
-                target = (Player) attacker;
-            } else {
-                return;
-            }
+            if (attacker instanceof Player) target = (Player) attacker;
+            else return;
         }
 
         if (target == null) return;

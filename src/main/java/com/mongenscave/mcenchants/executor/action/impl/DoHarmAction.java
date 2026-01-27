@@ -23,24 +23,17 @@ public class DoHarmAction extends EnchantAction {
             String targetSpec = parts[2].toUpperCase();
             if (targetSpec.equals("@VICTIM")) {
                 Object victim = context.get("victim");
-                if (victim instanceof LivingEntity) {
-                    target = (LivingEntity) victim;
-                }
+                if (victim instanceof LivingEntity) target = (LivingEntity) victim;
             } else if (targetSpec.equals("@ATTACKER")) {
                 Object attacker = context.get("attacker");
-                if (attacker instanceof LivingEntity) {
-                    target = (LivingEntity) attacker;
-                }
+                if (attacker instanceof LivingEntity) target = (LivingEntity) attacker;
             }
         } else {
             Object victim = context.get("victim");
-            if (victim instanceof LivingEntity) {
-                target = (LivingEntity) victim;
-            } else {
+            if (victim instanceof LivingEntity) target = (LivingEntity) victim;
+            else {
                 Object targetObj = context.get("target");
-                if (targetObj instanceof LivingEntity) {
-                    target = (LivingEntity) targetObj;
-                }
+                if (targetObj instanceof LivingEntity) target = (LivingEntity) targetObj;
             }
         }
 
@@ -57,9 +50,8 @@ public class DoHarmAction extends EnchantAction {
     private double parseDamage(@NotNull String damageStr, @NotNull Map<String, Object> context) {
         if (damageStr.equals("%damage%")) {
             Object damageObj = context.get("damage");
-            if (damageObj instanceof Number) {
-                return ((Number) damageObj).doubleValue();
-            }
+
+            if (damageObj instanceof Number) return ((Number) damageObj).doubleValue();
             return 1.0;
         }
 

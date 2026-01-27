@@ -14,9 +14,7 @@ public class CancelEventAction extends EnchantAction {
     @Override
     public void execute(@NotNull Player player, @NotNull ActionData actionData, @NotNull Map<String, Object> context) {
         Event event = (Event) context.get("event");
-        if (event instanceof Cancellable cancellable) {
-            cancellable.setCancelled(true);
-        }
+        if (event instanceof Cancellable cancellable) cancellable.setCancelled(true);
     }
 
     @Override
