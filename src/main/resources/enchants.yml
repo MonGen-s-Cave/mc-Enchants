@@ -171,46 +171,6 @@ enchants:
         actions:
           - "CANCEL_EVENT"
 
-  restore:
-    name: "{categoryColor}Helyreállítás"
-    category: "legendary"
-    applies-to: "pickaxe,shovel,axe"
-    item-lore:
-      enabled: true
-      lines:
-        - "{categoryColor}Helyreállítás &8[&#94A3B8{level}&8]"
-    book-lore:
-      enabled: true
-      lines:
-        - "Eltöréskor a tárgy eséllyel elveszíti ezt"
-        - "a varázst, de visszaszerzi a tartóssága felét."
-    type: "ITEM_BREAK"
-    levels:
-      1:
-        chance: 40
-        cooldown: 0
-        actions:
-          - "REMOVE_ENCHANT:restore"
-          - "ADD_DURABILITY_ITEM:-50"
-      2:
-        chance: 60
-        cooldown: 0
-        actions:
-          - "REMOVE_ENCHANT:restore"
-          - "ADD_DURABILITY_ITEM:-50"
-      3:
-        chance: 80
-        cooldown: 0
-        actions:
-          - "REMOVE_ENCHANT:restore"
-          - "ADD_DURABILITY_ITEM:-50"
-      4:
-        chance: 100
-        cooldown: 0
-        actions:
-          - "REMOVE_ENCHANT:restore"
-          - "ADD_DURABILITY_ITEM:-50"
-
   shuffle:
     name: "{categoryColor}Felkeverés"
     category: "common"
