@@ -314,6 +314,8 @@ enchants:
         actions:
           - "SHUFFLE_HOTBAR:@Attacker"
 
+  # ========== RARE GROUP ==========
+
   famine:
     name: "{categoryColor}Éhínség"
     category: "rare"
@@ -509,6 +511,8 @@ enchants:
         actions:
           - "POTION:WITHER:2:60:@Victim"
           - "POTION:POISON:2:60:@Victim"
+
+  # ========== EPIC GROUP ==========
 
   blind:
     name: "{categoryColor}Vakítás"
@@ -877,6 +881,7 @@ enchants:
         chance: 100
         actions:
           - "BREAK_BLOCK:3"
+
   enrage:
     name: "{categoryColor}Tombolás"
     category: "ultimate"
@@ -1026,28 +1031,28 @@ enchants:
         chance: 13
         cooldown: 3
         conditions:
-          - "{holding_bow} = true => allow"
+          - "{holding} = bow:true => allow"
         actions:
           - "INCREASE_DAMAGE:50-150"
       2:
         chance: 19
         cooldown: 3
         conditions:
-          - "{holding_bow} = true => allow"
+          - "{holding} = bow:true => allow"
         actions:
           - "INCREASE_DAMAGE:50-150"
       3:
         chance: 25
         cooldown: 3
         conditions:
-          - "{holding_bow} = true => allow"
+          - "{holding} = bow:true => allow"
         actions:
           - "INCREASE_DAMAGE:50-150"
       4:
         chance: 32
         cooldown: 3
         conditions:
-          - "{holding_bow} = true => allow"
+          - "{holding} = bow:true => allow"
         actions:
           - "INCREASE_DAMAGE:50-150"
 
@@ -1142,28 +1147,28 @@ enchants:
         chance: 12
         cooldown: 4
         conditions:
-          - "{holding_bow} = true => allow"
+          - "{holding} = bow:true => allow"
         actions:
           - "INCREASE_DAMAGE:25-50"
       2:
         chance: 17
         cooldown: 4
         conditions:
-          - "{holding_bow} = true => allow"
+          - "{holding} = bow:true => allow"
         actions:
           - "INCREASE_DAMAGE:25-50"
       3:
         chance: 25
         cooldown: 4
         conditions:
-          - "{holding_bow} = true => allow"
+          - "{holding} = bow:true => allow"
         actions:
           - "INCREASE_DAMAGE:50-100"
       4:
         chance: 33
         cooldown: 4
         conditions:
-          - "{holding_bow} = true => allow"
+          - "{holding} = bow:true => allow"
         actions:
           - "INCREASE_DAMAGE:50-100"
 
@@ -1318,28 +1323,28 @@ enchants:
         chance: 8
         cooldown: 2
         conditions:
-          - "{holding_axe} = true => allow"
+          - "{holding} = axe:true => allow"
         actions:
           - "INCREASE_DAMAGE:25-100"
       2:
         chance: 15
         cooldown: 2
         conditions:
-          - "{holding_axe} = true => allow"
+          - "{holding} = axe:true => allow"
         actions:
           - "INCREASE_DAMAGE:25-100"
       3:
         chance: 19
         cooldown: 2
         conditions:
-          - "{holding_axe} = true => allow"
+          - "{holding} = axe:true => allow"
         actions:
           - "INCREASE_DAMAGE:25-100"
       4:
         chance: 25
         cooldown: 2
         conditions:
-          - "{holding_axe} = true => allow"
+          - "{holding} = axe:true => allow"
         actions:
           - "INCREASE_DAMAGE:25-100"
 
@@ -1586,56 +1591,56 @@ enchants:
         chance: 17
         cooldown: 1
         conditions:
-          - "{holding_sword} = true => allow"
+          - "{holding} = sword:true => allow"
         actions:
           - "DOUBLE_DAMAGE"
       2:
         chance: 23
         cooldown: 1
         conditions:
-          - "{holding_sword} = true => allow"
+          - "{holding} = sword:true => allow"
         actions:
           - "DOUBLE_DAMAGE"
       3:
         chance: 29
         cooldown: 1
         conditions:
-          - "{holding_sword} = true => allow"
+          - "{holding} = sword:true => allow"
         actions:
           - "DOUBLE_DAMAGE"
       4:
         chance: 35
         cooldown: 1
         conditions:
-          - "{holding_sword} = true => allow"
+          - "{holding} = sword:true => allow"
         actions:
           - "DOUBLE_DAMAGE"
       5:
         chance: 41
         cooldown: 1
         conditions:
-          - "{holding_sword} = true => allow"
+          - "{holding} = sword:true => allow"
         actions:
           - "DOUBLE_DAMAGE"
       6:
         chance: 49
         cooldown: 1
         conditions:
-          - "{holding_sword} = true => allow"
+          - "{holding} = sword:true => allow"
         actions:
           - "DOUBLE_DAMAGE"
       7:
         chance: 52
         cooldown: 1
         conditions:
-          - "{holding_sword} = true => allow"
+          - "{holding} = sword:true => allow"
         actions:
           - "DOUBLE_DAMAGE"
       8:
         chance: 56
         cooldown: 1
         conditions:
-          - "{holding_sword} = true => allow"
+          - "{holding} = sword:true => allow"
         actions:
           - "DOUBLE_DAMAGE"
 

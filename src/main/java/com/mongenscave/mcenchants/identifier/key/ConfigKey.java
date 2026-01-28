@@ -14,7 +14,12 @@ public enum ConfigKey {
 
     SOUND_ERROR("sounds.error"),
     SOUND_SUCCESS("sounds.success"),
-    SOUND_OPEN_GUI("sounds.open-gui");
+    SOUND_OPEN_GUI("sounds.open-gui"),
+
+    ENCHANT_PER_ITEM("enchant-per-item"),
+
+    IGNORED_MATERIALS("ignored-materials"),
+    BLACKLISTED_WORLDS("blacklisted-worlds");
 
     private final String path;
     private static final Config config = McEnchants.getInstance().getConfiguration();

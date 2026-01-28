@@ -3,6 +3,7 @@ package com.mongenscave.mcenchants.gui.impl;
 import com.mongenscave.mcenchants.McEnchants;
 import com.mongenscave.mcenchants.data.MenuController;
 import com.mongenscave.mcenchants.gui.Menu;
+import com.mongenscave.mcenchants.identifier.key.ItemKey;
 import com.mongenscave.mcenchants.identifier.key.MenuKey;
 import com.mongenscave.mcenchants.item.ItemFactory;
 import com.mongenscave.mcenchants.manager.BookManager;
@@ -31,6 +32,16 @@ public final class RepairerMenu extends Menu {
     @Override
     public void handleMenu(@NotNull InventoryClickEvent event) {
         if (!(event.getWhoClicked() instanceof Player player)) return;
+
+        int slot = event.getSlot();
+
+        if (ItemKey.REPAIRER_BACK.matchesSlot(slot)) {
+            event.setCancelled(true);
+            handleItemClick(event, player);
+            close();
+            new MainMenu(MenuController.getMenuUtils(player)).open();
+            return;
+        }
 
         event.setCancelled(true);
 

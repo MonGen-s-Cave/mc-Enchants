@@ -7,6 +7,7 @@ import com.mongenscave.mcenchants.executor.EnchantActionExecutor;
 import com.mongenscave.mcenchants.executor.action.EnchantAction;
 import com.mongenscave.mcenchants.executor.condition.ConditionEvaluator;
 import com.mongenscave.mcenchants.identifier.EnchantType;
+import com.mongenscave.mcenchants.identifier.key.ConfigKey;
 import com.mongenscave.mcenchants.manager.EnchantManager;
 import com.mongenscave.mcenchants.model.Enchant;
 import com.mongenscave.mcenchants.model.EnchantLevel;
@@ -75,7 +76,7 @@ public final class EnchantTriggerListener implements Listener {
 
     private void loadBlacklistedWorlds() {
         blacklistedWorlds.clear();
-        List<String> worlds = McEnchants.getInstance().getConfiguration().getStringList("blacklisted-worlds");
+        List<String> worlds = ConfigKey.BLACKLISTED_WORLDS.getList();
         blacklistedWorlds.addAll(worlds);
     }
 

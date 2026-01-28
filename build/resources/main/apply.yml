@@ -1,5 +1,5 @@
 applies-to-rules:
-  separator: ","
+  separator: ", "
   displays:
     hoe:
       display: "Kapa"

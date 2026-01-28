@@ -37,6 +37,16 @@ public final class EnchanterMenu extends Menu {
 
         if (event.getCurrentItem() == null) return;
 
+        int slot = event.getSlot();
+        Player player = (Player) event.getWhoClicked();
+
+        if (ItemKey.ENCHANTER_BACK.matchesSlot(slot)) {
+            handleItemClick(event, player);
+            close();
+            new MainMenu(MenuController.getMenuUtils(player)).open();
+            return;
+        }
+
         ItemStack clicked = event.getCurrentItem();
         ItemMeta meta = clicked.getItemMeta();
         if (meta == null) return;
@@ -49,7 +59,6 @@ public final class EnchanterMenu extends Menu {
         String categoryId = pdc.get(categoryKey, PersistentDataType.STRING);
         if (categoryId == null) return;
 
-        Player player = (Player) event.getWhoClicked();
         Category category = categoryManager.getCategory(categoryId);
 
         int requiredXP = category.getPrice();

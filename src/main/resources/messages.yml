@@ -21,5 +21,6 @@ messages:
   success-purchase: "%prefix% &aSuccessfully bought a book!"
   givebook-sender: "%prefix% &aSuccessfully gave book!"
   giveenchant-sender: "%prefix% &aSuccessfully gave book!"
+  max-enchants-reached: "%prefix% &cThis item has reached the maximum number of enchants!"
 
 version: '1'

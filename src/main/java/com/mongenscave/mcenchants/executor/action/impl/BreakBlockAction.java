@@ -3,6 +3,7 @@ package com.mongenscave.mcenchants.executor.action.impl;
 import com.mongenscave.mcenchants.McEnchants;
 import com.mongenscave.mcenchants.data.ActionData;
 import com.mongenscave.mcenchants.executor.action.EnchantAction;
+import com.mongenscave.mcenchants.identifier.key.ConfigKey;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
@@ -26,7 +27,7 @@ public class BreakBlockAction extends EnchantAction {
     private static void loadIgnoredMaterials() {
         IGNORED_MATERIALS.clear();
 
-        List<String> ignoredList = McEnchants.getInstance().getConfiguration().getStringList("ignored-materials");
+        List<String> ignoredList = ConfigKey.IGNORED_MATERIALS.getList();
 
         for (String materialName : ignoredList) {
             try {

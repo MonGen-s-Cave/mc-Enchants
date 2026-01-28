@@ -2,6 +2,12 @@ main-menu:
   title: "&aNavigáció"
   size: 54
   items:
+    close:
+      material: "RED_WOOL"
+      name: "&cBezárás"
+      slot: 26
+      lore:
+        - "&7Katt hogy bezárd!"
     enchanter:
       material: "BOOK"
       name: "&7Enchantok vásárlása"
@@ -23,17 +29,29 @@ main-menu:
 
 repairer-menu:
   title: "&aJavító"
-  size: 9
+  size: 27
   book-input-slot: 0
   dust-input-slot: 1
   output-slot: 8
-  items: []
+  items:
+    back:
+      material: "RED_WOOL"
+      name: "&cVissza"
+      slot: 26
+      lore:
+        - "&7Katt hogy visszamenj!"
 
 resolver-menu:
   title: "&aFelbontó"
   size: 36
   placeable-slots: "0,1,2,3,4,5,6,7,8,9,10"
   items:
+    back:
+      material: "RED_WOOL"
+      name: "&cVissza"
+      slot: 26
+      lore:
+        - "&7Katt hogy visszamenj!"
     accept:
       material: "LIME_WOOL"
       name: "&aElfogadás"
@@ -50,9 +68,15 @@ resolver-menu:
 
 enchanter-menu:
   title: "&aEnchantok vásárlása"
-  size: 9
+  size: 36
 
   items:
+    back:
+      material: "RED_WOOL"
+      name: "&cVissza"
+      slot: 26
+      lore:
+        - "&7Katt hogy visszamenj!"
     common:
       material: "PAPER"
       modeldata: 99

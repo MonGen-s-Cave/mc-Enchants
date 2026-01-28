@@ -27,7 +27,6 @@ public final class BookRevealListener implements Listener {
     public void onPlayerInteract(@NotNull PlayerInteractEvent event) {
         if (event.getAction() != Action.RIGHT_CLICK_AIR) return;
         if (event.getHand() != EquipmentSlot.HAND) return;
-        if (!event.getPlayer().isSneaking()) return;
 
         Player player = event.getPlayer();
         ItemStack item = player.getInventory().getItemInMainHand();

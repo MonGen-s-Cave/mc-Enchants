@@ -15,9 +15,6 @@ public class ConditionRegistry {
         register(new HealthCondition());
         register(new HasWitherCondition());
         register(new HasPoisonCondition());
-        register(new HoldingBowCondition());
-        register(new HoldingAxeCondition());
-        register(new HoldingSwordCondition());
         register(new HeadshotCondition());
     }
 

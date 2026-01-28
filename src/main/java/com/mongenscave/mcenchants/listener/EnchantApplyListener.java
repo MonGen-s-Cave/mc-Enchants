@@ -76,6 +76,15 @@ public final class EnchantApplyListener implements Listener {
             return;
         }
 
+        int maxEnchantsPerItem = McEnchants.getInstance().getConfiguration().getInt("enchant-per-item", 5);
+        int currentEnchantCount = getEnchantCount(clicked);
+
+        if (currentEnchantCount >= maxEnchantsPerItem) {
+            player.sendMessage(MessageKey.MAX_ENCHANTS_REACHED.getMessage());
+            SoundUtil.playErrorSound(player);
+            return;
+        }
+
         applyEnchant(player, clicked, enchant, bookData, event);
     }
 
@@ -109,6 +118,22 @@ public final class EnchantApplyListener implements Listener {
         if (enchantsData == null) return false;
 
         return enchantsData.contains(enchantId + ":");
+    }
+
+    private int getEnchantCount(@NotNull ItemStack item) {
+        ItemMeta meta = item.getItemMeta();
+        if (meta == null) return 0;
+
+        PersistentDataContainer pdc = meta.getPersistentDataContainer();
+        NamespacedKey key = new NamespacedKey(McEnchants.getInstance(), "enchants");
+
+        if (!pdc.has(key, PersistentDataType.STRING)) return 0;
+
+        String enchantsData = pdc.get(key, PersistentDataType.STRING);
+        if (enchantsData == null || enchantsData.isEmpty()) return 0;
+
+        String[] entries = enchantsData.split(";");
+        return entries.length;
     }
 
     private void addEnchantToItem(@NotNull ItemStack item, @NotNull String enchantId, int level) {
