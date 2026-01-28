@@ -23,11 +23,7 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.block.Action;
 import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.event.entity.*;
-import org.bukkit.event.player.PlayerInteractEvent;
-import org.bukkit.event.player.PlayerItemBreakEvent;
-import org.bukkit.event.player.PlayerItemHeldEvent;
-import org.bukkit.event.player.PlayerJoinEvent;
-import org.bukkit.event.player.PlayerQuitEvent;
+import org.bukkit.event.player.*;
 import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
@@ -417,20 +413,34 @@ public final class EnchantTriggerListener implements Listener {
         triggerEnchants(killer, item, EnchantType.KILL_MOB, context);
     }
 
-    @EventHandler(priority = EventPriority.NORMAL, ignoreCancelled = true)
-    public void onItemBreak(@NotNull PlayerItemBreakEvent event) {
+    @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
+    public void onItemDamage(@NotNull PlayerItemDamageEvent event) {
         if (isWorldBlacklisted(event.getPlayer())) return;
 
         Player player = event.getPlayer();
-        ItemStack item = event.getBrokenItem();
+        ItemStack item = event.getItem();
 
-        Map<String, Object> context = new HashMap<>();
-        context.put("player", player);
-        context.put("target", player);
-        context.put("broken_item", item);
-        context.put("event", event);
+        if (item.getType().isAir()) return;
 
-        triggerEnchants(player, item, EnchantType.ITEM_BREAK, context);
+        if (!(item.getItemMeta() instanceof org.bukkit.inventory.meta.Damageable meta)) return;
+
+        int currentDamage = meta.getDamage();
+        int maxDurability = item.getType().getMaxDurability();
+        int damage = event.getDamage();
+
+        LoggerUtil.info("[ITEM_BREAK] Item: " + item.getType() + ", Current damage: " + currentDamage + ", Max: " + maxDurability + ", Incoming: " + damage);
+
+        if (currentDamage + damage >= maxDurability) {
+            LoggerUtil.info("[ITEM_BREAK] Item will break! Triggering ITEM_BREAK enchants");
+
+            Map<String, Object> context = new HashMap<>();
+            context.put("player", player);
+            context.put("target", player);
+            context.put("broken_item", item);
+            context.put("event", event);
+
+            triggerEnchants(player, item, EnchantType.ITEM_BREAK, context);
+        }
     }
 
     private void triggerEnchants(@NotNull Player player, @Nullable ItemStack item, @NotNull EnchantType type,
