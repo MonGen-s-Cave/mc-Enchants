@@ -1639,57 +1639,6 @@ enchants:
         actions:
           - "DOUBLE_DAMAGE"
 
-  sniper:
-    name: "{categoryColor}Mesterlövész"
-    category: "legendary"
-    applies-to: "bow,crossbow"
-    item-lore:
-      enabled: true
-      lines:
-        - "{categoryColor}Mesterlövész &8[&#94A3B8{level}&8]"
-    book-lore:
-      enabled: true
-      lines:
-        - "Fejlövések akár 3,5-szeres"
-        - "sebzést is okozhatnak."
-    type: "SHOOT"
-    levels:
-      1:
-        chance: 15
-        cooldown: 5
-        conditions:
-          - "{headshot} = true => allow"
-        actions:
-          - "INCREASE_DAMAGE:100-350"
-      2:
-        chance: 20
-        cooldown: 5
-        conditions:
-          - "{headshot} = true => allow"
-        actions:
-          - "INCREASE_DAMAGE:100-350"
-      3:
-        chance: 25
-        cooldown: 5
-        conditions:
-          - "{headshot} = true => allow"
-        actions:
-          - "INCREASE_DAMAGE:100-350"
-      4:
-        chance: 30
-        cooldown: 5
-        conditions:
-          - "{headshot} = true => allow"
-        actions:
-          - "INCREASE_DAMAGE:100-350"
-      5:
-        chance: 35
-        cooldown: 5
-        conditions:
-          - "{headshot} = true => allow"
-        actions:
-          - "INCREASE_DAMAGE:100-350"
-
   # ========== MYTHIC GROUP ==========
 
   skullrift:

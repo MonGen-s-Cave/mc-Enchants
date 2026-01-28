@@ -12,6 +12,8 @@ sounds:
   success: "minelush.gui.upgrade"
   open-gui: "minelush.gui.button_click_1"
 
+enchant-per-item: 5
+
 ignored-materials:
   - "BEDROCK"
   - "BARRIER"
@@ -23,6 +25,7 @@ ignored-materials:
   - "ENDER_CHEST"
   - "TRAPPED_CHEST"
   - "SHULKER_BOX"
+  - "NOTE_BLOCK"
   - "WHITE_SHULKER_BOX"
   - "ORANGE_SHULKER_BOX"
   - "MAGENTA_SHULKER_BOX"
@@ -99,7 +102,7 @@ mysterious-book-item:
     - ' &#C81035☒ &fBukás ráta: &#C81035&ksud%'
     - ' &#14ABB1☐ &fAlkalmazható: &#14ABB1&kfkskasksa'
     - ''
-    - '&f<glyph:emoji_mouse_middle:colorable> &#CACACAʜ<glyph:uhosszu:colorable>ᴢᴅ ʀ<glyph:ahosszu:colorable> ᴀᴢ ᴀʟᴋᴀʟᴍᴀᴢ<glyph:ahosszu:colorable>ꜱʜᴏᴢ'
+    - '&f<glyph:emoji_mouse_right:colorable> &#CACACAᴊᴏʙʙ ᴋᴀᴛᴛ ᴀ ꜰᴇʟꜰᴇᴅᴇᴢ<glyph:ehosszu:colorable>ꜱʜᴇᴢ!'
 
 dust-item:
   material: "SUGAR"

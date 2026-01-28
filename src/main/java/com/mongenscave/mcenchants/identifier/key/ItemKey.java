@@ -13,9 +13,15 @@ public enum ItemKey {
     MAIN_ENCHANTER("main-menu.items.enchanter"),
     MAIN_REPAIRER("main-menu.items.repairer"),
     MAIN_RESOLVER("main-menu.items.resolver"),
+    MAIN_CLOSE("main-menu.items.close"),
 
     RESOLVER_ACCEPT("resolver-menu.items.accept"),
-    RESOLVER_DENY("resolver-menu.items.deny");
+    RESOLVER_DENY("resolver-menu.items.deny"),
+    RESOLVER_BACK("resolver-menu.items.back"),
+
+    REPAIRER_BACK("repairer-menu.items.back"),
+
+    ENCHANTER_BACK("enchanter-menu.items.back");
 
     private final String path;
 

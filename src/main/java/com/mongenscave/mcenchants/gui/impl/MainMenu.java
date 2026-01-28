@@ -39,6 +39,11 @@ public final class MainMenu extends Menu {
             new ResolverMenu(MenuController.getMenuUtils(player)).open();
             return;
         }
+
+        if (ItemKey.MAIN_CLOSE.matchesSlot(slot)) {
+            handleItemClick(event, player);
+            close();
+        }
     }
 
     @Override

@@ -72,7 +72,7 @@ public final class EnchanterMenu extends Menu {
 
         player.sendMessage(MessageKey.SUCCESS_PURCHASE.getMessage());
         SoundUtil.playSuccessSound(player);
-        player.closeInventory();
+        close();
     }
 
     private int getTotalExperience(@NotNull Player player) {

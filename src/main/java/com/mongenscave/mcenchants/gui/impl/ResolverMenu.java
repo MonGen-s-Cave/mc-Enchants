@@ -70,6 +70,13 @@ public final class ResolverMenu extends Menu {
             return;
         }
 
+        if (ItemKey.RESOLVER_BACK.matchesSlot(slot)) {
+            handleItemClick(event, player);
+            close();
+            new MainMenu(MenuController.getMenuUtils(player)).open();
+            return;
+        }
+
         if (!placeableSlots.contains(slot)) event.setCancelled(true);
     }
 
