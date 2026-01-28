@@ -17,9 +17,7 @@ public record ActionData(
         String[] initialSplit = actionString.split(":", 2);
         String baseAction = initialSplit[0].trim().toUpperCase();
 
-        if (baseAction.equals("POTION")) {
-            return new ActionData(actionString, baseAction, 0, 1.0, 0);
-        }
+        if (baseAction.equals("POTION")) return new ActionData(actionString, baseAction, 0, 1.0, 0);
 
         String[] parts = actionString.split(":");
         String actionType = parts[0].trim().toUpperCase();

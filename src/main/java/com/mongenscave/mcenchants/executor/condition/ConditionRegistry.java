@@ -16,6 +16,7 @@ public class ConditionRegistry {
         register(new HasWitherCondition());
         register(new HasPoisonCondition());
         register(new HeadshotCondition());
+        register(new HoldingWeaponCondition());
     }
 
     private static void register(@NotNull EnchantCondition condition) {

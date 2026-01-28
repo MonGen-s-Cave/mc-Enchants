@@ -24,14 +24,11 @@ public class ActionRegistry {
         register(new AddHealthAction());
         register(new BreakBlockAction());
         register(new CureAction());
-        register(new DamageArmorAction());
         register(new DoHarmAction());
         register(new DropHeadAction());
         register(new IncreaseDamageAction());
         register(new LightningAction());
         register(new NegateDamageAction());
-        register(new StealExpAction());
-        register(new ExpAction());
         register(new KillAction());
         register(new StealHealthAction());
         register(new CurePermanentAction());
