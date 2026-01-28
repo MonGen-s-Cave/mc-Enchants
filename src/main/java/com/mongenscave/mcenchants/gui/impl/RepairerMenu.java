@@ -27,6 +27,7 @@ public final class RepairerMenu extends Menu {
         this.bookInputSlot = MenuKey.MENU_REPAIRER_BOOK_INPUT.getInt();
         this.dustInputSlot = MenuKey.MENU_REPAIRER_DUST_INPUT.getInt();
         this.outputSlot = MenuKey.MENU_REPAIRER_OUTPUT.getInt();
+        SoundUtil.playOpenGuiSound(menuController.owner());
     }
 
     @Override

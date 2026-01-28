@@ -32,6 +32,7 @@ public final class ResolverMenu extends Menu {
         this.bookManager = McEnchants.getInstance().getManagerRegistry().getBookManager();
         this.enchantManager = McEnchants.getInstance().getManagerRegistry().getEnchantManager();
         this.placeableSlots = parsePlaceableSlots();
+        SoundUtil.playOpenGuiSound(menuController.owner());
     }
 
     @NotNull

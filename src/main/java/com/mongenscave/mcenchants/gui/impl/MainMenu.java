@@ -5,6 +5,7 @@ import com.mongenscave.mcenchants.gui.Menu;
 import com.mongenscave.mcenchants.identifier.key.ItemKey;
 import com.mongenscave.mcenchants.identifier.key.MenuKey;
 import com.mongenscave.mcenchants.item.ItemFactory;
+import com.mongenscave.mcenchants.util.SoundUtil;
 import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.jetbrains.annotations.NotNull;
@@ -13,6 +14,7 @@ public final class MainMenu extends Menu {
 
     public MainMenu(@NotNull MenuController menuController) {
         super(menuController);
+        SoundUtil.playOpenGuiSound(menuController.owner());
     }
 
     @Override
@@ -42,7 +44,7 @@ public final class MainMenu extends Menu {
 
         if (ItemKey.MAIN_CLOSE.matchesSlot(slot)) {
             handleItemClick(event, player);
-            close();
+            player.closeInventory();
         }
     }
 

@@ -29,6 +29,7 @@ public final class EnchanterMenu extends Menu {
         super(menuController);
         this.bookManager = McEnchants.getInstance().getManagerRegistry().getBookManager();
         this.categoryManager = McEnchants.getInstance().getManagerRegistry().getCategoryManager();
+        SoundUtil.playOpenGuiSound(menuController.owner());
     }
 
     @Override
