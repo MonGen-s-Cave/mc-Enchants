@@ -94,47 +94,6 @@ enchants:
         actions:
           - "POTION:NAUSEA:0:120:@Victim"
 
-  experience:
-    name: "{categoryColor}Tapasztalat"
-    category: "common"
-    applies-to: "pickaxe,spade,axe"
-    item-lore:
-      enabled: true
-      lines:
-        - "{categoryColor}Tapasztalat &8[&#94A3B8{level}&8]"
-    book-lore:
-      enabled: true
-      lines:
-        - "Eséllyel tapasztalati pontot ad"
-        - "bányászatkor."
-    type: "MINING"
-    levels:
-      1:
-        chance: 15
-        cooldown: 1
-        actions:
-          - "EXP:2-5"
-      2:
-        chance: 30
-        cooldown: 1
-        actions:
-          - "EXP:3-7"
-      3:
-        chance: 45
-        cooldown: 1
-        actions:
-          - "EXP:4-9"
-      4:
-        chance: 60
-        cooldown: 1
-        actions:
-          - "EXP:5-11"
-      5:
-        chance: 75
-        cooldown: 1
-        actions:
-          - "EXP:6-13"
-
   haste:
     name: "{categoryColor}Sietség"
     category: "common"
@@ -314,8 +273,6 @@ enchants:
         actions:
           - "SHUFFLE_HOTBAR:@Attacker"
 
-  # ========== RARE GROUP ==========
-
   famine:
     name: "{categoryColor}Éhínség"
     category: "rare"
@@ -419,47 +376,6 @@ enchants:
         actions:
           - "ADD_FOOD:1-4:@Victim"
 
-  skillswipe:
-    name: "{categoryColor}Tudáslópás"
-    category: "rare"
-    applies-to: "sword"
-    item-lore:
-      enabled: true
-      lines:
-        - "{categoryColor}Tudáslópás &8[&#94A3B8{level}&8]"
-    book-lore:
-      enabled: true
-      lines:
-        - "Eséllyel ellop egy kis tapasztalati"
-        - "pontot az ellenségtől."
-    type: "ATTACK"
-    levels:
-      1:
-        chance: 15
-        cooldown: 5
-        actions:
-          - "STEAL_EXP:25-125"
-      2:
-        chance: 17
-        cooldown: 5
-        actions:
-          - "STEAL_EXP:25-175"
-      3:
-        chance: 19
-        cooldown: 5
-        actions:
-          - "STEAL_EXP:25-225"
-      4:
-        chance: 21
-        cooldown: 5
-        actions:
-          - "STEAL_EXP:25-275"
-      5:
-        chance: 23
-        cooldown: 5
-        actions:
-          - "STEAL_EXP:25-350"
-
   virus:
     name: "{categoryColor}Vírus"
     category: "rare"
@@ -511,8 +427,6 @@ enchants:
         actions:
           - "POTION:WITHER:2:60:@Victim"
           - "POTION:POISON:2:60:@Victim"
-
-  # ========== EPIC GROUP ==========
 
   blind:
     name: "{categoryColor}Vakítás"
@@ -606,42 +520,6 @@ enchants:
         actions:
           - "POTION:POISON:1:80:@Victim"
 
-  demonforged:
-    name: "{categoryColor}Démonkovácsolt"
-    category: "epic"
-    applies-to: "sword"
-    item-lore:
-      enabled: true
-      lines:
-        - "{categoryColor}Démonkovácsolt &8[&#94A3B8{level}&8]"
-    book-lore:
-      enabled: true
-      lines:
-        - "Fokozott tartósságvesztést okoz"
-        - "az ellenség páncélján."
-    type: "ATTACK"
-    levels:
-      1:
-        chance: 8
-        cooldown: 6
-        actions:
-          - "DAMAGE_ARMOR:3"  # FIX: eltávolítva @VICTIM, a kód automatikusan kezeli
-      2:
-        chance: 12
-        cooldown: 6
-        actions:
-          - "DAMAGE_ARMOR:4"
-      3:
-        chance: 15
-        cooldown: 6
-        actions:
-          - "DAMAGE_ARMOR:5"
-      4:
-        chance: 17
-        cooldown: 6
-        actions:
-          - "DAMAGE_ARMOR:6"
-
   voodoo:
     name: "{categoryColor}Vudu Átok"
     category: "epic"
@@ -686,8 +564,6 @@ enchants:
         cooldown: 2
         actions:
           - "POTION:WEAKNESS:1:120:@Attacker"
-
-  # ========== ULTIMATE GROUP ==========
 
   planter:
     name: "{categoryColor}Ültető Mester"
@@ -772,7 +648,7 @@ enchants:
         chance: 40
         actions:
           - "REMOVE_ENCHANT:restore"
-          - "ADD_DURABILITY_ITEM:0;50;0"  # FIX: 50% javítás (radius;multiplier;duration)
+          - "ADD_DURABILITY_ITEM:0;50;0"
       2:
         chance: 60
         actions:
@@ -1172,8 +1048,6 @@ enchants:
         actions:
           - "INCREASE_DAMAGE:50-100"
 
-  # ========== LEGENDARY GROUP ==========
-
   impale:
     name: "{categoryColor}Leszúrás"
     category: "legendary"
@@ -1470,42 +1344,6 @@ enchants:
         actions:
           - "KILL:3-5"
 
-  inquisitive:
-    name: "{categoryColor}Kíváncsi Lélek"
-    category: "legendary"
-    applies-to: "sword"
-    item-lore:
-      enabled: true
-      lines:
-        - "{categoryColor}Kíváncsi Lélek &8[&#94A3B8{level}&8]"
-    book-lore:
-      enabled: true
-      lines:
-        - "Eséllyel megnöveli a szörnyekből"
-        - "kapott XP-t."
-    type: "KILL_MOB"
-    levels:
-      1:
-        chance: 30
-        cooldown: 4
-        actions:
-          - "EXP:%exp%*1.25"  # ✅ HELYES - context-ből veszi az exp értéket
-      2:
-        chance: 35
-        cooldown: 4
-        actions:
-          - "EXP:%exp%*1.5"
-      3:
-        chance: 40
-        cooldown: 4
-        actions:
-          - "EXP:%exp%*1.75"
-      4:
-        chance: 45
-        cooldown: 4
-        actions:
-          - "EXP:%exp%*2.0"
-
   lifesteal:
     name: "{categoryColor}Életerő-lopás"
     category: "legendary"
@@ -1643,8 +1481,6 @@ enchants:
           - "{holding} = sword:true => allow"
         actions:
           - "DOUBLE_DAMAGE"
-
-  # ========== MYTHIC GROUP ==========
 
   skullrift:
     name: "{categoryColor}Koponyahasadék"

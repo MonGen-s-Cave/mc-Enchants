@@ -8,11 +8,8 @@ public enum EnchantType {
     BREAK_BLOCK,
     SHOOT,
     FALL_DAMAGE,
-    ITEM_BREAK,
     MINING,
     EFFECT_STATIC,
-    PASSIVE,
     KILL_PLAYER,
-    KILL_MOB,
     ATTACK_MOB
 }

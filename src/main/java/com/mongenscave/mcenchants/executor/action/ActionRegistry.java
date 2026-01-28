@@ -17,7 +17,6 @@ public class ActionRegistry {
         register(new InvincibleAction());
         register(new DoubleDamageAction());
         register(new CancelEventAction());
-        register(new AddDurabilityAction());
         register(new ShuffleHotbarAction());
         register(new SmeltAction());
         register(new AddFoodAction());

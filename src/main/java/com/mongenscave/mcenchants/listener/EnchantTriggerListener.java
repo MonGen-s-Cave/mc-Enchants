@@ -23,7 +23,10 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.block.Action;
 import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.event.entity.*;
-import org.bukkit.event.player.*;
+import org.bukkit.event.player.PlayerInteractEvent;
+import org.bukkit.event.player.PlayerItemHeldEvent;
+import org.bukkit.event.player.PlayerJoinEvent;
+import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
@@ -101,21 +104,17 @@ public final class EnchantTriggerListener implements Listener {
             for (Map.Entry<String, Integer> entry : enchants.entrySet()) {
                 String enchantId = entry.getKey();
                 int level = entry.getValue();
-
                 Enchant enchant = enchantManager.getEnchant(enchantId);
-                if (enchant == null) continue;
 
-                if (enchant.getType() != EnchantType.PASSIVE &&
-                        enchant.getType() != EnchantType.EFFECT_STATIC) continue;
+                if (enchant == null) continue;
+                if (enchant.getType() != EnchantType.EFFECT_STATIC) continue;
 
                 EnchantLevel enchantLevel = enchant.getLevel(level);
                 if (enchantLevel == null) continue;
 
                 currentEffects.add(enchantId);
 
-                if (enchant.getType() == EnchantType.EFFECT_STATIC) {
-                    applyEffectEnchant(player, enchantLevel);
-                }
+                if (enchant.getType() == EnchantType.EFFECT_STATIC) applyEffectEnchant(player, enchantLevel);
             }
         }
 
@@ -388,63 +387,7 @@ public final class EnchantTriggerListener implements Listener {
         triggerEnchants(killer, item, EnchantType.KILL_PLAYER, context);
     }
 
-    @EventHandler(priority = EventPriority.NORMAL, ignoreCancelled = true)
-    public void onEntityDeath(@NotNull EntityDeathEvent event) {
-        LivingEntity entity = event.getEntity();
-
-        if (entity instanceof Player) return;
-
-        Player killer = entity.getKiller();
-        if (killer == null) return;
-        if (isWorldBlacklisted(killer)) return;
-
-        ItemStack item = killer.getInventory().getItemInMainHand();
-
-        int exp = event.getDroppedExp();
-
-        Map<String, Object> context = new HashMap<>();
-        context.put("player", killer);
-        context.put("attacker", killer);
-        context.put("victim", entity);
-        context.put("target", entity);
-        context.put("exp", exp);
-        context.put("event", event);
-
-        triggerEnchants(killer, item, EnchantType.KILL_MOB, context);
-    }
-
-    @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
-    public void onItemDamage(@NotNull PlayerItemDamageEvent event) {
-        if (isWorldBlacklisted(event.getPlayer())) return;
-
-        Player player = event.getPlayer();
-        ItemStack item = event.getItem();
-
-        if (item.getType().isAir()) return;
-
-        if (!(item.getItemMeta() instanceof org.bukkit.inventory.meta.Damageable meta)) return;
-
-        int currentDamage = meta.getDamage();
-        int maxDurability = item.getType().getMaxDurability();
-        int damage = event.getDamage();
-
-        LoggerUtil.info("[ITEM_BREAK] Item: " + item.getType() + ", Current damage: " + currentDamage + ", Max: " + maxDurability + ", Incoming: " + damage);
-
-        if (currentDamage + damage >= maxDurability) {
-            LoggerUtil.info("[ITEM_BREAK] Item will break! Triggering ITEM_BREAK enchants");
-
-            Map<String, Object> context = new HashMap<>();
-            context.put("player", player);
-            context.put("target", player);
-            context.put("broken_item", item);
-            context.put("event", event);
-
-            triggerEnchants(player, item, EnchantType.ITEM_BREAK, context);
-        }
-    }
-
-    private void triggerEnchants(@NotNull Player player, @Nullable ItemStack item, @NotNull EnchantType type,
-                                 @NotNull Map<String, Object> context) {
+    private void triggerEnchants(@NotNull Player player, @Nullable ItemStack item, @NotNull EnchantType type, @NotNull Map<String, Object> context) {
         if (item == null || item.getType().isAir()) {
             return;
         }
