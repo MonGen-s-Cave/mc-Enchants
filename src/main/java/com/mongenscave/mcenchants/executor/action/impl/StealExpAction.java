@@ -17,39 +17,46 @@ public class StealExpAction extends EnchantAction {
     @Override
     public void execute(@NotNull Player attacker, @NotNull ActionData actionData, @NotNull Map<String, Object> context) {
         String actionString = actionData.fullActionString();
-        LoggerUtil.info("[STEAL_EXP] Full action string: " + actionString);
+
+        // Ellenőrizzük hogy van-e "STEAL_EXP:" prefix
+        if (!actionString.toUpperCase().startsWith("STEAL_EXP:")) {
+            LoggerUtil.warn("[STEAL_EXP] Invalid action format. Expected 'STEAL_EXP:amount' but got: " + actionString);
+            return;
+        }
 
         String[] parts = actionString.split(":", 3);
-        if (parts.length < 2) {
+        if (parts.length < 2 || parts[1].trim().isEmpty()) {
             LoggerUtil.warn("[STEAL_EXP] Missing exp amount parameter. Action: " + actionString);
             return;
         }
 
         int expAmount = parseAmount(parts[1].trim());
-        LoggerUtil.info("[STEAL_EXP] Parsed exp amount: " + expAmount);
 
         Player victim = null;
 
+        // Ha van target specifikáció (@VICTIM vagy @ATTACKER)
         if (parts.length >= 3) {
             String targetSpec = parts[2].toUpperCase().trim();
-            LoggerUtil.info("[STEAL_EXP] Target spec: " + targetSpec);
 
             if (targetSpec.equals("@VICTIM")) {
                 Object victimObj = context.get("victim");
-                if (victimObj instanceof Player) victim = (Player) victimObj;
-                else {
+                if (victimObj instanceof Player) {
+                    victim = (Player) victimObj;
+                } else {
                     LoggerUtil.warn("[STEAL_EXP] @VICTIM specified but victim is not a player");
                     return;
                 }
             } else if (targetSpec.equals("@ATTACKER")) {
                 Object attackerObj = context.get("attacker");
-                if (attackerObj instanceof Player) victim = (Player) attackerObj;
-                else {
+                if (attackerObj instanceof Player) {
+                    victim = (Player) attackerObj;
+                } else {
                     LoggerUtil.warn("[STEAL_EXP] @ATTACKER specified but attacker is not a player");
                     return;
                 }
             }
         } else {
+            // Ha nincs target spec, akkor alapból a victim
             Object victimObj = context.get("victim");
             if (victimObj instanceof Player) {
                 victim = (Player) victimObj;
@@ -64,25 +71,13 @@ public class StealExpAction extends EnchantAction {
             return;
         }
 
-        LoggerUtil.info("[STEAL_EXP] Stealing " + expAmount + " exp from " + victim.getName() + " to " + attacker.getName());
-
         int victimTotalExp = getTotalExperience(victim);
-        LoggerUtil.info("[STEAL_EXP] Victim total exp: " + victimTotalExp);
-
         int actualStolen = Math.min(expAmount, victimTotalExp);
-        LoggerUtil.info("[STEAL_EXP] Actually stealing: " + actualStolen);
 
         if (actualStolen > 0) {
             int newVictimExp = victimTotalExp - actualStolen;
             setTotalExperience(victim, newVictimExp);
-            LoggerUtil.info("[STEAL_EXP] Victim new exp: " + newVictimExp);
-
-            int attackerBefore = getTotalExperience(attacker);
             attacker.giveExp(actualStolen);
-            int attackerAfter = getTotalExperience(attacker);
-            LoggerUtil.info("[STEAL_EXP] Attacker exp: " + attackerBefore + " -> " + attackerAfter);
-        } else {
-            LoggerUtil.warn("[STEAL_EXP] No exp stolen (victim has 0 exp)");
         }
     }
 

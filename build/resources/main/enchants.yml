@@ -438,27 +438,27 @@ enchants:
         chance: 15
         cooldown: 5
         actions:
-          - "STEAL_EXP:25-125:@VICTIM"
+          - "STEAL_EXP:25-125"
       2:
         chance: 17
         cooldown: 5
         actions:
-          - "STEAL_EXP:25-175:@VICTIM"
+          - "STEAL_EXP:25-175"
       3:
         chance: 19
         cooldown: 5
         actions:
-          - "STEAL_EXP:25-225:@VICTIM"
+          - "STEAL_EXP:25-225"
       4:
         chance: 21
         cooldown: 5
         actions:
-          - "STEAL_EXP:25-275:@VICTIM"
+          - "STEAL_EXP:25-275"
       5:
         chance: 23
         cooldown: 5
         actions:
-          - "STEAL_EXP:25-350:@VICTIM"
+          - "STEAL_EXP:25-350"
 
   virus:
     name: "{categoryColor}Vírus"
@@ -625,22 +625,22 @@ enchants:
         chance: 8
         cooldown: 6
         actions:
-          - "DAMAGE_ARMOR:3:@VICTIM"  # +3 extra damage az armornak
+          - "DAMAGE_ARMOR:3"  # FIX: eltávolítva @VICTIM, a kód automatikusan kezeli
       2:
         chance: 12
         cooldown: 6
         actions:
-          - "DAMAGE_ARMOR:4:@VICTIM"
+          - "DAMAGE_ARMOR:4"
       3:
         chance: 15
         cooldown: 6
         actions:
-          - "DAMAGE_ARMOR:5:@VICTIM"
+          - "DAMAGE_ARMOR:5"
       4:
         chance: 17
         cooldown: 6
         actions:
-          - "DAMAGE_ARMOR:6:@VICTIM"
+          - "DAMAGE_ARMOR:6"
 
   voodoo:
     name: "{categoryColor}Vudu Átok"
@@ -772,7 +772,7 @@ enchants:
         chance: 40
         actions:
           - "REMOVE_ENCHANT:restore"
-          - "ADD_DURABILITY_ITEM:0;50;0"
+          - "ADD_DURABILITY_ITEM:0;50;0"  # FIX: 50% javítás (radius;multiplier;duration)
       2:
         chance: 60
         actions:
@@ -1075,22 +1075,22 @@ enchants:
         chance: 12
         cooldown: 2
         actions:
-          - "DAMAGE_ARMOR:3:@VICTIM"
+          - "DAMAGE_ARMOR:3"
       2:
         chance: 25
         cooldown: 2
         actions:
-          - "DAMAGE_ARMOR:4:@VICTIM"
+          - "DAMAGE_ARMOR:4"
       3:
         chance: 39
         cooldown: 2
         actions:
-          - "DAMAGE_ARMOR:5:@VICTIM"
+          - "DAMAGE_ARMOR:5"
       4:
         chance: 46
         cooldown: 2
         actions:
-          - "DAMAGE_ARMOR:6:@VICTIM"
+          - "DAMAGE_ARMOR:6"
 
   dominate:
     name: "{categoryColor}Uralom"
@@ -1489,7 +1489,7 @@ enchants:
         chance: 30
         cooldown: 4
         actions:
-          - "EXP:%exp%*1.25"
+          - "EXP:%exp%*1.25"  # ✅ HELYES - context-ből veszi az exp értéket
       2:
         chance: 35
         cooldown: 4

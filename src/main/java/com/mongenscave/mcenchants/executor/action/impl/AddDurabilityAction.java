@@ -21,17 +21,13 @@ public class AddDurabilityAction extends EnchantAction {
 
     @Override
     public void execute(@NotNull Player player, @NotNull ActionData actionData, @NotNull Map<String, Object> context) {
-        LoggerUtil.info("[ADD_DURABILITY] Starting execution");
-
         Object brokenItemObj = context.get("broken_item");
         ItemStack item = null;
 
         if (brokenItemObj instanceof ItemStack) {
             item = (ItemStack) brokenItemObj;
-            LoggerUtil.info("[ADD_DURABILITY] Got broken_item from context: " + item.getType());
         } else {
             item = player.getInventory().getItemInMainHand();
-            LoggerUtil.info("[ADD_DURABILITY] Using main hand item: " + item.getType());
         }
 
         if (item.getType() == Material.AIR) {
@@ -39,17 +35,17 @@ public class AddDurabilityAction extends EnchantAction {
             return;
         }
 
+        // A multiplier értéke a százalék (pl. 50.0 = 50%)
         double repairPercent = actionData.multiplier();
-        LoggerUtil.info("[ADD_DURABILITY] Repair percent: " + repairPercent + "%");
 
         Object eventObj = context.get("event");
         if (!(eventObj instanceof PlayerItemDamageEvent damageEvent)) {
-            LoggerUtil.warn("[ADD_DURABILITY] Event is not PlayerItemDamageEvent: " + (eventObj != null ? eventObj.getClass().getName() : "null"));
+            LoggerUtil.warn("[ADD_DURABILITY] Event is not PlayerItemDamageEvent");
             return;
         }
 
+        // Megakadályozzuk a durability csökkenést
         damageEvent.setCancelled(true);
-        LoggerUtil.info("[ADD_DURABILITY] Cancelled damage event");
 
         if (!(item.getItemMeta() instanceof Damageable)) {
             LoggerUtil.warn("[ADD_DURABILITY] Item is not damageable");
@@ -62,18 +58,22 @@ public class AddDurabilityAction extends EnchantAction {
                 int maxDurability = finalItem.getType().getMaxDurability();
                 int currentDamage = damageable.getDamage();
 
-                LoggerUtil.info("[ADD_DURABILITY] Before: damage=" + currentDamage + ", max=" + maxDurability);
+                // Számítsuk ki mennyit javítunk (a max durability %-a)
+                int durabilityToRestore = (int) Math.ceil(maxDurability * (repairPercent / 100.0));
 
-                int durabilityToRestore = (int) (maxDurability * (repairPercent / 100.0));
+                // Az új damage érték (csökkentjük a damage-t = javítás)
                 int newDamage = Math.max(0, currentDamage - durabilityToRestore);
 
                 damageable.setDamage(newDamage);
 
-                LoggerUtil.info("[ADD_DURABILITY] After: damage=" + newDamage + ", restored=" + durabilityToRestore);
+                LoggerUtil.info("[ADD_DURABILITY] Repaired item: " + finalItem.getType() +
+                        " | Before damage: " + currentDamage +
+                        " | After damage: " + newDamage +
+                        " | Restored: " + durabilityToRestore +
+                        " | Max durability: " + maxDurability +
+                        " | Repair %: " + repairPercent);
             }
         });
-
-        LoggerUtil.info("[ADD_DURABILITY] Successfully repaired item");
     }
 
     @Override
