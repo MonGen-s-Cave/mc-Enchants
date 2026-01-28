@@ -21,12 +21,16 @@ public class AddDurabilityAction extends EnchantAction {
             return;
         }
 
-        int durabilityToAdd = (int) actionData.multiplier();
+        double repairPercent = actionData.multiplier();
 
         item.editMeta(meta -> {
             if (meta instanceof Damageable damageable) {
+                int maxDurability = item.getType().getMaxDurability();
                 int currentDamage = damageable.getDamage();
-                int newDamage = Math.max(0, currentDamage + durabilityToAdd);
+
+                int durabilityToRestore = (int) (maxDurability * (repairPercent / 100.0));
+                int newDamage = Math.max(0, currentDamage - durabilityToRestore);
+
                 damageable.setDamage(newDamage);
             }
         });

@@ -66,16 +66,12 @@ public class DamageArmorAction extends EnchantAction {
     }
 
     private boolean damageArmorPiece(@NotNull ItemStack item, int damageAmount) {
-        if (!(item.getItemMeta() instanceof Damageable meta)) {
-            return false;
-        }
+        if (!(item.getItemMeta() instanceof Damageable meta)) return false;
 
         int currentDamage = meta.getDamage();
         int maxDurability = item.getType().getMaxDurability();
 
-        if (maxDurability <= 0) {
-            return false;
-        }
+        if (maxDurability <= 0) return false;
 
         int newDamage = currentDamage + damageAmount;
 

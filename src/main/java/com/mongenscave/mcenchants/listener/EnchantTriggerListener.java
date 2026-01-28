@@ -270,9 +270,7 @@ public final class EnchantTriggerListener implements Listener {
 
             triggerEnchants(attacker, item, EnchantType.ATTACK, context);
 
-            if (!(event.getEntity() instanceof Player)) {
-                triggerEnchants(attacker, item, EnchantType.ATTACK_MOB, context);
-            }
+            if (!(event.getEntity() instanceof Player)) triggerEnchants(attacker, item, EnchantType.ATTACK_MOB, context);
         }
 
         if (event.getEntity() instanceof Player victim) {
@@ -288,9 +286,7 @@ public final class EnchantTriggerListener implements Listener {
 
             ItemStack[] armor = victim.getInventory().getArmorContents();
             for (ItemStack piece : armor) {
-                if (piece != null && !piece.getType().isAir()) {
-                    triggerEnchants(victim, piece, EnchantType.DEFENSE, context);
-                }
+                if (piece != null && !piece.getType().isAir()) triggerEnchants(victim, piece, EnchantType.DEFENSE, context);
             }
         }
     }
