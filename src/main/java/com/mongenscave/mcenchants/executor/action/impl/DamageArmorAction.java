@@ -1,5 +1,5 @@
 // ============================================
-// KRITIKUS JAVÍTÁS - DamageArmorAction.java
+// VÉGSŐ JAVÍTÁS - DamageArmorAction.java
 // ============================================
 
 package com.mongenscave.mcenchants.executor.action.impl;
@@ -19,58 +19,55 @@ import java.util.concurrent.ThreadLocalRandom;
 public class DamageArmorAction extends EnchantAction {
     @Override
     public void execute(@NotNull Player player, @NotNull ActionData actionData, @NotNull Map<String, Object> context) {
-        String actionString = actionData.fullActionString();
+        // ✅ FIX: Közvetlenül az actionData-ból szerezzük az értéket
+        int damageAmount;
 
-        // Ellenőrizzük hogy van-e "DAMAGE_ARMOR:" prefix
-        if (!actionString.toUpperCase().startsWith("DAMAGE_ARMOR:")) {
-            LoggerUtil.warn("[DAMAGE_ARMOR] Invalid action format. Expected 'DAMAGE_ARMOR:amount' but got: " + actionString);
-            return;
+        // Ha van multiplier érték, azt használjuk
+        if (actionData.multiplier() > 1.0) {
+            damageAmount = (int) actionData.multiplier();
+        }
+        // Ha van radius érték, azt használjuk
+        else if (actionData.radius() > 0) {
+            damageAmount = actionData.radius();
+        }
+        // Különben próbáljuk meg a full stringből kinyerni
+        else {
+            String fullAction = actionData.fullActionString();
+            damageAmount = parseAmountFromString(fullAction);
         }
 
-        String[] parts = actionString.split(":", 3);
-        if (parts.length < 2 || parts[1].trim().isEmpty()) {
-            LoggerUtil.warn("[DAMAGE_ARMOR] Missing damage amount parameter. Action: " + actionString);
+        if (damageAmount <= 0) {
+            LoggerUtil.warn("[DAMAGE_ARMOR] Invalid damage amount: " + damageAmount);
             return;
         }
-
-        int damageAmount = parseDamageAmount(parts[1].trim());
 
         Player target = null;
+        String fullAction = actionData.fullActionString();
 
-        // Ha van target specifikáció (@VICTIM vagy @ATTACKER)
-        if (parts.length >= 3) {
-            String targetSpec = parts[2].toUpperCase().trim();
-
-            if (targetSpec.equals("@VICTIM")) {
-                Object victim = context.get("victim");
-                if (victim instanceof Player) {
-                    target = (Player) victim;
-                } else {
-                    LoggerUtil.warn("[DAMAGE_ARMOR] Victim is not a player");
-                    return;
-                }
-            } else if (targetSpec.equals("@ATTACKER")) {
-                Object attacker = context.get("attacker");
-                if (attacker instanceof Player) {
-                    target = (Player) attacker;
-                } else {
+        // Target meghatározása
+        if (fullAction.contains(":")) {
+            String[] parts = fullAction.split(":");
+            if (parts.length >= 3) {
+                String targetSpec = parts[2].toUpperCase().trim();
+                if (targetSpec.equals("@VICTIM")) {
+                    Object victim = context.get("victim");
+                    if (victim instanceof Player) {
+                        target = (Player) victim;
+                    }
+                } else if (targetSpec.equals("@ATTACKER")) {
                     target = player;
                 }
             }
-        } else {
-            // Ha nincs target spec, akkor alapból a victim
+        }
+
+        // Ha nincs explicit target, victim az alapértelmezett
+        if (target == null) {
             Object victim = context.get("victim");
             if (victim instanceof Player) {
                 target = (Player) victim;
             } else {
-                LoggerUtil.warn("[DAMAGE_ARMOR] No victim found in context");
                 return;
             }
-        }
-
-        if (target == null) {
-            LoggerUtil.warn("[DAMAGE_ARMOR] Target is null");
-            return;
         }
 
         ItemStack[] armor = target.getInventory().getArmorContents();
@@ -81,7 +78,6 @@ public class DamageArmorAction extends EnchantAction {
             if (piece != null && !piece.getType().isAir()) {
                 if (damageArmorPiece(piece, damageAmount)) {
                     damaged = true;
-
                     if (piece.getType() == Material.AIR) {
                         armor[i] = null;
                     }
@@ -91,6 +87,7 @@ public class DamageArmorAction extends EnchantAction {
 
         if (damaged) {
             target.getInventory().setArmorContents(armor);
+            LoggerUtil.info("[DAMAGE_ARMOR] Successfully damaged armor with amount: " + damageAmount);
         }
     }
 
@@ -123,9 +120,19 @@ public class DamageArmorAction extends EnchantAction {
         return item.setItemMeta(meta);
     }
 
-    private int parseDamageAmount(@NotNull String amountStr) {
-        amountStr = amountStr.trim();
+    private int parseAmountFromString(@NotNull String fullAction) {
+        if (!fullAction.contains(":")) {
+            return 1;
+        }
 
+        String[] parts = fullAction.split(":");
+        if (parts.length < 2) {
+            return 1;
+        }
+
+        String amountStr = parts[1].trim();
+
+        // Range támogatás (pl: "3-5")
         if (amountStr.contains("-")) {
             String[] range = amountStr.split("-");
             try {
@@ -134,9 +141,11 @@ public class DamageArmorAction extends EnchantAction {
                 return ThreadLocalRandom.current().nextInt(min, max + 1);
             } catch (NumberFormatException e) {
                 LoggerUtil.warn("[DAMAGE_ARMOR] Failed to parse range: " + amountStr);
+                return 1;
             }
         }
 
+        // Fix érték
         try {
             return Integer.parseInt(amountStr);
         } catch (NumberFormatException e) {

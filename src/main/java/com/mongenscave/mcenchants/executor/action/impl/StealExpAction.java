@@ -1,5 +1,5 @@
 // ============================================
-// KRITIKUS JAVÍTÁS - StealExpAction.java
+// VÉGSŐ JAVÍTÁS - StealExpAction.java
 // ============================================
 
 package com.mongenscave.mcenchants.executor.action.impl;
@@ -16,17 +16,17 @@ import java.util.concurrent.ThreadLocalRandom;
 public class StealExpAction extends EnchantAction {
     @Override
     public void execute(@NotNull Player attacker, @NotNull ActionData actionData, @NotNull Map<String, Object> context) {
-        String actionString = actionData.fullActionString();
+        // ✅ FIX: A full action stringből dolgozunk
+        String fullAction = actionData.fullActionString();
 
-        // Ellenőrizzük hogy van-e "STEAL_EXP:" prefix
-        if (!actionString.toUpperCase().startsWith("STEAL_EXP:")) {
-            LoggerUtil.warn("[STEAL_EXP] Invalid action format. Expected 'STEAL_EXP:amount' but got: " + actionString);
+        if (!fullAction.contains(":")) {
+            LoggerUtil.warn("[STEAL_EXP] Invalid action format: " + fullAction);
             return;
         }
 
-        String[] parts = actionString.split(":", 3);
+        String[] parts = fullAction.split(":", 3);
         if (parts.length < 2 || parts[1].trim().isEmpty()) {
-            LoggerUtil.warn("[STEAL_EXP] Missing exp amount parameter. Action: " + actionString);
+            LoggerUtil.warn("[STEAL_EXP] Missing exp amount in action: " + fullAction);
             return;
         }
 
@@ -34,7 +34,7 @@ public class StealExpAction extends EnchantAction {
 
         Player victim = null;
 
-        // Ha van target specifikáció (@VICTIM vagy @ATTACKER)
+        // Target meghatározása
         if (parts.length >= 3) {
             String targetSpec = parts[2].toUpperCase().trim();
 
@@ -56,7 +56,7 @@ public class StealExpAction extends EnchantAction {
                 }
             }
         } else {
-            // Ha nincs target spec, akkor alapból a victim
+            // Alapértelmezett: victim
             Object victimObj = context.get("victim");
             if (victimObj instanceof Player) {
                 victim = (Player) victimObj;
@@ -78,6 +78,9 @@ public class StealExpAction extends EnchantAction {
             int newVictimExp = victimTotalExp - actualStolen;
             setTotalExperience(victim, newVictimExp);
             attacker.giveExp(actualStolen);
+
+            LoggerUtil.info("[STEAL_EXP] Stole " + actualStolen + " XP from " + victim.getName() +
+                    " to " + attacker.getName() + " (from action: " + fullAction + ")");
         }
     }
 
@@ -89,19 +92,25 @@ public class StealExpAction extends EnchantAction {
     private int parseAmount(@NotNull String amountStr) {
         amountStr = amountStr.trim();
 
+        // Range támogatás (pl: "25-125")
         if (amountStr.contains("-")) {
             String[] range = amountStr.split("-");
             try {
                 int min = Integer.parseInt(range[0].trim());
                 int max = Integer.parseInt(range[1].trim());
-                return ThreadLocalRandom.current().nextInt(min, max + 1);
+                int result = ThreadLocalRandom.current().nextInt(min, max + 1);
+                LoggerUtil.info("[STEAL_EXP] Calculated from range " + min + "-" + max + ": " + result);
+                return result;
             } catch (NumberFormatException e) {
                 LoggerUtil.warn("[STEAL_EXP] Failed to parse range: " + amountStr);
             }
         }
 
+        // Fix érték
         try {
-            return Integer.parseInt(amountStr);
+            int result = Integer.parseInt(amountStr);
+            LoggerUtil.info("[STEAL_EXP] Using fixed value: " + result);
+            return result;
         } catch (NumberFormatException e) {
             LoggerUtil.warn("[STEAL_EXP] Failed to parse amount: " + amountStr);
             return 0;

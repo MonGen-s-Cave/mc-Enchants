@@ -1,5 +1,5 @@
 // ============================================
-// KRITIKUS JAVÍTÁS - ExpAction.java
+// VÉGSŐ JAVÍTÁS - ExpAction.java
 // ============================================
 
 package com.mongenscave.mcenchants.executor.action.impl;
@@ -16,17 +16,17 @@ import java.util.concurrent.ThreadLocalRandom;
 public class ExpAction extends EnchantAction {
     @Override
     public void execute(@NotNull Player player, @NotNull ActionData actionData, @NotNull Map<String, Object> context) {
-        String actionString = actionData.fullActionString();
+        // ✅ FIX: A full action stringből dolgozunk
+        String fullAction = actionData.fullActionString();
 
-        // Ellenőrizzük hogy van-e "EXP:" prefix
-        if (!actionString.toUpperCase().startsWith("EXP:")) {
-            LoggerUtil.warn("[EXP] Invalid action format. Expected 'EXP:amount' but got: " + actionString);
+        if (!fullAction.contains(":")) {
+            LoggerUtil.warn("[EXP] Invalid action format: " + fullAction);
             return;
         }
 
-        String[] parts = actionString.split(":", 2);
+        String[] parts = fullAction.split(":", 2);
         if (parts.length < 2 || parts[1].trim().isEmpty()) {
-            LoggerUtil.warn("[EXP] Missing exp amount parameter. Action string: " + actionString);
+            LoggerUtil.warn("[EXP] Missing exp amount in action: " + fullAction);
             return;
         }
 
@@ -35,6 +35,7 @@ public class ExpAction extends EnchantAction {
 
         if (expAmount > 0) {
             player.giveExp(expAmount);
+            LoggerUtil.info("[EXP] Gave " + expAmount + " XP to player from action: " + fullAction);
         }
     }
 
@@ -44,20 +45,22 @@ public class ExpAction extends EnchantAction {
     }
 
     private int calculateExp(@NotNull String expString, @NotNull Map<String, Object> context) {
-        // Ha %exp% placeholder van benne
+        // %exp% placeholder kezelés
         if (expString.contains("%exp%")) {
             Object expObj = context.get("exp");
 
             if (expObj instanceof Number) {
                 double baseExp = ((Number) expObj).doubleValue();
 
-                // Ha van szorzó (pl: %exp%*1.25)
+                // Multiplier kezelés (pl: %exp%*1.25)
                 if (expString.contains("*")) {
                     String[] parts = expString.split("\\*");
                     if (parts.length == 2) {
                         try {
-                            double multiplier = Double.parseDouble(parts[1]);
-                            return (int) Math.round(baseExp * multiplier);
+                            double multiplier = Double.parseDouble(parts[1].trim());
+                            int result = (int) Math.round(baseExp * multiplier);
+                            LoggerUtil.info("[EXP] Calculated from context: " + baseExp + " * " + multiplier + " = " + result);
+                            return result;
                         } catch (NumberFormatException e) {
                             LoggerUtil.warn("[EXP] Failed to parse multiplier in: " + expString);
                         }
@@ -71,14 +74,16 @@ public class ExpAction extends EnchantAction {
             return 0;
         }
 
-        // Ha range formátum (pl: 2-5)
+        // Range formátum (pl: 2-5)
         if (expString.contains("-")) {
             String[] range = expString.split("-");
             if (range.length == 2) {
                 try {
                     int min = Integer.parseInt(range[0].trim());
                     int max = Integer.parseInt(range[1].trim());
-                    return ThreadLocalRandom.current().nextInt(min, max + 1);
+                    int result = ThreadLocalRandom.current().nextInt(min, max + 1);
+                    LoggerUtil.info("[EXP] Calculated from range " + min + "-" + max + ": " + result);
+                    return result;
                 } catch (NumberFormatException e) {
                     LoggerUtil.warn("[EXP] Failed to parse range: " + expString);
                 }
@@ -87,27 +92,12 @@ public class ExpAction extends EnchantAction {
 
         // Fix érték
         try {
-            return Integer.parseInt(expString.trim());
+            int result = Integer.parseInt(expString.trim());
+            LoggerUtil.info("[EXP] Using fixed value: " + result);
+            return result;
         } catch (NumberFormatException e) {
             LoggerUtil.warn("[EXP] Failed to parse exp string: " + expString);
             return 0;
         }
-    }
-
-    private int getTotalExperience(@NotNull Player player) {
-        int level = player.getLevel();
-        int exp = Math.round(player.getExp() * getExpToLevel(level));
-
-        for (int i = 0; i < level; i++) {
-            exp += getExpToLevel(i);
-        }
-
-        return exp;
-    }
-
-    private int getExpToLevel(int level) {
-        if (level <= 15) return 2 * level + 7;
-        else if (level <= 30) return 5 * level - 38;
-        else return 9 * level - 158;
     }
 }
