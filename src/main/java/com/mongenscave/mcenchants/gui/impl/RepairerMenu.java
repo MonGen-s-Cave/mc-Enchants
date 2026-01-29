@@ -30,19 +30,13 @@ public final class RepairerMenu extends Menu {
         SoundUtil.playOpenGuiSound(menuController.owner());
     }
 
+    // TODO: MOST CLONEOLJA HA BERAKSZ ITEMET INPUT SLOTBA DE HA SUCCESS NEM VONJA LE EZT FIXALNI KELL !!!!!!!!!!!
+
     @Override
     public void handleMenu(@NotNull InventoryClickEvent event) {
         if (!(event.getWhoClicked() instanceof Player player)) return;
 
         int slot = event.getSlot();
-
-        if (ItemKey.REPAIRER_BACK.matchesSlot(slot)) {
-            event.setCancelled(true);
-            handleItemClick(event, player);
-            close();
-            new MainMenu(MenuController.getMenuUtils(player)).open();
-            return;
-        }
 
         event.setCancelled(true);
 
@@ -72,7 +66,7 @@ public final class RepairerMenu extends Menu {
 
         if (rawSlot == bookInputSlot || rawSlot == dustInputSlot) {
             ItemStack returnItem = inventory.getItem(rawSlot);
-            if (returnItem == null || returnItem.getType() == Material.AIR) return;
+            if (returnItem == null || returnItem.getType() == Material.AIR || !bookManager.isDust(returnItem) || !bookManager.isRevealedBook(returnItem)) return;
 
             inventory.setItem(rawSlot, null);
             inventory.setItem(outputSlot, null);
@@ -84,7 +78,7 @@ public final class RepairerMenu extends Menu {
 
         if (rawSlot == outputSlot) {
             ItemStack result = inventory.getItem(outputSlot);
-            if (result == null || result.getType() == Material.AIR) return;
+            if (result == null || result.getType() == Material.AIR || !bookManager.isDust(result) && !bookManager.isRevealedBook(result)) return;
 
             player.getInventory().addItem(result);
 
@@ -94,17 +88,18 @@ public final class RepairerMenu extends Menu {
 
             SoundUtil.playSuccessSound(player);
         }
+
+        if (ItemKey.REPAIRER_BACK.matchesSlot(slot)) {
+            handleItemClick(event, player);
+            close();
+            new MainMenu(MenuController.getMenuUtils(player)).open();
+        }
     }
 
     private void placeItem(@NotNull ItemStack source, int slot) {
-        ItemStack existing = inventory.getItem(slot);
-        if (existing != null && existing.getType() != Material.AIR) return;
-
         ItemStack one = source.clone();
         one.setAmount(1);
         inventory.setItem(slot, one);
-
-        source.setAmount(source.getAmount() - 1);
     }
 
     private void processRepair() {
