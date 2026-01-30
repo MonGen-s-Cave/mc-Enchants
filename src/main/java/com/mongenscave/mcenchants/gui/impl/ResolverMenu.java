@@ -27,11 +27,14 @@ public final class ResolverMenu extends Menu {
     private final EnchantManager enchantManager;
     private final List<Integer> placeableSlots;
 
+    private final List<ItemStack> placedBookSnapshots = new ArrayList<>();
+
     public ResolverMenu(@NotNull MenuController menuController) {
         super(menuController);
         this.bookManager = McEnchants.getInstance().getManagerRegistry().getBookManager();
         this.enchantManager = McEnchants.getInstance().getManagerRegistry().getEnchantManager();
         this.placeableSlots = parsePlaceableSlots();
+
         SoundUtil.playOpenGuiSound(menuController.owner());
     }
 
@@ -54,18 +57,21 @@ public final class ResolverMenu extends Menu {
 
     @Override
     public void handleMenu(@NotNull InventoryClickEvent event) {
-        int slot = event.getSlot();
         Player player = (Player) event.getWhoClicked();
 
+        int rawSlot = event.getRawSlot();
+        int topSize = inventory.getSize();
+        int slot = event.getSlot();
+
+        event.setCancelled(true);
+
         if (ItemKey.RESOLVER_ACCEPT.matchesSlot(slot)) {
-            event.setCancelled(true);
             handleItemClick(event, player);
             acceptResolve(player);
             return;
         }
 
         if (ItemKey.RESOLVER_DENY.matchesSlot(slot)) {
-            event.setCancelled(true);
             handleItemClick(event, player);
             denyResolve(player);
             return;
@@ -78,73 +84,131 @@ public final class ResolverMenu extends Menu {
             return;
         }
 
-        if (!placeableSlots.contains(slot)) event.setCancelled(true);
+        if (rawSlot >= topSize) {
+            ItemStack clicked = event.getCurrentItem();
+            if (clicked == null || clicked.getType() == Material.AIR) return;
+            if (!bookManager.isRevealedBook(clicked)) return;
+
+            int targetSlot = findFirstFreePlaceableSlot();
+            if (targetSlot == -1) return;
+
+            placePreview(clicked, targetSlot);
+            SoundUtil.playSuccessSound(player);
+        }
+    }
+
+    private void placePreview(@NotNull ItemStack source, int slot) {
+        ItemStack preview = source.clone();
+        preview.setAmount(1);
+        inventory.setItem(slot, preview);
+
+        ItemStack snapshot = source.clone();
+        snapshot.setAmount(1);
+        placedBookSnapshots.add(snapshot);
     }
 
     private void acceptResolve(@NotNull Player player) {
-        List<ItemStack> books = new ArrayList<>();
-
-        for (int slot : placeableSlots) {
-            ItemStack item = inventory.getItem(slot);
-            if (item != null && bookManager.isRevealedBook(item)) {
-                books.add(item);
-            }
-        }
-
-        if (books.isEmpty()) {
+        if (placedBookSnapshots.isEmpty()) {
             player.sendMessage(MessageKey.RESOLVER_EMPTY_BOOK.getMessage());
             SoundUtil.playErrorSound(player);
             return;
         }
 
+        for (ItemStack snapshot : placedBookSnapshots) {
+            if (!hasExactItem(player, snapshot)) {
+                SoundUtil.playErrorSound(player);
+                return;
+            }
+        }
+
         int totalDust = 0;
         String categoryId = null;
 
-        for (ItemStack book : books) {
-            EnchantedBook bookData = bookManager.getBookData(book);
+        for (ItemStack snapshot : placedBookSnapshots) {
+            EnchantedBook bookData = bookManager.getBookData(snapshot);
             if (bookData == null) continue;
 
             Enchant enchant = enchantManager.getEnchant(bookData.getEnchantId());
             if (enchant == null) continue;
 
             categoryId = enchant.getCategory().getId();
-
-            int successRate = bookData.getSuccessRate();
-            int dustAmount = calculateDustAmount(successRate);
-            totalDust += dustAmount * book.getAmount();
+            totalDust += calculateDustAmount(bookData.getSuccessRate());
         }
 
         if (categoryId == null || totalDust == 0) {
-            player.sendMessage(MessageKey.ERROR_DUE_RESOLVER.getMessage());
             SoundUtil.playErrorSound(player);
             return;
         }
 
-        for (int slot : placeableSlots) {
-            inventory.setItem(slot, null);
+        for (ItemStack snapshot : placedBookSnapshots) {
+            consumeExactItem(player, snapshot);
         }
+
+        clearPreview();
 
         ItemStack dust = bookManager.createDust(categoryId);
         dust.setAmount(Math.min(totalDust, 64));
-
         player.getInventory().addItem(dust);
+
         player.sendMessage(MessageKey.SUCCESS_RESOLVE.getMessage());
         SoundUtil.playSuccessSound(player);
         player.closeInventory();
     }
 
-    private void denyResolve(@NotNull Player player) {
-        for (int slot : placeableSlots) {
-            ItemStack item = inventory.getItem(slot);
-            if (item != null) {
-                player.getInventory().addItem(item);
-                inventory.setItem(slot, null);
-            }
+    private boolean hasExactItem(@NotNull Player player, @NotNull ItemStack snapshot) {
+        for (ItemStack item : player.getInventory().getContents()) {
+            if (item == null || item.getType() == Material.AIR) continue;
+            if (item.isSimilar(snapshot)) return true;
         }
 
+        return false;
+    }
+
+    private void denyResolve(@NotNull Player player) {
+        clearPreview();
         player.sendMessage(MessageKey.SUCCESS_DENY.getMessage());
         SoundUtil.playErrorSound(player);
         player.closeInventory();
+    }
+
+    private void clearPreview() {
+        for (int slot : placeableSlots) {
+            inventory.setItem(slot, null);
+        }
+
+        placedBookSnapshots.clear();
+    }
+
+    private int findFirstFreePlaceableSlot() {
+        for (int slot : placeableSlots) {
+            ItemStack current = inventory.getItem(slot);
+
+            if (current == null) return slot;
+            if (current.getType() == Material.AIR) return slot;
+            if (bookManager.isRevealedBook(current)) continue;
+
+            return slot;
+        }
+
+        return -1;
+    }
+
+    private boolean consumeExactItem(@NotNull Player player, @NotNull ItemStack snapshot) {
+        for (int i = 0; i < player.getInventory().getSize(); i++) {
+            ItemStack item = player.getInventory().getItem(i);
+            if (item == null || item.getType() == Material.AIR) continue;
+            if (!item.isSimilar(snapshot)) continue;
+
+            if (item.getAmount() > 1) {
+                item.setAmount(item.getAmount() - 1);
+            } else {
+                player.getInventory().setItem(i, null);
+            }
+
+            return true;
+        }
+
+        return false;
     }
 
     private int calculateDustAmount(int successRate) {
@@ -160,6 +224,7 @@ public final class ResolverMenu extends Menu {
         ItemFactory.setItemsForMenu("resolver-menu.items", inventory);
     }
 
+    @NotNull
     @Override
     public String getMenuName() {
         return MenuKey.MENU_RESOLVER_TITLE.getString();

@@ -20,6 +20,8 @@ public final class RepairerMenu extends Menu {
     private final int bookInputSlot;
     private final int dustInputSlot;
     private final int outputSlot;
+    private ItemStack placedBookItem;
+    private ItemStack placedDustItem;
 
     public RepairerMenu(@NotNull MenuController menuController) {
         super(menuController);
@@ -30,76 +32,102 @@ public final class RepairerMenu extends Menu {
         SoundUtil.playOpenGuiSound(menuController.owner());
     }
 
-    // TODO: MOST CLONEOLJA HA BERAKSZ ITEMET INPUT SLOTBA DE HA SUCCESS NEM VONJA LE EZT FIXALNI KELL !!!!!!!!!!!
-
     @Override
     public void handleMenu(@NotNull InventoryClickEvent event) {
         if (!(event.getWhoClicked() instanceof Player player)) return;
-
-        int slot = event.getSlot();
 
         event.setCancelled(true);
 
         int rawSlot = event.getRawSlot();
         int topSize = inventory.getSize();
 
-        ItemStack item = event.getCurrentItem();
-        if (item == null || item.getType() == Material.AIR) return;
+        ItemStack clicked = event.getCurrentItem();
+        if (clicked == null || clicked.getType() == Material.AIR) return;
 
         if (rawSlot >= topSize) {
-            if (bookManager.isRevealedBook(item)) {
-                placeItem(item, bookInputSlot);
+            if (bookManager.isRevealedBook(clicked)) {
+                placeItem(clicked, bookInputSlot);
                 processRepair();
                 SoundUtil.playSuccessSound(player);
-                return;
-            }
-
-            if (bookManager.isDust(item)) {
-                placeItem(item, dustInputSlot);
+            } else if (bookManager.isDust(clicked)) {
+                placeItem(clicked, dustInputSlot);
                 processRepair();
                 SoundUtil.playSuccessSound(player);
-                return;
             }
-
-            return;
-        }
-
-        if (rawSlot == bookInputSlot || rawSlot == dustInputSlot) {
-            ItemStack returnItem = inventory.getItem(rawSlot);
-            if (returnItem == null || returnItem.getType() == Material.AIR || !bookManager.isDust(returnItem) || !bookManager.isRevealedBook(returnItem)) return;
-
-            inventory.setItem(rawSlot, null);
-            inventory.setItem(outputSlot, null);
-
-            player.getInventory().addItem(returnItem);
-            SoundUtil.playOpenGuiSound(player);
             return;
         }
 
         if (rawSlot == outputSlot) {
-            ItemStack result = inventory.getItem(outputSlot);
-            if (result == null || result.getType() == Material.AIR || !bookManager.isDust(result) && !bookManager.isRevealedBook(result)) return;
-
-            player.getInventory().addItem(result);
-
-            inventory.setItem(outputSlot, null);
-            inventory.setItem(bookInputSlot, null);
-            inventory.setItem(dustInputSlot, null);
-
-            SoundUtil.playSuccessSound(player);
+            handleOutputTake(player);
+            return;
         }
 
-        if (ItemKey.REPAIRER_BACK.matchesSlot(slot)) {
+        if (ItemKey.REPAIRER_BACK.matchesSlot(event.getSlot())) {
             handleItemClick(event, player);
             close();
             new MainMenu(MenuController.getMenuUtils(player)).open();
         }
     }
 
+    private void handleOutputTake(@NotNull Player player) {
+        ItemStack result = inventory.getItem(outputSlot);
+        if (result == null || result.getType() == Material.AIR) return;
+
+        if (placedBookItem == null || placedDustItem == null) {
+            SoundUtil.playErrorSound(player);
+            return;
+        }
+
+        if (!consumeItem(player, placedBookItem) || !consumeItem(player, placedDustItem)) {
+            SoundUtil.playErrorSound(player);
+            return;
+        }
+
+        player.getInventory().addItem(result);
+
+        inventory.setItem(outputSlot, null);
+        inventory.setItem(bookInputSlot, null);
+        inventory.setItem(dustInputSlot, null);
+
+        placedBookItem = null;
+        placedDustItem = null;
+
+        SoundUtil.playSuccessSound(player);
+
+        setMenuItems();
+    }
+
+    private boolean consumeItem(@NotNull Player player, @NotNull ItemStack snapshot) {
+        for (int i = 0; i < player.getInventory().getSize(); i++) {
+            ItemStack item = player.getInventory().getItem(i);
+            if (item == null || item.getType() == Material.AIR) continue;
+
+            if (!item.isSimilar(snapshot)) continue;
+
+            if (item.getAmount() > 1) {
+                item.setAmount(item.getAmount() - 1);
+            } else {
+                player.getInventory().setItem(i, null);
+            }
+
+            return true;
+        }
+        return false;
+    }
+
     private void placeItem(@NotNull ItemStack source, int slot) {
-        ItemStack one = source.clone();
-        one.setAmount(1);
-        inventory.setItem(slot, one);
+        ItemStack preview = source.clone();
+        preview.setAmount(1);
+        inventory.setItem(slot, preview);
+
+        ItemStack item = source.clone();
+        item.setAmount(1);
+
+        if (slot == bookInputSlot) {
+            this.placedBookItem = item;
+        } else if (slot == dustInputSlot) {
+            this.placedDustItem = item;
+        }
     }
 
     private void processRepair() {
