@@ -89,6 +89,17 @@ public final class ResolverMenu extends Menu {
             if (clicked == null || clicked.getType() == Material.AIR) return;
             if (!bookManager.isRevealedBook(clicked)) return;
 
+            ItemStack snapshot = clicked.clone();
+            snapshot.setAmount(1);
+
+            int available = countInInventory(player, snapshot);
+            int alreadyPlaced = countPlaced(snapshot);
+
+            if (alreadyPlaced >= available) {
+                SoundUtil.playErrorSound(player);
+                return;
+            }
+
             int targetSlot = findFirstFreePlaceableSlot();
             if (targetSlot == -1) return;
 
@@ -153,6 +164,31 @@ public final class ResolverMenu extends Menu {
         player.sendMessage(MessageKey.SUCCESS_RESOLVE.getMessage());
         SoundUtil.playSuccessSound(player);
         player.closeInventory();
+    }
+
+    private int countInInventory(@NotNull Player player, @NotNull ItemStack snapshot) {
+        int amount = 0;
+
+        for (ItemStack item : player.getInventory().getContents()) {
+            if (item == null || item.getType() == Material.AIR) continue;
+            if (!item.isSimilar(snapshot)) continue;
+
+            amount += item.getAmount();
+        }
+
+        return amount;
+    }
+
+    private int countPlaced(@NotNull ItemStack snapshot) {
+        int amount = 0;
+
+        for (ItemStack placed : placedBookSnapshots) {
+            if (placed.isSimilar(snapshot)) {
+                amount++;
+            }
+        }
+
+        return amount;
     }
 
     private boolean hasExactItem(@NotNull Player player, @NotNull ItemStack snapshot) {
