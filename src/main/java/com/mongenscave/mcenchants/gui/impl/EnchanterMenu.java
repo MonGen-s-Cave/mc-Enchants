@@ -71,13 +71,20 @@ public final class EnchanterMenu extends Menu {
             return;
         }
 
+        if (player.getInventory().firstEmpty() == -1) {
+            player.sendMessage(MessageKey.INVENTORY_FULL.getMessage());
+            SoundUtil.playErrorSound(player);
+            return;
+        }
+
+        ItemStack mysteriousBook = bookManager.createMysteriousBook(categoryId);
+
         int newTotalXP = playerXP - requiredXP;
         player.setExp(0);
         player.setLevel(0);
         player.setTotalExperience(0);
         player.giveExp(newTotalXP);
 
-        ItemStack mysteriousBook = bookManager.createMysteriousBook(categoryId);
         player.getInventory().addItem(mysteriousBook);
 
         player.sendMessage(MessageKey.SUCCESS_PURCHASE.getMessage());

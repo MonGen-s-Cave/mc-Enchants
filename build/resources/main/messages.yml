@@ -22,5 +22,6 @@ messages:
   givebook-sender: "%prefix% &aSuccessfully gave book!"
   giveenchant-sender: "%prefix% &aSuccessfully gave book!"
   max-enchants-reached: "%prefix% &cThis item has reached the maximum number of enchants!"
+  inventory-full: "%prefix% &cYour inventory is full! Make some space first!"
 
 version: '1'

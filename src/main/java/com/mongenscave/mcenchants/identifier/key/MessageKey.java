@@ -36,7 +36,8 @@ public enum MessageKey {
     SUCCESS_PURCHASE("messages.success-purchase"),
     GIVEBOOK_SENDER("messages.givebook-sender"),
     GIVEENCHANT_SENDER("messages.giveenchant-sender"),
-    MAX_ENCHANTS_REACHED("messages.max-enchants-reached");
+    MAX_ENCHANTS_REACHED("messages.max-enchants-reached"),
+    INVENTORY_FULL("messages.inventory-full");
 
     private final String path;
     private static final Config config = McEnchants.getInstance().getLanguage();

@@ -167,23 +167,43 @@ public final class ResolverMenu extends Menu {
     }
 
     private int countInInventory(@NotNull Player player, @NotNull ItemStack snapshot) {
+        EnchantedBook snapshotData = bookManager.getBookData(snapshot);
+        if (snapshotData == null) return 0;
+
         int amount = 0;
 
         for (ItemStack item : player.getInventory().getContents()) {
             if (item == null || item.getType() == Material.AIR) continue;
-            if (!item.isSimilar(snapshot)) continue;
+            if (!bookManager.isRevealedBook(item)) continue;
 
-            amount += item.getAmount();
+            EnchantedBook itemData = bookManager.getBookData(item);
+            if (itemData == null) continue;
+
+            if (itemData.getEnchantId().equals(snapshotData.getEnchantId()) &&
+                    itemData.getLevel() == snapshotData.getLevel() &&
+                    itemData.getSuccessRate() == snapshotData.getSuccessRate() &&
+                    itemData.getDestroyRate() == snapshotData.getDestroyRate()) {
+                amount += item.getAmount();
+            }
         }
 
         return amount;
     }
 
     private int countPlaced(@NotNull ItemStack snapshot) {
+        EnchantedBook snapshotData = bookManager.getBookData(snapshot);
+        if (snapshotData == null) return 0;
+
         int amount = 0;
 
         for (ItemStack placed : placedBookSnapshots) {
-            if (placed.isSimilar(snapshot)) {
+            EnchantedBook placedData = bookManager.getBookData(placed);
+            if (placedData == null) continue;
+
+            if (placedData.getEnchantId().equals(snapshotData.getEnchantId()) &&
+                    placedData.getLevel() == snapshotData.getLevel() &&
+                    placedData.getSuccessRate() == snapshotData.getSuccessRate() &&
+                    placedData.getDestroyRate() == snapshotData.getDestroyRate()) {
                 amount++;
             }
         }
@@ -192,9 +212,22 @@ public final class ResolverMenu extends Menu {
     }
 
     private boolean hasExactItem(@NotNull Player player, @NotNull ItemStack snapshot) {
+        EnchantedBook snapshotData = bookManager.getBookData(snapshot);
+        if (snapshotData == null) return false;
+
         for (ItemStack item : player.getInventory().getContents()) {
             if (item == null || item.getType() == Material.AIR) continue;
-            if (item.isSimilar(snapshot)) return true;
+            if (!bookManager.isRevealedBook(item)) continue;
+
+            EnchantedBook itemData = bookManager.getBookData(item);
+            if (itemData == null) continue;
+
+            if (itemData.getEnchantId().equals(snapshotData.getEnchantId()) &&
+                    itemData.getLevel() == snapshotData.getLevel() &&
+                    itemData.getSuccessRate() == snapshotData.getSuccessRate() &&
+                    itemData.getDestroyRate() == snapshotData.getDestroyRate()) {
+                return true;
+            }
         }
 
         return false;
@@ -230,18 +263,30 @@ public final class ResolverMenu extends Menu {
     }
 
     private boolean consumeExactItem(@NotNull Player player, @NotNull ItemStack snapshot) {
+        EnchantedBook snapshotData = bookManager.getBookData(snapshot);
+        if (snapshotData == null) return false;
+
         for (int i = 0; i < player.getInventory().getSize(); i++) {
             ItemStack item = player.getInventory().getItem(i);
             if (item == null || item.getType() == Material.AIR) continue;
-            if (!item.isSimilar(snapshot)) continue;
+            if (!bookManager.isRevealedBook(item)) continue;
 
-            if (item.getAmount() > 1) {
-                item.setAmount(item.getAmount() - 1);
-            } else {
-                player.getInventory().setItem(i, null);
+            EnchantedBook itemData = bookManager.getBookData(item);
+            if (itemData == null) continue;
+
+            if (itemData.getEnchantId().equals(snapshotData.getEnchantId()) &&
+                    itemData.getLevel() == snapshotData.getLevel() &&
+                    itemData.getSuccessRate() == snapshotData.getSuccessRate() &&
+                    itemData.getDestroyRate() == snapshotData.getDestroyRate()) {
+
+                if (item.getAmount() > 1) {
+                    item.setAmount(item.getAmount() - 1);
+                } else {
+                    player.getInventory().setItem(i, null);
+                }
+
+                return true;
             }
-
-            return true;
         }
 
         return false;
