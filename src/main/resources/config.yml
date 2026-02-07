@@ -9,8 +9,8 @@ blacklisted-worlds:
 
 enchant-remover-table:
   enabled: true
-  timeout-seconds: 25
-  block-material: "SMITHING_TABLE"
+  timeout-seconds: 10
+  block-material: "STONE"
   display-name: "&5&lEnchant Leszedő Asztal"
   lore:
     - "&7Helyezd le és kattints rá egy"

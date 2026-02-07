@@ -23,6 +23,9 @@ import org.bukkit.event.block.Action;
 import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.event.block.BlockPlaceEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
+import org.bukkit.event.player.PlayerItemHeldEvent;
+import org.bukkit.event.player.PlayerMoveEvent;
+import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
@@ -33,10 +36,8 @@ import org.jetbrains.annotations.NotNull;
 import org.joml.AxisAngle4f;
 import org.joml.Vector3f;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ThreadLocalRandom;
 
 public class EnchantRemoverListener implements Listener {
@@ -44,12 +45,26 @@ public class EnchantRemoverListener implements Listener {
     private final EnchantManager enchantManager;
     private final BookManager bookManager;
     private MyScheduledTask timeoutCheckTask;
+    private MyScheduledTask brushProgressTask;
+
+    private final Map<UUID, BrushProgress> activeBrushing = new ConcurrentHashMap<>();
+
+    private static class BrushProgress {
+        final Location tableLocation;
+        int ticksSinceLastRemoval;
+
+        BrushProgress(Location location) {
+            this.tableLocation = location;
+            this.ticksSinceLastRemoval = 0;
+        }
+    }
 
     public EnchantRemoverListener() {
         this.removerManager = McEnchants.getInstance().getManagerRegistry().getEnchantRemoverManager();
         this.enchantManager = McEnchants.getInstance().getManagerRegistry().getEnchantManager();
         this.bookManager = McEnchants.getInstance().getManagerRegistry().getBookManager();
         startTimeoutChecker();
+        startBrushProgressTracker();
     }
 
     private void startTimeoutChecker() {
@@ -65,8 +80,57 @@ public class EnchantRemoverListener implements Listener {
         }, 20L, 20L);
     }
 
+    private void startBrushProgressTracker() {
+        brushProgressTask = McEnchants.getInstance().getScheduler().runTaskTimer(() -> {
+            Iterator<Map.Entry<UUID, BrushProgress>> iterator = activeBrushing.entrySet().iterator();
+            while (iterator.hasNext()) {
+                Map.Entry<UUID, BrushProgress> entry = iterator.next();
+                UUID playerId = entry.getKey();
+                BrushProgress progress = entry.getValue();
+                Player player = McEnchants.getInstance().getServer().getPlayer(playerId);
+
+                if (player == null || !player.isOnline()) {
+                    iterator.remove();
+                    continue;
+                }
+
+                ItemStack hand = player.getInventory().getItemInMainHand();
+                if (hand.getType() != Material.BRUSH) {
+                    iterator.remove();
+                    continue;
+                }
+
+                EnchantRemoverTable table = removerManager.getTable(progress.tableLocation);
+                if (table == null || table.getPlacedItem() == null) {
+                    iterator.remove();
+                    continue;
+                }
+
+                if (player.getLocation().distance(progress.tableLocation) > 5.0) {
+                    iterator.remove();
+                    continue;
+                }
+
+                if (!player.isSneaking() && hand.getType() == Material.BRUSH) {
+                    progress.ticksSinceLastRemoval++;
+
+                    if (progress.ticksSinceLastRemoval % 3 == 0) {
+                        playBrushAnimation(progress.tableLocation, player);
+                    }
+
+                    if (progress.ticksSinceLastRemoval >= 12) {
+                        progress.ticksSinceLastRemoval = 0;
+                        removeOneEnchant(player, progress.tableLocation);
+                    }
+                }
+            }
+        }, 1L, 1L);
+    }
+
     public void shutdown() {
         if (timeoutCheckTask != null) timeoutCheckTask.cancel();
+        if (brushProgressTask != null) brushProgressTask.cancel();
+        activeBrushing.clear();
     }
 
     @EventHandler(priority = EventPriority.HIGH)
@@ -100,7 +164,6 @@ public class EnchantRemoverListener implements Listener {
 
     @EventHandler(priority = EventPriority.HIGH)
     public void onTableInteract(@NotNull PlayerInteractEvent event) {
-        if (event.getAction() != Action.RIGHT_CLICK_BLOCK) return;
         if (event.getHand() != EquipmentSlot.HAND) return;
         if (event.getClickedBlock() == null) return;
 
@@ -108,21 +171,35 @@ public class EnchantRemoverListener implements Listener {
 
         if (!removerManager.isTable(blockLoc)) return;
 
-        event.setCancelled(true);
-
         Player player = event.getPlayer();
         ItemStack handItem = player.getInventory().getItemInMainHand();
         EnchantRemoverTable table = removerManager.getTable(blockLoc);
 
         if (table == null) return;
 
-        if (handItem.getType().isAir() && table.getPlacedItem() != null) {
-            retrieveItem(player, table, blockLoc);
+        if (handItem.getType() == Material.BRUSH) {
+            if (table.getPlacedItem() == null) {
+                event.setCancelled(true);
+                return;
+            }
+
+            if (event.getAction() == Action.RIGHT_CLICK_BLOCK) {
+                event.setCancelled(false);
+
+                BrushProgress progress = activeBrushing.get(player.getUniqueId());
+                if (progress == null || !progress.tableLocation.equals(blockLoc)) {
+                    activeBrushing.put(player.getUniqueId(), new BrushProgress(blockLoc));
+                }
+            }
             return;
         }
 
-        if (handItem.getType() == Material.BRUSH) {
-            handleBrushSwipe(player, table, blockLoc);
+        if (event.getAction() != Action.RIGHT_CLICK_BLOCK) return;
+
+        event.setCancelled(true);
+
+        if (handItem.getType().isAir() && table.getPlacedItem() != null) {
+            retrieveItem(player, table, blockLoc);
             return;
         }
 
@@ -139,6 +216,11 @@ public class EnchantRemoverListener implements Listener {
         }
 
         placeItem(player, table, handItem, enchants, blockLoc);
+    }
+
+    @EventHandler
+    public void onItemHeldChange(@NotNull PlayerItemHeldEvent event) {
+        activeBrushing.remove(event.getPlayer().getUniqueId());
     }
 
     private void placeItem(@NotNull Player player, @NotNull EnchantRemoverTable table,
@@ -189,51 +271,51 @@ public class EnchantRemoverListener implements Listener {
         table.setItemDisplay(display);
     }
 
-    private void handleBrushSwipe(@NotNull Player player, @NotNull EnchantRemoverTable table, @NotNull Location blockLoc) {
-        if (table.getPlacedItem() == null) return;
+    private void removeOneEnchant(@NotNull Player player, @NotNull Location blockLoc) {
+        EnchantRemoverTable table = removerManager.getTable(blockLoc);
+        if (table == null) {
+            activeBrushing.remove(player.getUniqueId());
+            return;
+        }
+
+        if (table.getPlacedItem() == null) {
+            activeBrushing.remove(player.getUniqueId());
+            return;
+        }
 
         if (!table.hasEnchants()) {
             returnItemToWorld(table);
             player.sendMessage(MessageKey.REMOVER_ALL_REMOVED.getMessage());
+            activeBrushing.remove(player.getUniqueId());
             return;
         }
 
         String currentEnchant = table.getNextEnchant();
-        if (currentEnchant == null) return;
-
-        table.incrementSwipe(currentEnchant);
-
-        int requiredSwipes = ConfigKey.REMOVER_BRUSH_SWIPES.getInt();
-
-        playBrushAnimation(blockLoc, player);
-
-        if (table.getSwipeProgress(currentEnchant) >= requiredSwipes) {
-            removeEnchantFromTable(player, table, currentEnchant, blockLoc);
+        if (currentEnchant == null) {
+            activeBrushing.remove(player.getUniqueId());
+            return;
         }
-    }
 
-    private void removeEnchantFromTable(@NotNull Player player, @NotNull EnchantRemoverTable table,
-                                        @NotNull String enchantId, @NotNull Location blockLoc) {
-        int level = table.getRemainingEnchants().get(enchantId);
-        Enchant enchant = enchantManager.getEnchant(enchantId);
+        int level = table.getRemainingEnchants().get(currentEnchant);
+        Enchant enchant = enchantManager.getEnchant(currentEnchant);
 
         if (enchant == null) return;
 
-        int minSuccess = ConfigKey.REMOVER_SUCCESS_MIN.getInt();
-        int maxSuccess = ConfigKey.REMOVER_SUCCESS_MAX.getInt();
+        playBrushAnimation(blockLoc, player);
 
-        int newSuccessRate = ThreadLocalRandom.current().nextInt(minSuccess, maxSuccess + 1);
-        int newDestroyRate = 100 - newSuccessRate;
-
-        ItemStack book = bookManager.createRevealedBook(enchantId, level, newSuccessRate, newDestroyRate);
-        blockLoc.getWorld().dropItemNaturally(blockLoc.clone().add(0.5, 1.5, 0.5), book);
-
-        table.removeEnchant(enchantId);
-
-        removeEnchantFromItem(table.getPlacedItem(), enchantId);
+        table.removeEnchant(currentEnchant);
+        removeEnchantFromItem(table.getPlacedItem(), currentEnchant);
         removeEnchantLoreFromItem(table.getPlacedItem(), enchant, level);
 
         if (table.getItemDisplay() != null) table.getItemDisplay().setItemStack(table.getPlacedItem());
+
+        int minSuccess = ConfigKey.REMOVER_SUCCESS_MIN.getInt();
+        int maxSuccess = ConfigKey.REMOVER_SUCCESS_MAX.getInt();
+        int newSuccessRate = ThreadLocalRandom.current().nextInt(minSuccess, maxSuccess + 1);
+        int newDestroyRate = 100 - newSuccessRate;
+
+        ItemStack book = bookManager.createRevealedBook(currentEnchant, level, newSuccessRate, newDestroyRate);
+        blockLoc.getWorld().dropItemNaturally(blockLoc.clone().add(0.5, 1.5, 0.5), book);
 
         SoundUtil.playSuccessSound(player);
         blockLoc.getWorld().spawnParticle(Particle.ENCHANT, blockLoc.clone().add(0.5, 1.5, 0.5), 20);
@@ -241,6 +323,7 @@ public class EnchantRemoverListener implements Listener {
         if (!table.hasEnchants()) {
             returnItemToWorld(table);
             player.sendMessage(MessageKey.REMOVER_ALL_REMOVED.getMessage());
+            activeBrushing.remove(player.getUniqueId());
         }
     }
 
@@ -264,6 +347,7 @@ public class EnchantRemoverListener implements Listener {
         returnItemToWorld(table);
         player.sendMessage(MessageKey.REMOVER_ITEM_RETRIEVED.getMessage());
         SoundUtil.playSuccessSound(player);
+        activeBrushing.remove(player.getUniqueId());
     }
 
     private void returnItemToWorld(@NotNull EnchantRemoverTable table) {
@@ -333,11 +417,8 @@ public class EnchantRemoverListener implements Listener {
             }
         }
 
-        if (!newData.isEmpty()) {
-            pdc.set(key, PersistentDataType.STRING, newData.toString());
-        } else {
-            pdc.remove(key);
-        }
+        if (!newData.isEmpty()) pdc.set(key, PersistentDataType.STRING, newData.toString());
+        else pdc.remove(key);
 
         item.setItemMeta(meta);
     }
@@ -350,6 +431,8 @@ public class EnchantRemoverListener implements Listener {
         List<String> lore = new ArrayList<>(meta.getLore());
 
         if (!enchant.isItemLoreEnabled() || enchant.getItemLoreLines().isEmpty()) {
+            meta.setLore(lore);
+            item.setItemMeta(meta);
             return;
         }
 
@@ -385,5 +468,21 @@ public class EnchantRemoverListener implements Listener {
         }
 
         return String.valueOf(number);
+    }
+
+    @EventHandler
+    public void onPlayerQuit(@NotNull PlayerQuitEvent event) {
+        activeBrushing.remove(event.getPlayer().getUniqueId());
+    }
+
+    @EventHandler
+    public void onPlayerMove(@NotNull PlayerMoveEvent event) {
+        BrushProgress progress = activeBrushing.get(event.getPlayer().getUniqueId());
+
+        if (progress != null) {
+            if (event.getPlayer().getLocation().distance(progress.tableLocation) > 5.0) {
+                activeBrushing.remove(event.getPlayer().getUniqueId());
+            }
+        }
     }
 }
