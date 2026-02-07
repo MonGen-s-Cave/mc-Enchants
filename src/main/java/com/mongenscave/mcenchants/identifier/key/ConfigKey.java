@@ -19,7 +19,21 @@ public enum ConfigKey {
     ENCHANT_PER_ITEM("enchant-per-item"),
 
     IGNORED_MATERIALS("ignored-materials"),
-    BLACKLISTED_WORLDS("blacklisted-worlds");
+    BLACKLISTED_WORLDS("blacklisted-worlds"),
+
+    REMOVER_TABLE_ENABLED("enchant-remover-table.enabled"),
+    REMOVER_TABLE_MATERIAL("enchant-remover-table.block-material"),
+    REMOVER_TABLE_DISPLAY_NAME("enchant-remover-table.display-name"),
+    REMOVER_TABLE_LORE("enchant-remover-table.lore"),
+    REMOVER_TABLE_MODEL_DATA("enchant-remover-table.custom-model-data"),
+    REMOVER_TABLE_TIMEOUT("enchant-remover-table.timeout-seconds"),
+    REMOVER_TABLE_SCALE("enchant-remover-table.item-display.scale"),
+    REMOVER_TABLE_Y_OFFSET("enchant-remover-table.item-display.y-offset"),
+    REMOVER_BRUSH_SWIPES("enchant-remover-table.brush.required-swipes"),
+    REMOVER_BRUSH_PARTICLE("enchant-remover-table.brush.particle-effect"),
+    REMOVER_BRUSH_SOUND("enchant-remover-table.brush.sound-effect"),
+    REMOVER_SUCCESS_MIN("enchant-remover-table.new-success-rates.min"),
+    REMOVER_SUCCESS_MAX("enchant-remover-table.new-success-rates.max");
 
     private final String path;
     private static final Config config = McEnchants.getInstance().getConfiguration();
@@ -42,6 +56,14 @@ public enum ConfigKey {
 
     public int getInt() {
         return config.getInt(path);
+    }
+
+    public double getDouble() {
+        return config.getDouble(path);
+    }
+
+    public float getFloat() {
+        return config.getFloat(path);
     }
 
     public List<String> getList() {

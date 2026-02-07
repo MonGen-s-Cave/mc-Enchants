@@ -26,7 +26,6 @@ messages:
   remover-table-given: "%prefix% &aKaptál egy Enchant Leszedő Asztalt!"
   remover-item-placed: "%prefix% &aItem elhelyezve! Használj brush-t a söpréshez!"
   remover-item-retrieved: "%prefix% &aItem visszaadva!"
-  remover-enchant-removed: "%prefix% &aEnchant leszedve: &f{enchant} &8[{level}]"
   remover-all-removed: "%prefix% &aÖsszes enchant leszedve!"
   remover-wrong-item: "%prefix% &cEz a tárgy nem enchantolható!"
   remover-no-enchants: "%prefix% &cEnnek a tárgynak nincsenek egyedi enchantjai!"

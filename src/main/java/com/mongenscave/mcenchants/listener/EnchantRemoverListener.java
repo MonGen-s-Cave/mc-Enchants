@@ -1,6 +1,8 @@
 package com.mongenscave.mcenchants.listener;
 
+import com.github.Anon8281.universalScheduler.scheduling.tasks.MyScheduledTask;
 import com.mongenscave.mcenchants.McEnchants;
+import com.mongenscave.mcenchants.identifier.key.ConfigKey;
 import com.mongenscave.mcenchants.identifier.key.MessageKey;
 import com.mongenscave.mcenchants.item.ItemFactory;
 import com.mongenscave.mcenchants.manager.BookManager;
@@ -8,6 +10,7 @@ import com.mongenscave.mcenchants.manager.EnchantManager;
 import com.mongenscave.mcenchants.manager.EnchantRemoverManager;
 import com.mongenscave.mcenchants.model.Enchant;
 import com.mongenscave.mcenchants.model.EnchantRemoverTable;
+import com.mongenscave.mcenchants.processor.MessageProcessor;
 import com.mongenscave.mcenchants.util.SoundUtil;
 import org.bukkit.*;
 import org.bukkit.entity.Display;
@@ -30,7 +33,9 @@ import org.jetbrains.annotations.NotNull;
 import org.joml.AxisAngle4f;
 import org.joml.Vector3f;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ThreadLocalRandom;
 
@@ -38,11 +43,30 @@ public class EnchantRemoverListener implements Listener {
     private final EnchantRemoverManager removerManager;
     private final EnchantManager enchantManager;
     private final BookManager bookManager;
+    private MyScheduledTask timeoutCheckTask;
 
     public EnchantRemoverListener() {
         this.removerManager = McEnchants.getInstance().getManagerRegistry().getEnchantRemoverManager();
         this.enchantManager = McEnchants.getInstance().getManagerRegistry().getEnchantManager();
         this.bookManager = McEnchants.getInstance().getManagerRegistry().getBookManager();
+        startTimeoutChecker();
+    }
+
+    private void startTimeoutChecker() {
+        timeoutCheckTask = McEnchants.getInstance().getScheduler().runTaskTimer(() -> {
+            long timeoutSeconds = ConfigKey.REMOVER_TABLE_TIMEOUT.getInt();
+            long timeoutMillis = timeoutSeconds * 1000L;
+
+            removerManager.getAllTables().forEach((location, table) -> {
+                if (table.isExpired(timeoutMillis)) {
+                    returnItemToWorld(table);
+                }
+            });
+        }, 20L, 20L);
+    }
+
+    public void shutdown() {
+        if (timeoutCheckTask != null) timeoutCheckTask.cancel();
     }
 
     @EventHandler(priority = EventPriority.HIGH)
@@ -64,6 +88,7 @@ public class EnchantRemoverListener implements Listener {
         EnchantRemoverTable table = removerManager.getTable(blockLoc);
 
         if (table == null) return;
+
         if (table.getPlacedItem() != null) blockLoc.getWorld().dropItemNaturally(blockLoc, table.getPlacedItem());
         if (table.getItemDisplay() != null) table.getItemDisplay().remove();
 
@@ -138,18 +163,21 @@ public class EnchantRemoverListener implements Listener {
     private void createItemDisplay(@NotNull EnchantRemoverTable table,
                                    @NotNull ItemStack item,
                                    @NotNull Location blockLoc) {
-        Location displayLoc = blockLoc.clone().add(0.5, 1.2, 0.5);
+        float scale = ConfigKey.REMOVER_TABLE_SCALE.getFloat();
+        double yOffset = ConfigKey.REMOVER_TABLE_Y_OFFSET.getDouble();
+
+        Location displayLoc = blockLoc.clone().add(0.5, yOffset, 0.5);
 
         ItemDisplay display = blockLoc.getWorld().spawn(displayLoc, ItemDisplay.class, entity -> {
             entity.setItemStack(item);
-            entity.setDisplayWidth(0.8f);
-            entity.setDisplayHeight(0.8f);
+            entity.setDisplayWidth(scale);
+            entity.setDisplayHeight(scale);
             entity.setBillboard(Display.Billboard.FIXED);
 
             Transformation transformation = new Transformation(
                     new Vector3f(0, 0, 0),
                     new AxisAngle4f((float)Math.toRadians(90), 1, 0, 0),
-                    new Vector3f(0.8f, 0.8f, 0.8f),
+                    new Vector3f(scale, scale, scale),
                     new AxisAngle4f(0, 0, 1, 0)
             );
             entity.setTransformation(transformation);
@@ -165,6 +193,7 @@ public class EnchantRemoverListener implements Listener {
         if (table.getPlacedItem() == null) return;
 
         if (!table.hasEnchants()) {
+            returnItemToWorld(table);
             player.sendMessage(MessageKey.REMOVER_ALL_REMOVED.getMessage());
             return;
         }
@@ -174,12 +203,13 @@ public class EnchantRemoverListener implements Listener {
 
         table.incrementSwipe(currentEnchant);
 
-        int requiredSwipes = McEnchants.getInstance().getConfiguration()
-                .getInt("enchant-remover-table.brush.required-swipes", 5);
+        int requiredSwipes = ConfigKey.REMOVER_BRUSH_SWIPES.getInt();
 
         playBrushAnimation(blockLoc, player);
 
-        if (table.getSwipeProgress(currentEnchant) >= requiredSwipes) removeEnchantFromTable(player, table, currentEnchant, blockLoc);
+        if (table.getSwipeProgress(currentEnchant) >= requiredSwipes) {
+            removeEnchantFromTable(player, table, currentEnchant, blockLoc);
+        }
     }
 
     private void removeEnchantFromTable(@NotNull Player player, @NotNull EnchantRemoverTable table,
@@ -189,10 +219,8 @@ public class EnchantRemoverListener implements Listener {
 
         if (enchant == null) return;
 
-        int minSuccess = McEnchants.getInstance().getConfiguration()
-                .getInt("enchant-remover-table.new-success-rates.min", 40);
-        int maxSuccess = McEnchants.getInstance().getConfiguration()
-                .getInt("enchant-remover-table.new-success-rates.max", 75);
+        int minSuccess = ConfigKey.REMOVER_SUCCESS_MIN.getInt();
+        int maxSuccess = ConfigKey.REMOVER_SUCCESS_MAX.getInt();
 
         int newSuccessRate = ThreadLocalRandom.current().nextInt(minSuccess, maxSuccess + 1);
         int newDestroyRate = 100 - newSuccessRate;
@@ -203,27 +231,24 @@ public class EnchantRemoverListener implements Listener {
         table.removeEnchant(enchantId);
 
         removeEnchantFromItem(table.getPlacedItem(), enchantId);
+        removeEnchantLoreFromItem(table.getPlacedItem(), enchant, level);
 
         if (table.getItemDisplay() != null) table.getItemDisplay().setItemStack(table.getPlacedItem());
-
-        String levelRoman = String.valueOf(level);
-        player.sendMessage(MessageKey.REMOVER_ENCHANT_REMOVED.getMessage()
-                .replace("{enchant}", enchant.getName())
-                .replace("{level}", levelRoman));
 
         SoundUtil.playSuccessSound(player);
         blockLoc.getWorld().spawnParticle(Particle.ENCHANT, blockLoc.clone().add(0.5, 1.5, 0.5), 20);
 
-        if (!table.hasEnchants()) player.sendMessage(MessageKey.REMOVER_ALL_REMOVED.getMessage());
+        if (!table.hasEnchants()) {
+            returnItemToWorld(table);
+            player.sendMessage(MessageKey.REMOVER_ALL_REMOVED.getMessage());
+        }
     }
 
     private void playBrushAnimation(@NotNull Location location, @NotNull Player player) {
-        String sound = McEnchants.getInstance().getConfiguration()
-                .getString("enchant-remover-table.brush.sound-effect", "ITEM_BRUSH_BRUSHING_SAND");
+        String sound = ConfigKey.REMOVER_BRUSH_SOUND.getString();
         player.playSound(location, Sound.valueOf(sound), 1.0f, 1.0f);
 
-        String particleType = McEnchants.getInstance().getConfiguration()
-                .getString("enchant-remover-table.brush.particle-effect", "CRIT");
+        String particleType = ConfigKey.REMOVER_BRUSH_PARTICLE.getString();
 
         location.getWorld().spawnParticle(
                 Particle.valueOf(particleType),
@@ -236,8 +261,15 @@ public class EnchantRemoverListener implements Listener {
 
     private void retrieveItem(@NotNull Player player, @NotNull EnchantRemoverTable table,
                               @NotNull Location blockLoc) {
+        returnItemToWorld(table);
+        player.sendMessage(MessageKey.REMOVER_ITEM_RETRIEVED.getMessage());
+        SoundUtil.playSuccessSound(player);
+    }
+
+    private void returnItemToWorld(@NotNull EnchantRemoverTable table) {
         if (table.getPlacedItem() == null) return;
 
+        Location blockLoc = table.getLocation();
         blockLoc.getWorld().dropItemNaturally(blockLoc.clone().add(0.5, 1.2, 0.5), table.getPlacedItem());
 
         if (table.getItemDisplay() != null) {
@@ -248,9 +280,6 @@ public class EnchantRemoverListener implements Listener {
         table.setPlacedItem(null);
         table.getRemainingEnchants().clear();
         table.getSwipeProgress().clear();
-
-        player.sendMessage(MessageKey.REMOVER_ITEM_RETRIEVED.getMessage());
-        SoundUtil.playSuccessSound(player);
     }
 
     @NotNull
@@ -304,9 +333,57 @@ public class EnchantRemoverListener implements Listener {
             }
         }
 
-        if (!newData.isEmpty()) pdc.set(key, PersistentDataType.STRING, newData.toString());
-        else pdc.remove(key);
+        if (!newData.isEmpty()) {
+            pdc.set(key, PersistentDataType.STRING, newData.toString());
+        } else {
+            pdc.remove(key);
+        }
 
         item.setItemMeta(meta);
+    }
+
+    private void removeEnchantLoreFromItem(@NotNull ItemStack item, @NotNull Enchant enchant, int level) {
+        ItemMeta meta = item.getItemMeta();
+        if (meta == null) return;
+        if (!meta.hasLore()) return;
+
+        List<String> lore = new ArrayList<>(meta.getLore());
+
+        if (!enchant.isItemLoreEnabled() || enchant.getItemLoreLines().isEmpty()) {
+            return;
+        }
+
+        String romanLevel = getRomanNumeral(level);
+
+        List<String> linesToRemove = new ArrayList<>();
+        for (String line : enchant.getItemLoreLines()) {
+            String processedLine = MessageProcessor.process(line
+                    .replace("{categoryColor}", enchant.getCategory().getColor())
+                    .replace("{level}", romanLevel));
+            linesToRemove.add(processedLine);
+        }
+
+        lore.removeAll(linesToRemove);
+
+        meta.setLore(lore);
+        item.setItemMeta(meta);
+    }
+
+    @NotNull
+    private String getRomanNumeral(int number) {
+        List<String> levels = McEnchants.getInstance().getLevels().getList("levels");
+
+        for (String level : levels) {
+            String[] parts = level.split(":");
+            if (parts.length == 2) {
+                try {
+                    if (Integer.parseInt(parts[0]) == number) {
+                        return parts[1];
+                    }
+                } catch (NumberFormatException ignored) {}
+            }
+        }
+
+        return String.valueOf(number);
     }
 }

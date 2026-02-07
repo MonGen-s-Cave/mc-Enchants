@@ -5,6 +5,7 @@ import com.mongenscave.mcenchants.config.Config;
 import com.mongenscave.mcenchants.data.ItemData;
 import com.mongenscave.mcenchants.data.SoundData;
 import com.mongenscave.mcenchants.gui.Menu;
+import com.mongenscave.mcenchants.identifier.key.ConfigKey;
 import com.mongenscave.mcenchants.processor.MessageProcessor;
 import com.mongenscave.mcenchants.util.LoggerUtil;
 import com.nexomc.nexo.api.NexoItems;
@@ -133,14 +134,12 @@ public interface ItemFactory {
     }
 
     static @NonNull ItemStack createEnchantRemoverTable() {
-        Config config = McEnchants.getInstance().getConfiguration();
-
-        String materialName = config.getString("enchant-remover-table.block-material", "SMITHING_TABLE");
-        Material material = Material.valueOf(materialName.toUpperCase());
-
-        String name = config.getString("enchant-remover-table.display-name", "&5Enchant Leszedő Asztal");
-        List<String> lore = config.getStringList("enchant-remover-table.lore");
-        int modelData = config.getInt("enchant-remover-table.custom-model-data", 1000);
+        Material material = Material.valueOf(ConfigKey.REMOVER_TABLE_MATERIAL.getString().toUpperCase());
+        String name = ConfigKey.REMOVER_TABLE_DISPLAY_NAME.getString();
+        List<String> lore = ConfigKey.REMOVER_TABLE_LORE.getList().stream()
+                .map(MessageProcessor::process)
+                .toList();
+        int modelData = ConfigKey.REMOVER_TABLE_MODEL_DATA.getInt();
 
         ItemStack item = ItemFactory.create(material, 1)
                 .setName(name)
@@ -148,7 +147,9 @@ public interface ItemFactory {
                 .finish();
 
         item.editMeta(meta -> {
-            meta.setCustomModelData(modelData);
+            if (modelData > 0) {
+                meta.setCustomModelData(modelData);
+            }
 
             NamespacedKey key = new NamespacedKey(McEnchants.getInstance(), "enchant_remover_table");
             meta.getPersistentDataContainer().set(key, PersistentDataType.BYTE, (byte) 1);

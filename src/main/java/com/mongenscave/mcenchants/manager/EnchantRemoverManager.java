@@ -5,6 +5,7 @@ import org.bukkit.Location;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.Collections;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -17,9 +18,7 @@ public class EnchantRemoverManager {
 
     public void unregisterTable(@NotNull Location location) {
         EnchantRemoverTable table = tables.remove(location);
-        if (table != null && table.getItemDisplay() != null) {
-            table.getItemDisplay().remove();
-        }
+        if (table != null && table.getItemDisplay() != null) table.getItemDisplay().remove();
     }
 
     @Nullable
@@ -31,11 +30,14 @@ public class EnchantRemoverManager {
         return tables.containsKey(location);
     }
 
+    @NotNull
+    public Map<Location, EnchantRemoverTable> getAllTables() {
+        return Collections.unmodifiableMap(tables);
+    }
+
     public void clearAll() {
         tables.values().forEach(table -> {
-            if (table.getItemDisplay() != null) {
-                table.getItemDisplay().remove();
-            }
+            if (table.getItemDisplay() != null) table.getItemDisplay().remove();
         });
         tables.clear();
     }

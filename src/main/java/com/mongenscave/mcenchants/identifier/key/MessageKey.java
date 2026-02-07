@@ -43,7 +43,6 @@ public enum MessageKey {
     REMOVER_TABLE_GIVEN("messages.remover-table-given"),
     REMOVER_ITEM_PLACED("messages.remover-item-placed"),
     REMOVER_ITEM_RETRIEVED("messages.remover-item-retrieved"),
-    REMOVER_ENCHANT_REMOVED("messages.remover-enchant-removed"),
     REMOVER_ALL_REMOVED("messages.remover-all-removed"),
     REMOVER_WRONG_ITEM("messages.remover-wrong-item"),
     REMOVER_NO_ENCHANTS("messages.remover-no-enchants");
