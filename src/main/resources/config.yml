@@ -7,6 +7,29 @@ blacklisted-worlds:
   - "world_spawn"
   - "lobby"
 
+enchant-remover-table:
+  enabled: true
+  block-material: "SMITHING_TABLE"
+  display-name: "&5&lEnchant Leszedő Asztal"
+  lore:
+    - "&7Helyezd le és kattints rá egy"
+    - "&7enchantolt tárggyal hogy leszedjed"
+    - "&7az enchantokat!"
+
+  item-display:
+    scale: 0.8
+    y-offset: 1.0
+    rotation-speed: 1.0
+
+  brush:
+    required-swipes: 5  # Hány brush kell egy enchant leszedéséhez
+    particle-effect: "CRIT"
+    sound-effect: "ITEM_BRUSH_BRUSHING_SAND"
+
+  new-success-rates:
+    min: 40
+    max: 75
+
 sounds:
   error: "minelush.gui.weapon_ui_sound"
   success: "minelush.gui.upgrade"

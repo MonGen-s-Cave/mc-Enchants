@@ -6,10 +6,7 @@ import com.mongenscave.mcenchants.annotation.Enchant;
 import com.mongenscave.mcenchants.command.CommandEnchant;
 import com.mongenscave.mcenchants.handler.CommandExceptionHandler;
 import com.mongenscave.mcenchants.identifier.key.ConfigKey;
-import com.mongenscave.mcenchants.listener.BookRevealListener;
-import com.mongenscave.mcenchants.listener.EnchantApplyListener;
-import com.mongenscave.mcenchants.listener.EnchantTriggerListener;
-import com.mongenscave.mcenchants.listener.MenuListener;
+import com.mongenscave.mcenchants.listener.*;
 import com.mongenscave.mcenchants.suggestion.CategorySuggestionProvider;
 import com.mongenscave.mcenchants.suggestion.EnchantSuggestionProvider;
 import lombok.experimental.UtilityClass;
@@ -47,10 +44,13 @@ public class RegisterUtil {
         pm.registerEvents(new MenuListener(), plugin);
         pm.registerEvents(new EnchantApplyListener(), plugin);
         pm.registerEvents(new BookRevealListener(), plugin);
+        pm.registerEvents(new EnchantRemoverListener(), plugin);
 
         enchantTriggerListener = new EnchantTriggerListener();
         pm.registerEvents(enchantTriggerListener, plugin);
     }
+
+
 
     public void unregisterListeners() {
         if (enchantTriggerListener != null) enchantTriggerListener.shutdown();
