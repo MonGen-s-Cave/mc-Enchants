@@ -7,23 +7,17 @@ blacklisted-worlds:
   - "world_spawn"
   - "lobby"
 
-enchant-remover-table:
+enchant-remover:
   enabled: true
+  interaction-block: "nexo:unenchanter_block"
   timeout-seconds: 10
-  block-material: "STONE"
-  display-name: "&5&lEnchant Leszedő Asztal"
-  lore:
-    - "&7Helyezd le és kattints rá egy"
-    - "&7enchantolt tárggyal hogy leszedjed"
-    - "&7az enchantokat!"
 
   item-display:
     scale: 0.8
-    y-offset: 1.0
-    rotation-speed: 1.0
+    y-offset: 1.1
 
   brush:
-    required-swipes: 5  # Hány brush kell egy enchant leszedéséhez
+    required-swipes: 5
     particle-effect: "CRIT"
     sound-effect: "ITEM_BRUSH_BRUSHING_SAND"
 

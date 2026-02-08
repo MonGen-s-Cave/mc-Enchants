@@ -133,39 +133,6 @@ public interface ItemFactory {
         return Optional.of(baseItem);
     }
 
-    static @NonNull ItemStack createEnchantRemoverTable() {
-        Material material = Material.valueOf(ConfigKey.REMOVER_TABLE_MATERIAL.getString().toUpperCase());
-        String name = ConfigKey.REMOVER_TABLE_DISPLAY_NAME.getString();
-        List<String> lore = ConfigKey.REMOVER_TABLE_LORE.getList().stream()
-                .map(MessageProcessor::process)
-                .toList();
-        int modelData = ConfigKey.REMOVER_TABLE_MODEL_DATA.getInt();
-
-        ItemStack item = ItemFactory.create(material, 1)
-                .setName(name)
-                .setLore(lore)
-                .finish();
-
-        item.editMeta(meta -> {
-            if (modelData > 0) {
-                meta.setCustomModelData(modelData);
-            }
-
-            NamespacedKey key = new NamespacedKey(McEnchants.getInstance(), "enchant_remover_table");
-            meta.getPersistentDataContainer().set(key, PersistentDataType.BYTE, (byte) 1);
-        });
-
-        return item;
-    }
-
-    static boolean isEnchantRemoverTable(@NotNull ItemStack item) {
-        ItemMeta meta = item.getItemMeta();
-        if (meta == null) return false;
-
-        NamespacedKey key = new NamespacedKey(McEnchants.getInstance(), "enchant_remover_table");
-        return meta.getPersistentDataContainer().has(key, PersistentDataType.BYTE);
-    }
-
     static Optional<ItemStack> buildItem(@NotNull Section section) {
         try {
             String materialName = section.getString("material");

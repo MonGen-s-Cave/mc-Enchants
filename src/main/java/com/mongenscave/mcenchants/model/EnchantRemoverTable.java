@@ -13,11 +13,10 @@ import java.util.*;
 @Getter
 @Setter
 public class EnchantRemoverTable {
-    private final @NotNull Location location;
+    private @NotNull Location location;
     private @Nullable ItemStack placedItem;
     private @Nullable ItemDisplay itemDisplay;
     private final Map<String, Integer> remainingEnchants = new HashMap<>();
-    private final Map<String, Integer> swipeProgress = new HashMap<>();
     private long placedTimestamp = 0;
 
     public EnchantRemoverTable(@NotNull Location location) {
@@ -26,24 +25,14 @@ public class EnchantRemoverTable {
 
     public void addEnchant(@NotNull String enchantId, int level) {
         remainingEnchants.put(enchantId, level);
-        swipeProgress.put(enchantId, 0);
     }
 
     public boolean hasEnchants() {
         return !remainingEnchants.isEmpty();
     }
 
-    public void incrementSwipe(@NotNull String enchantId) {
-        swipeProgress.put(enchantId, swipeProgress.getOrDefault(enchantId, 0) + 1);
-    }
-
-    public int getSwipeProgress(@NotNull String enchantId) {
-        return swipeProgress.getOrDefault(enchantId, 0);
-    }
-
     public void removeEnchant(@NotNull String enchantId) {
         remainingEnchants.remove(enchantId);
-        swipeProgress.remove(enchantId);
     }
 
     @Nullable

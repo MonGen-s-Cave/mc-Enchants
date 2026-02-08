@@ -6,11 +6,8 @@ import com.mongenscave.mcenchants.annotation.Enchant;
 import com.mongenscave.mcenchants.data.MenuController;
 import com.mongenscave.mcenchants.gui.impl.MainMenu;
 import com.mongenscave.mcenchants.identifier.key.MessageKey;
-import com.mongenscave.mcenchants.item.ItemFactory;
-import com.mongenscave.mcenchants.listener.EnchantTriggerListener;
 import com.mongenscave.mcenchants.manager.BookManager;
 import com.mongenscave.mcenchants.manager.EnchantManager;
-import com.mongenscave.mcenchants.processor.MessageProcessor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
@@ -49,16 +46,6 @@ public class CommandEnchant implements OrphanCommand {
         plugin.getManagerRegistry().reload();
 
         sender.sendMessage(MessageKey.RELOAD.getMessage());
-    }
-
-    @Subcommand("givetable")
-    @CommandPermission("mcenchants.admin.givetable")
-    public void giveTable(@NotNull CommandSender sender, @NotNull Player target, @Default("1") @Range(from = 1, to = 64) int amount) {
-        ItemStack table = ItemFactory.createEnchantRemoverTable();
-        table.setAmount(amount);
-
-        target.getInventory().addItem(table);
-        sender.sendMessage(MessageKey.REMOVER_TABLE_GIVEN.getMessage());
     }
 
     @Subcommand("givebook")
