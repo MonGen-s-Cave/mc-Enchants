@@ -4,12 +4,14 @@ import com.mongenscave.mcenchants.data.ActionData;
 import com.mongenscave.mcenchants.executor.action.EnchantAction;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
+import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.Map;
+import java.util.concurrent.ThreadLocalRandom;
 
 public class SmeltAction extends EnchantAction {
     @Override
@@ -22,7 +24,14 @@ public class SmeltAction extends EnchantAction {
         Material smelted = getSmeltedMaterial(block.getType());
         if (smelted != null) {
             block.setType(Material.AIR);
-            block.getWorld().dropItemNaturally(block.getLocation(), new ItemStack(smelted));
+
+            ItemStack tool = player.getInventory().getItemInMainHand();
+            int fortuneLevel = tool.getEnchantmentLevel(Enchantment.FORTUNE);
+
+            int amount = calculateAmount(fortuneLevel);
+
+            ItemStack smeltedItem = new ItemStack(smelted, amount);
+            block.getWorld().dropItemNaturally(block.getLocation(), smeltedItem);
         }
     }
 
@@ -34,6 +43,15 @@ public class SmeltAction extends EnchantAction {
     @Override
     public boolean canExecute(@NotNull Map<String, Object> context) {
         return context.containsKey("block");
+    }
+
+    private int calculateAmount(int fortuneLevel) {
+        if (fortuneLevel <= 0) {
+            return 1;
+        }
+
+        int maxBonus = fortuneLevel + 1;
+        return ThreadLocalRandom.current().nextInt(1, maxBonus + 1);
     }
 
     @Nullable

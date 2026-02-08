@@ -38,6 +38,7 @@ public enum MessageKey {
     GIVEENCHANT_SENDER("messages.giveenchant-sender"),
     MAX_ENCHANTS_REACHED("messages.max-enchants-reached"),
     INVENTORY_FULL("messages.inventory-full"),
+    CATEGORY_MISMATCH("messages.category-mismatch"),
 
     // REMOVER
     REMOVER_TABLE_GIVEN("messages.remover-table-given"),

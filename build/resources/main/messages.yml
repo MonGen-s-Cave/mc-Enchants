@@ -29,5 +29,6 @@ messages:
   remover-all-removed: "%prefix% &aÖsszes enchant leszedve!"
   remover-wrong-item: "%prefix% &cEz a tárgy nem enchantolható!"
   remover-no-enchants: "%prefix% &cEnnek a tárgynak nincsenek egyedi enchantjai!"
+  category-mismatch: "%prefix% &cA por és a könyv kategóriája nem egyezik!"
 
 version: '1'

@@ -5,8 +5,12 @@ import com.mongenscave.mcenchants.data.MenuController;
 import com.mongenscave.mcenchants.gui.Menu;
 import com.mongenscave.mcenchants.identifier.key.ItemKey;
 import com.mongenscave.mcenchants.identifier.key.MenuKey;
+import com.mongenscave.mcenchants.identifier.key.MessageKey;
 import com.mongenscave.mcenchants.item.ItemFactory;
 import com.mongenscave.mcenchants.manager.BookManager;
+import com.mongenscave.mcenchants.manager.CategoryManager;
+import com.mongenscave.mcenchants.manager.EnchantManager;
+import com.mongenscave.mcenchants.model.Enchant;
 import com.mongenscave.mcenchants.model.EnchantedBook;
 import com.mongenscave.mcenchants.util.SoundUtil;
 import org.bukkit.Material;
@@ -17,6 +21,7 @@ import org.jetbrains.annotations.NotNull;
 
 public final class RepairerMenu extends Menu {
     private final BookManager bookManager;
+    private final EnchantManager enchantManager;
     private final int bookInputSlot;
     private final int dustInputSlot;
     private final int outputSlot;
@@ -26,6 +31,7 @@ public final class RepairerMenu extends Menu {
     public RepairerMenu(@NotNull MenuController menuController) {
         super(menuController);
         this.bookManager = McEnchants.getInstance().getManagerRegistry().getBookManager();
+        this.enchantManager = McEnchants.getInstance().getManagerRegistry().getEnchantManager();
         this.bookInputSlot = MenuKey.MENU_REPAIRER_BOOK_INPUT.getInt();
         this.dustInputSlot = MenuKey.MENU_REPAIRER_DUST_INPUT.getInt();
         this.outputSlot = MenuKey.MENU_REPAIRER_OUTPUT.getInt();
@@ -40,6 +46,7 @@ public final class RepairerMenu extends Menu {
 
         int rawSlot = event.getRawSlot();
         int topSize = inventory.getSize();
+        int slot = event.getSlot();
 
         ItemStack clicked = event.getCurrentItem();
         if (clicked == null || clicked.getType() == Material.AIR) return;
@@ -47,11 +54,11 @@ public final class RepairerMenu extends Menu {
         if (rawSlot >= topSize) {
             if (bookManager.isRevealedBook(clicked)) {
                 placeItem(clicked, bookInputSlot);
-                processRepair();
+                processRepair(player);
                 SoundUtil.playSuccessSound(player);
             } else if (bookManager.isDust(clicked)) {
                 placeItem(clicked, dustInputSlot);
-                processRepair();
+                processRepair(player);
                 SoundUtil.playSuccessSound(player);
             }
             return;
@@ -104,11 +111,8 @@ public final class RepairerMenu extends Menu {
 
             if (!item.isSimilar(snapshot)) continue;
 
-            if (item.getAmount() > 1) {
-                item.setAmount(item.getAmount() - 1);
-            } else {
-                player.getInventory().setItem(i, null);
-            }
+            if (item.getAmount() > 1) item.setAmount(item.getAmount() - 1);
+            else player.getInventory().setItem(i, null);
 
             return true;
         }
@@ -123,14 +127,11 @@ public final class RepairerMenu extends Menu {
         ItemStack item = source.clone();
         item.setAmount(1);
 
-        if (slot == bookInputSlot) {
-            this.placedBookItem = item;
-        } else if (slot == dustInputSlot) {
-            this.placedDustItem = item;
-        }
+        if (slot == bookInputSlot) this.placedBookItem = item;
+        else if (slot == dustInputSlot) this.placedDustItem = item;
     }
 
-    private void processRepair() {
+    private void processRepair(@NotNull Player player) {
         ItemStack bookItem = inventory.getItem(bookInputSlot);
         ItemStack dustItem = inventory.getItem(dustInputSlot);
 
@@ -145,6 +146,18 @@ public final class RepairerMenu extends Menu {
 
         EnchantedBook bookData = bookManager.getBookData(bookItem);
         if (bookData == null) return;
+
+        Enchant enchant = enchantManager.getEnchant(bookData.getEnchantId());
+        if (enchant == null) return;
+
+        String bookCategory = enchant.getCategory().getId();
+        String dustCategory = bookManager.getDustCategory(dustItem);
+
+        if (!bookCategory.equals(dustCategory)) {
+            player.sendMessage(MessageKey.CATEGORY_MISMATCH.getMessage());
+            SoundUtil.playErrorSound(player);
+            return;
+        }
 
         bookData.repair(repairAmount);
 
