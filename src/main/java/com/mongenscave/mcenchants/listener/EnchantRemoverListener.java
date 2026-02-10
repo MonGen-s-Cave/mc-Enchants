@@ -39,6 +39,7 @@ import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ThreadLocalRandom;
 
+@SuppressWarnings("deprecation")
 public class EnchantRemoverListener implements Listener {
     private final EnchantManager enchantManager;
     private final BookManager bookManager;
@@ -459,31 +460,30 @@ public class EnchantRemoverListener implements Listener {
 
     private void removeEnchantLoreFromItem(@NotNull ItemStack item, @NotNull Enchant enchant, int level) {
         ItemMeta meta = item.getItemMeta();
-        if (meta == null) return;
-        if (!meta.hasLore()) return;
+        if (meta == null || !meta.hasLore()) return;
 
         List<String> lore = new ArrayList<>(meta.getLore());
 
-        if (!enchant.isItemLoreEnabled() || enchant.getItemLoreLines().isEmpty()) {
-            meta.setLore(lore);
-            item.setItemMeta(meta);
-            return;
-        }
+        if (!enchant.isItemLoreEnabled() || enchant.getItemLoreLines().isEmpty()) return;
 
         String romanLevel = getRomanNumeral(level);
 
-        List<String> linesToRemove = new ArrayList<>();
-        for (String line : enchant.getItemLoreLines()) {
-            String processedLine = MessageProcessor.process(line
-                    .replace("{categoryColor}", enchant.getCategory().getColor())
-                    .replace("{level}", romanLevel));
-            linesToRemove.add(processedLine);
-        }
+        List<String> processedPatterns = enchant.getItemLoreLines().stream()
+                .map(line -> MessageProcessor.process(line
+                        .replace("{categoryColor}", enchant.getCategory().getColor())
+                        .replace("{level}", romanLevel)))
+                .map(this::normalize)
+                .toList();
 
-        lore.removeAll(linesToRemove);
+        lore.removeIf(existing -> processedPatterns.stream().anyMatch(pattern -> normalize(existing).equals(pattern)));
 
         meta.setLore(lore);
         item.setItemMeta(meta);
+    }
+
+    @NotNull
+    private String normalize(String line) {
+        return ChatColor.stripColor(line).trim();
     }
 
     @NotNull
