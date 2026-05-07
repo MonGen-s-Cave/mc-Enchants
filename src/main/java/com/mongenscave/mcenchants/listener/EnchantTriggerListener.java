@@ -14,6 +14,8 @@ import com.mongenscave.mcenchants.model.EnchantLevel;
 import com.mongenscave.mcenchants.util.LoggerUtil;
 import org.bukkit.Location;
 import org.bukkit.NamespacedKey;
+import org.bukkit.damage.DamageSource;
+import org.bukkit.damage.DamageType;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.Projectile;
@@ -328,6 +330,15 @@ public final class EnchantTriggerListener implements Listener {
         if (!(event.getHitEntity() instanceof LivingEntity target)) return;
 
         Projectile projectile = event.getEntity();
+
+        if (target instanceof Player victim) {
+            EntityDamageByEntityEvent damageEvent = new EntityDamageByEntityEvent(projectile, victim,
+                    EntityDamageEvent.DamageCause.PROJECTILE, DamageSource.builder(DamageType.ARROW).build(), 0);
+
+            McEnchants.getInstance().getServer().getPluginManager().callEvent(damageEvent);
+
+            if (damageEvent.isCancelled()) return;
+        }
 
         PersistentDataContainer pdc = projectile.getPersistentDataContainer();
         NamespacedKey key = new NamespacedKey(McEnchants.getInstance(), "shooter");
