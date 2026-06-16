@@ -1,15 +1,16 @@
 package com.mongenscave.mcenchants.executor.action.impl;
 
-import com.mongenscave.mcenchants.McEnchants;
 import com.mongenscave.mcenchants.data.ActionData;
 import com.mongenscave.mcenchants.executor.action.EnchantAction;
 import com.mongenscave.mcenchants.identifier.key.ConfigKey;
+import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.block.Container;
 import org.bukkit.block.Sign;
 import org.bukkit.entity.Player;
+import org.bukkit.event.block.BlockBreakEvent;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.HashSet;
@@ -19,6 +20,7 @@ import java.util.Set;
 
 public class BreakBlockAction extends EnchantAction {
     private static final Set<Material> IGNORED_MATERIALS = new HashSet<>();
+    private static boolean respectProtection = true;
 
     static {
         loadIgnoredMaterials();
@@ -35,6 +37,8 @@ public class BreakBlockAction extends EnchantAction {
                 IGNORED_MATERIALS.add(material);
             } catch (IllegalArgumentException ignored) {}
         }
+
+        respectProtection = ConfigKey.RESPECT_PROTECTION.getBoolean();
     }
 
     @Override
@@ -53,6 +57,9 @@ public class BreakBlockAction extends EnchantAction {
                     Block block = center.clone().add(x, y, z).getBlock();
 
                     if (shouldIgnoreBlock(block)) continue;
+                    if (block.equals(centerBlock)) continue;
+                    if (!canBreak(player, block)) continue;
+
                     block.breakNaturally(player.getInventory().getItemInMainHand());
                 }
             }
@@ -75,6 +82,16 @@ public class BreakBlockAction extends EnchantAction {
         if (block.isLiquid()) return true;
 
         return block.getState() instanceof Container || block.getState() instanceof Sign;
+    }
+
+    private boolean canBreak(@NotNull Player player, @NotNull Block block) {
+        if (!respectProtection) return true;
+
+        BlockBreakEvent event = new BlockBreakEvent(block, player);
+        event.setDropItems(false);
+        Bukkit.getPluginManager().callEvent(event);
+
+        return !event.isCancelled();
     }
 
     public static void reloadIgnoredMaterials() {

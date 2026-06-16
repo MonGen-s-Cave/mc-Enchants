@@ -32,6 +32,8 @@ sounds:
 
 enchant-per-item: 5
 
+respect-protection: true
+
 ignored-materials:
   - "BEDROCK"
   - "BARRIER"

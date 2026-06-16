@@ -20,6 +20,7 @@ public enum ConfigKey {
 
     IGNORED_MATERIALS("ignored-materials"),
     BLACKLISTED_WORLDS("blacklisted-worlds"),
+    RESPECT_PROTECTION("respect-protection"),
 
     REMOVER_ENABLED("enchant-remover.enabled"),
     REMOVER_INTERACTION_BLOCK("enchant-remover.interaction-block"),
