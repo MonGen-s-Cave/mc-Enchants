@@ -5,6 +5,7 @@ import com.mongenscave.mcenchants.McEnchants;
 import com.mongenscave.mcenchants.data.ActionData;
 import com.mongenscave.mcenchants.executor.EnchantActionExecutor;
 import com.mongenscave.mcenchants.executor.action.EnchantAction;
+import com.mongenscave.mcenchants.executor.action.impl.BreakBlockAction;
 import com.mongenscave.mcenchants.executor.condition.ConditionEvaluator;
 import com.mongenscave.mcenchants.identifier.EnchantType;
 import com.mongenscave.mcenchants.identifier.key.ConfigKey;
@@ -235,6 +236,7 @@ public final class EnchantTriggerListener implements Listener {
 
     @EventHandler(priority = EventPriority.NORMAL, ignoreCancelled = true)
     public void onBlockBreak(@NotNull BlockBreakEvent event) {
+        if (BreakBlockAction.isProtectionCheck()) return;
         if (isWorldBlacklisted(event.getPlayer())) return;
 
         Player player = event.getPlayer();

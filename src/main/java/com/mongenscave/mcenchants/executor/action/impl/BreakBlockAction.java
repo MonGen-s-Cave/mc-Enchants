@@ -22,6 +22,12 @@ public class BreakBlockAction extends EnchantAction {
     private static final Set<Material> IGNORED_MATERIALS = new HashSet<>();
     private static boolean respectProtection = true;
 
+    private static final ThreadLocal<Boolean> PROTECTION_CHECK = ThreadLocal.withInitial(() -> false);
+
+    public static boolean isProtectionCheck() {
+        return PROTECTION_CHECK.get();
+    }
+
     static {
         loadIgnoredMaterials();
     }
@@ -89,7 +95,13 @@ public class BreakBlockAction extends EnchantAction {
 
         BlockBreakEvent event = new BlockBreakEvent(block, player);
         event.setDropItems(false);
-        Bukkit.getPluginManager().callEvent(event);
+
+        PROTECTION_CHECK.set(true);
+        try {
+            Bukkit.getPluginManager().callEvent(event);
+        } finally {
+            PROTECTION_CHECK.set(false);
+        }
 
         return !event.isCancelled();
     }
